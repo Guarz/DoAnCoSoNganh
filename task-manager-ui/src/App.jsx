@@ -7,6 +7,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [newProduct, setNewProduct] = useState({ product_name: '', category_id: '', description: '' });
 
+  // State phục vụ chức năng Chi tiết đơn hàng
+  const [viewingOrder, setViewingOrder] = useState(null);
+  const [orderItems, setOrderItems] = useState([]);
+
   // 1. Tải toàn bộ dữ liệu từ API Laravel
   const fetchAllData = async () => {
     setLoading(true);
@@ -48,6 +52,26 @@ function App() {
     }
   };
 
+  // 4. Hàm cập nhật trạng thái đơn hàng
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await axios.post('http://127.0.0.1:8000/api/update-order-status', {
+        order_id: orderId,
+        status: newStatus
+      });
+      fetchAllData(); // Tải lại để cập nhật giao diện
+    } catch (err) { alert("Lỗi cập nhật trạng thái!"); }
+  };
+
+  // 5. Hàm lấy chi tiết đơn hàng
+  const showDetail = async (orderId) => {
+    try {
+      const res = await axios.get(`http://127.0.0.1:8000/api/get-order-details/${orderId}`);
+      setOrderItems(res.data);
+      setViewingOrder(orderId);
+    } catch (err) { alert("Không thể lấy chi tiết đơn hàng!"); }
+  };
+
   const renderContent = () => {
     if (loading) return <div style={{ textAlign: 'center', padding: '50px' }}><h3>🔄 Đang tải dữ liệu...</h3></div>;
 
@@ -76,24 +100,88 @@ function App() {
               </select>
               <button type="submit" style={btnSaveStyle}>LƯU LẠI</button>
             </form>
-            {renderTable(["ID", "Tên SP", "Danh mục", "Thao tác"], data.products, ["product_id", "product_name", "category_name"], true)}
+            {renderTable(["ID", "Tên SP", "Danh mục", "Thao tác"], data.products, ["product_id", "product_name", "category_name"], "product")}
           </div>
         );
       case 'categories': return renderTable(["ID", "Tên danh mục"], data.categories, ["category_id", "category_name"]);
-      case 'orders': return renderTable(["ID", "Khách hàng", "Tổng tiền", "Trạng thái"], data.orders, ["order_id", "customer_name", "total_amount", "status"]);
+
+      case 'orders':
+        return (
+          <div>
+            <h2 style={{ marginBottom: '20px' }}>🛒 Quản lý Đơn hàng</h2>
+            {renderTable(["ID", "Khách hàng", "Tổng tiền", "Trạng thái", "Thao tác"], data.orders, ["order_id", "customer_name", "total_amount", "status"], "order")}
+
+            {/* Hiển thị chi tiết đơn hàng khi bấm nút */}
+            {viewingOrder && (
+              <div style={modalStyle}>
+                <h3>Chi tiết đơn hàng #{viewingOrder}</h3>
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
+                  <thead>
+                    <tr style={{ background: '#eee' }}>
+                      <th style={tdStyle}>Sản phẩm</th>
+                      <th style={tdStyle}>Số lượng</th>
+                      <th style={tdStyle}>Giá</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orderItems.map((item, i) => (
+                      <tr key={i} style={{ borderBottom: '1px solid #ddd' }}>
+                        <td style={tdStyle}>{item.product_name}</td>
+                        <td style={tdStyle}>{item.quantity}</td>
+                        <td style={tdStyle}>{Number(item.price).toLocaleString()}đ</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <button onClick={() => setViewingOrder(null)} style={{ marginTop: '15px', padding: '8px 20px', cursor: 'pointer' }}>Đóng</button>
+              </div>
+            )}
+          </div>
+        );
+
       case 'users': return renderTable(["ID", "Tên", "Email", "Ngày tạo"], data.users, ["user_id", "name", "email", "created_at"]);
       default: return <h3>Chức năng đang cập nhật...</h3>;
     }
   };
 
-  const renderTable = (headers, rows, keys, isProd = false) => (
+  const renderTable = (headers, rows, keys, type = null) => (
     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
       <thead><tr style={{ background: '#f8f9fa' }}>{headers.map(h => <th key={h} style={tdStyle}>{h}</th>)}</tr></thead>
       <tbody>
         {rows.map((r, i) => (
           <tr key={i} style={{ borderBottom: '1px solid #eee' }}>
-            {keys.map(k => <td key={k} style={tdStyle}>{r[k] || '---'}</td>)}
-            {isProd && <td style={tdStyle}><button onClick={() => deleteProduct(r.product_id)} style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer' }}>Xóa bỏ</button></td>}
+            {keys.map(k => {
+              if (k === 'status' && type === 'order') {
+                return (
+                  <td key={k} style={tdStyle}>
+                    <select
+                      value={r[k]}
+                      onChange={(e) => updateOrderStatus(r.order_id, e.target.value)}
+                      style={{ padding: '5px', borderRadius: '4px' }}
+                    >
+                      <option value="pending">Chờ xử lý</option>
+                      <option value="completed">Đã giao hàng</option>
+                      <option value="cancelled">Hủy đơn</option>
+                    </select>
+                  </td>
+                )
+              }
+              return <td key={k} style={tdStyle}>{r[k] || '---'}</td>
+            })}
+
+            {/* Cột thao tác cho Sản phẩm */}
+            {type === 'product' && (
+              <td style={tdStyle}>
+                <button onClick={() => deleteProduct(r.product_id)} style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer' }}>Xóa bỏ</button>
+              </td>
+            )}
+
+            {/* Cột thao tác cho Đơn hàng */}
+            {type === 'order' && (
+              <td style={tdStyle}>
+                <button onClick={() => showDetail(r.order_id)} style={{ color: '#3498db', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 'bold' }}>Chi tiết</button>
+              </td>
+            )}
           </tr>
         ))}
       </tbody>
@@ -106,7 +194,7 @@ function App() {
         <h2 style={{ padding: '30px', textAlign: 'center', borderBottom: '1px solid #34495e' }}>🛡️ ADMIN</h2>
         <nav style={{ padding: '15px' }}>
           {['dashboard', 'products', 'categories', 'orders', 'users'].map(m => (
-            <div key={m} onClick={() => setActiveMenu(m)} style={navItem(activeMenu === m)}>{m.toUpperCase()}</div>
+            <div key={m} onClick={() => { setActiveMenu(m); setViewingOrder(null); }} style={navItem(activeMenu === m)}>{m.toUpperCase()}</div>
           ))}
         </nav>
       </div>
@@ -131,5 +219,6 @@ const tdStyle = { padding: '15px', textAlign: 'left' };
 const formStyle = { display: 'flex', gap: '10px', marginBottom: '30px', background: '#f8f9fa', padding: '20px', borderRadius: '10px' };
 const inputStyle = { padding: '10px', borderRadius: '5px', border: '1px solid #ddd', flex: 1 };
 const btnSaveStyle = { padding: '10px 25px', background: '#27ae60', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' };
+const modalStyle = { marginTop: '20px', padding: '20px', border: '2px solid #3498db', borderRadius: '10px', background: '#f0faff' };
 
 export default App;

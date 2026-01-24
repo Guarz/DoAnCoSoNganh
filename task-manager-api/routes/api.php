@@ -86,3 +86,24 @@ Route::get('/get-stats', function () {
         'total_users' => DB::table('users')->count(),
     ]);
 });
+// --- QUẢN LÝ ĐƠN HÀNG NÂNG CAO ---
+
+// 1. Cập nhật trạng thái đơn hàng (Dùng POST hoặc PUT)
+Route::post('/update-order-status', function (Request $request) {
+    try {
+        DB::table('orders')
+            ->where('order_id', $request->order_id)
+            ->update(['status' => $request->status]);
+        return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+    }
+});
+
+// 2. Lấy chi tiết món đồ trong đơn hàng
+Route::get('/get-order-details/{id}', function ($id) {
+    $items = DB::table('order_items')
+        ->where('order_id', $id)
+        ->get();
+    return response()->json($items);
+});
