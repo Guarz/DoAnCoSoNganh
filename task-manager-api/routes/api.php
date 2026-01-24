@@ -8,90 +8,61 @@ use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes - Hệ Thống Quản Trị
+| API Hệ Thống Quản Trị Hoàn Chỉnh (Đã tối ưu hóa)
 |--------------------------------------------------------------------------
 */
 
-/**
- * 1. API ĐĂNG NHẬP
- * Kiểm tra email và mật khẩu (đã mã hóa) từ database
- */
+// --- 1. NHÓM TÀI KHOẢN (USERS) ---
 Route::post('/login', function (Request $request) {
-    // Tìm user theo email
     $user = User::where('email', $request->email)->first();
-
-    // Sử dụng Hash::check để so sánh mật khẩu nhập vào với mã Bcrypt trong DB
     if (!$user || !Hash::check($request->password, $user->password)) {
-        return response()->json([
-            'success' => false, 
-            'message' => 'Sai email hoặc mật khẩu quản trị!'
-        ], 401);
+        return response()->json(['success' => false, 'message' => 'Sai tài khoản!'], 401);
     }
-
-    return response()->json([
-        'success' => true, 
-        'user' => $user
-    ]);
+    return response()->json(['success' => true, 'user' => $user]);
 });
 
-/**
- * 2. API LẤY DANH SÁCH SẢN PHẨM
- * Kết hợp với bảng categories để lấy tên danh mục thay vì chỉ lấy ID
- */
-Route::get('/get-products', function() {
+Route::get('/get-users', function () {
+    // Lấy thêm trường 'id' để React làm key khi render bảng
+    return DB::table('users')->select('user_id', 'name', 'email', 'created_at')->get();
+});
+
+// --- 2. NHÓM SẢN PHẨM (PRODUCTS) ---
+Route::get('/get-products', function () {
     return DB::table('products')
-        ->join('categories', 'products.category_id', '=', 'categories.category_id')
-        ->select('products.*', 'categories.category_name') // Lấy thêm category_name
-        ->orderBy('products.product_id', 'desc') // Sản phẩm mới nhất lên đầu
+        ->leftJoin('categories', 'products.category_id', '=', 'categories.category_id')
+        ->select('products.*', 'categories.category_name')
+        ->orderBy('products.product_id', 'desc')
         ->get();
 });
 
-/**
- * 3. API LẤY DANH SÁCH DANH MỤC
- * Dùng để hiển thị trong Select Box khi thêm sản phẩm mới
- */
-Route::get('/get-categories', function() {
-    return DB::table('categories')->select('category_id', 'category_name')->get();
-});
-
-/**
- * 4. API THÊM SẢN PHẨM MỚI
- */
-Route::post('/products', function(Request $request) {
+Route::post('/products', function (Request $request) {
     try {
+        // Thêm validate cơ bản để tránh lỗi Database
+        if (!$request->product_name || !$request->category_id) {
+            return response()->json(['success' => false, 'message' => 'Thiếu tên hoặc danh mục'], 400);
+        }
+
         $id = DB::table('products')->insertGetId([
             'product_name' => $request->product_name,
-            'description'  => $request->description,
-            'category_id'  => $request->category_id,
-            'created_at'   => now(),
-            'updated_at'   => now()
+            'description' => $request->description,
+            'category_id' => $request->category_id,
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
-        
-        return response()->json([
-            'success' => true, 
-            'message' => 'Thêm sản phẩm thành công!',
-            'product_id' => $id
-        ]);
+        return response()->json(['success' => true, 'product_id' => $id]);
     } catch (\Exception $e) {
         return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
     }
 });
+
 /**
  * 5. API XÓA SẢN PHẨM
  */
-const deleteProduct = async (id) => {
-    if (confirm("Bạn có chắc chắn muốn xóa?")) {
-        try {
-            const response = await fetch(`http://localhost:8000/api/products/${id}`, {
-                method: 'DELETE'
-            });
-            const result = await response.json();
-            if (result.success) {
-                alert("Xóa thành công!");
-                fetchProducts(); // Hàm gọi lại danh sách để cập nhật giao diện
-            }
-        } catch (error) {
-            console.error("Lỗi xóa:", error);
-        }
+Route::delete('/products/{id}', function($id) {
+    $deleted = DB::table('products')->where('product_id', $id)->delete();
+    
+    if ($deleted) {
+        return response()->json(['success' => true, 'message' => 'Đã xóa sản phẩm']);
     }
-};
+    return response()->json(['success' => false, 'message' => 'Không tìm thấy sản phẩm'], 404);
+});
