@@ -13,7 +13,14 @@ function Login({ setUser }) {
             localStorage.setItem('user', JSON.stringify(adminData));
             setUser(adminData);
             navigate('/admin');
-        } else {
+        } 
+        else if (email === 'user@gmail.com' && password === '123') {
+            const userData = { name: 'User', role: 'user', email: 'user@gmail.com' };
+            localStorage.setItem('user', JSON.stringify(userData));
+            setUser(userData);
+            navigate('/user')
+        }    
+            else  {
             alert("Sai tài khoản! Thử: admin@gmail.com / 123");
         }
     };

@@ -8,6 +8,11 @@ import ProductManagement from './pages/Admin/ProductManagement';
 import AdminOrders from './pages/Admin/AdminOrders';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import HomePage from './pages/HomePage';
+
+import UserLayout from "./layouts/UserLayout";
+import UserDashboard from "./pages/User/UserDashboard";
+import CartPage from "./pages/CartPage";
+import UserOrders from "./pages/User/UserOrders";
 // ================== APP ==================
 function App() {
   const [user, setUser] = useState(() => {
@@ -32,6 +37,9 @@ function App() {
             <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
               <Link to="/" style={linkStyle}>Trang chủ</Link>
 
+              {user?.role !== 'admin' && (
+                <Link to="/cart" style={linkStyle}>Giỏ hàng</Link>
+              )}
               {user?.role === 'admin' && (
                 <>
                   <Link to="/admin" style={linkStyle}>Dashboard</Link>
@@ -43,6 +51,9 @@ function App() {
               {user ? (
                 <>
                   <span>Chào, {user.name}</span>
+                  {user.role !== 'admin' && (
+                    <Link to="/UserOrders" style={linkStyle}>Đơn đã đặt</Link>
+                  )}
                   <button onClick={logout} style={btnLogoutStyle}>Thoát</button>
                 </>
               ) : (
@@ -54,9 +65,13 @@ function App() {
 
         {/* ROUTES */}
         <Routes>
-          <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
-
+          {/* USER */}
+          <Route element={<UserLayout />}>
+            <Route path="/" element={<UserDashboard />} /> 
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/UserOrders" element={user ? <UserOrders /> : <Navigate to="/login" />} />
+          </Route>
           {/* ADMIN */}
           <Route
             path="/admin"
