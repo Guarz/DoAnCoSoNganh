@@ -10,7 +10,6 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import HomePage from './pages/HomePage';
 
 import UserLayout from "./layouts/UserLayout";
-import UserDashboard from "./pages/User/UserDashboard";
 import CartPage from "./pages/CartPage";
 import UserOrders from "./pages/User/UserOrders";
 // ================== APP ==================
@@ -37,9 +36,7 @@ function App() {
             <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
               <Link to="/" style={linkStyle}>Trang chủ</Link>
 
-              {user?.role !== 'admin' && (
-                <Link to="/cart" style={linkStyle}>Giỏ hàng</Link>
-              )}
+              
               {user?.role === 'admin' && (
                 <>
                   <Link to="/admin" style={linkStyle}>Dashboard</Link>
@@ -47,12 +44,14 @@ function App() {
                   <Link to="/admin/orders" style={linkStyle}>Đơn hàng</Link>
                 </>
               )}
-
+              {user?.role !== 'admin' && (
+                <Link to="/cart" style={linkStyle}>Giỏ hàng</Link>
+              )}
               {user ? (
                 <>
                   <span>Chào, {user.name}</span>
                   {user.role !== 'admin' && (
-                    <Link to="/UserOrders" style={linkStyle}>Đơn đã đặt</Link>
+                    <Link to="/user/orders" style={linkStyle}>Đơn đã đặt</Link>
                   )}
                   <button onClick={logout} style={btnLogoutStyle}>Thoát</button>
                 </>
@@ -66,25 +65,25 @@ function App() {
         {/* ROUTES */}
         <Routes>
           <Route path="/login" element={<Login setUser={setUser} />} />
+          <Route path="/" element={<HomePage />} /> 
           {/* USER */}
-          <Route element={<UserLayout />}>
-            <Route path="/" element={<UserDashboard />} /> 
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/UserOrders" element={user ? <UserOrders /> : <Navigate to="/login" />} />
-          </Route>
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/user/orders" element={user ? <UserOrders /> : <Navigate to="/login" />} />
           {/* ADMIN */}
-          <Route
-            path="/admin"
-            element={user?.role === 'admin' ? <AdminDashboard /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/products"
-            element={user?.role === 'admin' ? <ProductManagement /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/orders"
-            element={user?.role === 'admin' ? <AdminOrders /> : <Navigate to="/login" />}
-          />
+
+            <Route
+              path="/admin"
+              element={user?.role === 'admin' ? <AdminDashboard /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/admin/products"
+              element={user?.role === 'admin' ? <ProductManagement /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/admin/orders"
+              element={user?.role === 'admin' ? <AdminOrders /> : <Navigate to="/login" />}
+            />
+            
         </Routes>
       </div>
     </Router>

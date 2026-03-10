@@ -32,21 +32,13 @@ function UserLayout() {
                     <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
                         <Link to="/" style={linkStyle}>Trang chủ</Link>
                         
-                        
                         <Link to="/cart" style={linkStyle}>
-                            🛒 Giỏ hàng {totalItems > 0 && <span style={badgeStyle}>{totalItems}</span>}
+                            Giỏ hàng {totalItems > 0 && <span style={badgeStyle}>{totalItems}</span>}
                         </Link>
-
-                        
-                        {user?.role === 'admin' && (
-                            <Link to="/admin" style={{ ...linkStyle, color: "#d63384" }}>
-                                👉 Quản trị Admin
-                            </Link>
-                        )}
 
                         {user ? (
                             <>
-                                <Link to="/user-orders" style={linkStyle}>Đơn hàng</Link>
+                                <Link to="/user/orders" style={linkStyle}>Đơn hàng</Link>
                                 <span>Chào, <strong>{user.name}</strong></span>
                                 <button onClick={logout} style={btnLogoutStyle}>Thoát</button>
                             </>

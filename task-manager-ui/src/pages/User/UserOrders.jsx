@@ -10,7 +10,7 @@ const UserOrders = () => {
         if (!user) return;
         
         // Gọi API lấy đơn hàng theo email/ID của User
-        axios.get(`http://127.0.0.1:8000/api/orders/user/${user.email}`)
+        axios.get(`http://127.0.0.1:8000/api/user/orders/${user.email}`)
             .then(res => setOrders(res.data))
             .catch(err => console.error("Lỗi tải đơn hàng:", err));
     }, [user?.email]);
