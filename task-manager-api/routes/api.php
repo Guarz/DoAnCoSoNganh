@@ -6,12 +6,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
-/*
-|--------------------------------------------------------------------------
-| API Hệ Thống Quản Trị Hoàn Chỉnh (Đã tối ưu hóa)
-|--------------------------------------------------------------------------
-*/
-
 // --- 1. NHÓM TÀI KHOẢN (USERS) ---
 Route::post('/login', function (Request $request) {
     $user = User::where('email', $request->email)->first();
