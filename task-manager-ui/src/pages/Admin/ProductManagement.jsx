@@ -18,6 +18,7 @@ export default function ProductManagement() {
     // ================================
     const fetchProducts = async () => {
         try {
+
             setLoading(true);
 
             const res = await axios.get(
@@ -27,11 +28,14 @@ export default function ProductManagement() {
             setProducts(res.data);
 
         } catch (error) {
+
             console.error("Lỗi load sản phẩm:", error);
             alert("Không tải được danh sách sản phẩm");
 
         } finally {
+
             setLoading(false);
+
         }
     };
 
@@ -65,9 +69,18 @@ export default function ProductManagement() {
             fetchProducts();
 
         } catch (error) {
+
             console.error("Lỗi lưu sản phẩm:", error);
             alert("Có lỗi xảy ra khi lưu sản phẩm");
+
         }
+    };
+
+    // ================================
+    // HỦY CHẾ ĐỘ SỬA
+    // ================================
+    const handleCancelEdit = () => {
+        setEditing(null);
     };
 
     // ================================
@@ -115,6 +128,7 @@ export default function ProductManagement() {
                     <ProductForm
                         onSave={handleSave}
                         editing={editing}
+                        onCancel={handleCancelEdit}
                     />
 
                 </div>

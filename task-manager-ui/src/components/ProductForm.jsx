@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function ProductForm({ onSave, editing }) {
+export default function ProductForm({ onSave, editing, onCancel }) {
 
     const [form, setForm] = useState({
         name: "",
@@ -48,6 +48,15 @@ export default function ProductForm({ onSave, editing }) {
         });
     };
 
+    // hủy sửa
+    const handleCancel = () => {
+        setForm({
+            name: "",
+            price: ""
+        });
+        onCancel(); // quay về chế độ thêm
+    };
+
     return (
         <form onSubmit={handleSubmit} style={formStyle}>
 
@@ -71,6 +80,17 @@ export default function ProductForm({ onSave, editing }) {
             <button style={btnStyle}>
                 {editing ? "Cập nhật" : "Thêm"}
             </button>
+
+            {/* nút hủy sửa */}
+            {editing && (
+                <button
+                    type="button"
+                    onClick={handleCancel}
+                    style={cancelBtn}
+                >
+                    Hủy sửa
+                </button>
+            )}
 
         </form>
     );
@@ -101,4 +121,15 @@ const btnStyle = {
     borderRadius: 6,
     cursor: "pointer",
     fontWeight: "bold",
+};
+
+const cancelBtn = {
+    marginTop: 8,
+    width: "100%",
+    padding: 10,
+    background: "#6c757d",
+    color: "#fff",
+    border: "none",
+    borderRadius: 6,
+    cursor: "pointer",
 };
