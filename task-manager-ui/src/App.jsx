@@ -10,6 +10,7 @@ import { useState } from "react";
 
 import Login from "./pages/Login";
 
+import AdminHome from "./pages/Admin/AdminHome";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import ProductManagement from "./pages/Admin/ProductManagement";
 import AdminOrders from "./pages/Admin/AdminOrders";
@@ -46,13 +47,14 @@ function App() {
 
             <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
 
-              <Link to="/" style={linkStyle}>
-                Trang chủ
-              </Link>
 
-              {/* ADMIN MENU */}
+              {/* MENU ADMIN */}
               {user?.role === "admin" && (
                 <>
+                  <Link to="/admin/home" style={linkStyle}>
+                    Trang chủ 
+                  </Link>
+
                   <Link to="/admin" style={linkStyle}>
                     Dashboard
                   </Link>
@@ -67,7 +69,7 @@ function App() {
                 </>
               )}
 
-              {/* USER MENU */}
+              {/* USER */}
               {user?.role !== "admin" && (
                 <Link to="/cart" style={linkStyle}>
                   Giỏ hàng
@@ -77,7 +79,6 @@ function App() {
               {/* LOGIN / USER */}
               {user ? (
                 <>
-                  
                   {user.role !== "admin" && (
                     <Link to="/user/orders" style={linkStyle}>
                       Lịch sử mua hàng
@@ -103,11 +104,9 @@ function App() {
         {/* ROUTER */}
         <Routes>
 
-          {/* PUBLIC */}
+          {/* USER */}
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
-
-          {/* USER */}
           <Route path="/cart" element={<CartPage />} />
 
           <Route
@@ -116,6 +115,16 @@ function App() {
           />
 
           {/* ADMIN */}
+
+          <Route
+            path="/admin/home"
+            element={
+              user?.role === "admin"
+                ? <AdminHome />
+                : <Navigate to="/login" />
+            }
+          />
+
           <Route
             path="/admin"
             element={
@@ -143,7 +152,7 @@ function App() {
             }
           />
 
-          {/* PAGE NOT FOUND */}
+          {/* 404 */}
           <Route
             path="*"
             element={<h2 style={{ padding: 30 }}>404 - Không tìm thấy trang</h2>}
@@ -201,5 +210,5 @@ const btnLogoutStyle = {
   color: "#dc3545",
   background: "none",
   padding: "6px 10px",
-  cursor: "pointer",
+  cursor: "pointer"
 };

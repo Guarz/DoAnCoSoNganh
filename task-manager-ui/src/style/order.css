@@ -1,0 +1,47 @@
+.order-page{
+padding:30px;
+background:#b8f4e3;
+min-height:100vh;
+}
+
+.order-search{
+margin:15px 0;
+}
+
+.order-search input{
+padding:10px;
+width:300px;
+border-radius:8px;
+border:1px solid #cce4f1;
+}
+
+.order-table{
+background:rgb(197, 221, 244);
+padding:20px;
+border-radius:10px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:12px;
+border-bottom:1px solid #c4e5f1;
+text-align:center;
+}
+
+select{
+padding:5px;
+border-radius:5px;
+}
+
+.delete-btn{
+background:red;
+color:rgb(179, 223, 240);
+border:none;
+padding:5px 10px;
+border-radius:6px;
+cursor:pointer;
+}

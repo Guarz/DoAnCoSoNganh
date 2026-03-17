@@ -1,91 +1,157 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 
 function AdminOrders() {
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchOrders();
-    }, []);
+  const [orders, setOrders] = useState([]);
 
-    const fetchOrders = () => {
-        axios.get("http://127.0.0.1:8000/api/admin/orders")
-            .then(res => {
-                setOrders(res.data);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error(err);
-                setLoading(false);
-            });
-    };
+  useEffect(() => {
 
-    const updateStatus = (orderId, newStatus) => {
-        if (!window.confirm("Xác nhận đổi trạng thái đơn hàng?")) return;
+    const data = localStorage.getItem("orders");
 
-        axios.put(`http://127.0.0.1:8000/api/admin/orders/${orderId}`, {
-            status: newStatus
-        })
-            .then(() => {
-                alert("Cập nhật thành công");
-                fetchOrders();
-            })
-            .catch(() => alert("Lỗi cập nhật"));
-    };
+    if (data) {
+      setOrders(JSON.parse(data));
+    }
 
-    if (loading) return <p>Đang tải đơn hàng...</p>;
+  }, []);
 
-    return (
-        <div style={{ padding: 30 }}>
-            <h2>📦 QUẢN LÝ ĐƠN HÀNG</h2>
+  // cập nhật trạng thái
+  const changeStatus = (id, newStatus) => {
 
-            <table style={tableStyle}>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Khách hàng</th>
-                        <th>Ngày</th>
-                        <th>Tổng tiền</th>
-                        <th>Trạng thái</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {orders.map(o => (
-                        <tr key={o.id}>
-                            <td>{o.id}</td>
-                            <td>{o.customer_name}</td>
-                            <td>{o.order_date}</td>
-                            <td style={{ color: "#d63384", fontWeight: "bold" }}>
-                                {new Intl.NumberFormat("vi-VN").format(o.total_price)} VNĐ
-                            </td>
-                            <td>{o.status}</td>
-                            <td>
-                                <select
-                                    value={o.IdTT}
-                                    onChange={e => updateStatus(o.id, e.target.value)}
-                                >
-                                    <option value={0}>Chờ xử lý</option>
-                                    <option value={1}>Đã xác nhận</option>
-                                    <option value={2}>Đang giao</option>
-                                    <option value={3}>Hoàn thành</option>
-                                    <option value={4}>Hủy</option>
-                                </select>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+    const updated = orders.map(order =>
+      order.id === id ? { ...order, status: newStatus } : order
     );
+
+    setOrders(updated);
+
+    localStorage.setItem("orders", JSON.stringify(updated));
+  };
+
+  // xóa đơn hàng
+  const deleteOrder = (id) => {
+
+    const updated = orders.filter(order => order.id !== id);
+
+    setOrders(updated);
+
+    localStorage.setItem("orders", JSON.stringify(updated));
+  };
+
+  return (
+
+    <div style={{ padding: 30 }}>
+
+      <h2>📦 Quản lý đơn hàng</h2>
+
+      {orders.length === 0 ? (
+        <p>Chưa có đơn hàng</p>
+      ) : (
+
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            marginTop: 20
+          }}
+        >
+
+          <thead>
+
+            <tr style={{ background: "#abd0f5" }}>
+              <th>ID</th>
+              <th>Khách hàng</th>
+              <th>Sản phẩm</th>
+              <th>Tổng tiền</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            {orders.map(order => (
+
+              <tr key={order.id}>
+
+                <td>{order.id}</td>
+
+                <td>{order.customer}</td>
+
+                <td>{order.product}</td>
+
+                <td>{order.total} đ</td>
+
+                <td>
+
+                  <select
+                    value={order.status}
+                    onChange={(e) =>
+                      changeStatus(order.id, e.target.value)
+                    }
+                  >
+
+                    <option value="pending">
+                      Chờ xử lý
+                    </option>
+
+                    <option value="shipping">
+                      Đang giao
+                    </option>
+
+                    <option value="done">
+                      Hoàn thành
+                    </option>
+
+                  </select>
+
+                </td>
+
+                <td>
+
+                  <button
+                    onClick={() => deleteOrder(order.id)}
+                    style={{
+                      background: "red",
+                      color: "#fff",
+                      border: "none",
+                      padding: "5px 10px",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Xóa
+                  </button>
+
+                </td>
+
+              </tr>
+
+            ))}
+
+          </tbody>
+
+        </table>
+
+      )}
+
+    </div>
+  );
 }
 
-const tableStyle = {
-    width: "100%",
-    borderCollapse: "collapse",
-    background: "#fff"
-};
-
+// ví dụ dữ liệu đơn hàng
 export default AdminOrders;
+localStorage.setItem("orders", JSON.stringify([
+{
+id:1,
+customer:"Nguyễn Văn A",
+product:"Áo thun",
+total:200000,
+status:"pending"
+},
+{
+id:2,
+customer:"Trần Thị B",
+product:"Áo hoodie",
+total:350000,
+status:"shipping"
+}
+]))
