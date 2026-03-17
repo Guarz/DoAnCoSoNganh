@@ -10,11 +10,11 @@
 // )
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import ProductList from './pages/User/ProductList' // Import trực tiếp ProductList
-import './index.css' // Giữ lại CSS nếu bạn dùng Tailwind
+import App from './App.jsx'
+import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ProductList /> 
-  </React.StrictMode>,
+    <App />
+  </React.StrictMode>
 )
