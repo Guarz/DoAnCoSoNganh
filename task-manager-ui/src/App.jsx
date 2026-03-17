@@ -77,14 +77,15 @@ function App() {
               {/* LOGIN / USER */}
               {user ? (
                 <>
-                  <span>Chào, {user.name}</span>
-
+                  
                   {user.role !== "admin" && (
                     <Link to="/user/orders" style={linkStyle}>
                       Đơn đã đặt
                     </Link>
                   )}
 
+                  <span>Chào, {user.name}</span>
+                  
                   <button onClick={logout} style={btnLogoutStyle}>
                     Thoát
                   </button>
