@@ -1,70 +1,104 @@
 import { useEffect, useState } from "react";
 
 export default function ProductForm({ onSave, editing }) {
+
     const [form, setForm] = useState({
         name: "",
-        price: "",
+        price: ""
     });
 
+    // khi click sửa sản phẩm
     useEffect(() => {
         if (editing) {
-            setForm(editing);
+            setForm({
+                name: editing.name || "",
+                price: editing.price || ""
+            });
+        } else {
+            setForm({
+                name: "",
+                price: ""
+            });
         }
     }, [editing]);
 
+    // thay đổi input
     const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value
+        });
     };
 
+    // submit form
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!form.name || !form.price) return alert("Nhập đủ thông tin");
+
+        if (!form.name || !form.price) {
+            alert("Vui lòng nhập đầy đủ thông tin");
+            return;
+        }
 
         onSave(form);
-        setForm({ name: "", price: "" });
+
+        // reset form sau khi thêm
+        setForm({
+            name: "",
+            price: ""
+        });
     };
 
     return (
-        <div style={{ width: 300 }}>
-            <h3>{editing ? "✏️ Sửa sản phẩm" : "➕ Thêm sản phẩm"}</h3>
+        <form onSubmit={handleSubmit} style={formStyle}>
 
-            <form onSubmit={handleSubmit}>
-                <input
-                    name="name"
-                    placeholder="Tên sản phẩm"
-                    value={form.name}
-                    onChange={handleChange}
-                    style={inputStyle}
-                />
+            <input
+                name="name"
+                placeholder="Tên sản phẩm"
+                value={form.name}
+                onChange={handleChange}
+                style={inputStyle}
+            />
 
-                <input
-                    name="price"
-                    type="number"
-                    placeholder="Giá"
-                    value={form.price}
-                    onChange={handleChange}
-                    style={inputStyle}
-                />
+            <input
+                name="price"
+                type="number"
+                placeholder="Giá"
+                value={form.price}
+                onChange={handleChange}
+                style={inputStyle}
+            />
 
-                <button style={btnStyle}>
-                    {editing ? "Cập nhật" : "Thêm"}
-                </button>
-            </form>
-        </div>
+            <button style={btnStyle}>
+                {editing ? "Cập nhật" : "Thêm"}
+            </button>
+
+        </form>
     );
 }
 
+
+/* ================= STYLE ================= */
+
+const formStyle = {
+    display: "flex",
+    flexDirection: "column",
+};
+
 const inputStyle = {
     width: "100%",
-    padding: 8,
-    marginBottom: 10,
+    padding: 10,
+    marginBottom: 12,
+    border: "1px solid #ddd",
+    borderRadius: 6,
 };
 
 const btnStyle = {
     width: "100%",
     padding: 10,
-    background: "#000",
+    background: "#d63384",
     color: "#fff",
     border: "none",
+    borderRadius: 6,
     cursor: "pointer",
+    fontWeight: "bold",
 };
