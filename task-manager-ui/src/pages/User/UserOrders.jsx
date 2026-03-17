@@ -1,63 +1,101 @@
-
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const UserOrders = () => {
     const [orders, setOrders] = useState([]);
-    const user = JSON.parse(localStorage.getItem('user'));
+    const [loading, setLoading] = useState(true);
+    
+    // Lấy thông tin user từ localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    const themeColor = "#d63384"; 
 
     useEffect(() => {
-        if (!user) return;
-        
-        // Gọi API lấy đơn hàng theo email/ID của User
-        axios.get(`http://127.0.0.1:8000/api/user/orders/${user.email}`)
-            .then(res => setOrders(res.data))
-            .catch(err => console.error("Lỗi tải đơn hàng:", err));
-    }, [user?.email]);
+        if (user) {
+            fetchOrders();
+        }
+    }, []);
+
+    const fetchOrders = async () => {
+        try {
+            // Gọi API lấy đơn hàng (Bạn cần đảm bảo Route này đã tồn tại trong api.php)
+            const response = await axios.get(`http://127.0.0.1:8000/api/orders/${user.id}`);
+            setOrders(response.data); 
+            setLoading(false);
+        } catch (error) {
+            console.error("Lỗi lấy đơn hàng:", error);
+            setLoading(false);
+        }
+    };
+
+    if (loading) return <div style={{ padding: 20, textAlign: 'center' }}>Đang tải...</div>;
 
     return (
-        <div style={{ background: "#fff", padding: 30, borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
-            <h2 style={{ borderBottom: "2px solid #eee", paddingBottom: 10, marginBottom: 20 }}>📦 Lịch sử đơn hàng</h2>
+        <div style={{ maxWidth: 1000, margin: '0 auto', padding: '20px 0' }}>
+            <h2 style={{ marginBottom: 20 }}>📦 Lịch sử đơn hàng</h2>
 
             {orders.length === 0 ? (
-                <p>Bạn chưa có đơn hàng nào.</p>
+                <div style={styles.emptyBox}>
+                    <p>Bạn chưa có đơn hàng nào.</p>
+                </div>
             ) : (
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                    <thead>
-                        <tr style={{ background: "#f8f9fa", textAlign: "left" }}>
-                            <th style={thStyle}>Mã Đơn</th>
-                            <th style={thStyle}>Ngày đặt</th>
-                            <th style={thStyle}>Tổng tiền</th>
-                            <th style={thStyle}>Trạng thái</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {orders.map((order) => (
-                            <tr key={order.id} style={{ borderBottom: "1px solid #eee" }}>
-                                <td style={tdStyle}><strong>#{order.id}</strong></td>
-                                <td style={tdStyle}>{new Date(order.created_at || order.date).toLocaleDateString("vi-VN")}</td>
-                                <td style={{...tdStyle, color: "#d63384", fontWeight: "bold"}}>
-                                    {Number(order.total_price).toLocaleString()} đ
-                                </td>
-                                <td style={tdStyle}>
-                                    <span style={{
-                                        padding: "4px 8px", borderRadius: 4, fontSize: 12, fontWeight: "bold",
-                                        background: order.status === 'Chờ duyệt' ? '#fff3cd' : '#d4edda',
-                                        color: order.status === 'Chờ duyệt' ? '#856404' : '#155724'
-                                    }}>
-                                        {order.status || "Chờ duyệt"}
-                                    </span>
-                                </td>
-                            </tr>
+                orders.map((order) => (
+                    <div key={order.IdDH} style={styles.orderCard}>
+                        {/* Header: Mã đơn hàng & Trạng thái */}
+                        <div style={styles.orderHeader}>
+                            <span style={{ fontWeight: 'bold' }}>Mã đơn: #{order.IdDH}</span>
+                            <span style={{ color: themeColor }}>{order.TrangThai || 'Chờ xác nhận'}</span>
+                        </div>
+
+                        {/* Danh sách sản phẩm - Dựa trên cấu trúc ChiTietGioHang/SanPham */}
+                        {order.details && order.details.map((item, idx) => (
+                            <div key={idx} style={styles.productRow}>
+                                <div style={{ display: 'flex', flex: 1 }}>
+                                    {/* Lấy ảnh từ Quan hệ AnhSP */}
+                                    <img 
+                                        src={item.san_pham?.anh_s_p?.[0]?.HinhAnh || 'https://via.placeholder.com/80'} 
+                                        alt="Product" 
+                                        style={styles.productImg} 
+                                    />
+                                    <div style={{ marginLeft: 15 }}>
+                                        {/* Tên sản phẩm từ Model SanPham */}
+                                        <div style={{ fontWeight: '500' }}>{item.san_pham?.TenSP}</div>
+                                        <div style={{ color: '#888', fontSize: 13 }}>Số lượng: x{item.SoLuong}</div>
+                                    </div>
+                                </div>
+                                <div style={{ fontWeight: 'bold' }}>
+                                    {Number(item.GiaBan).toLocaleString()}₫
+                                </div>
+                            </div>
                         ))}
-                    </tbody>
-                </table>
+
+                        {/* Tổng tiền đơn hàng */}
+                        <div style={styles.orderFooter}>
+                            <div>
+                                <span style={{ color: '#888' }}>Tổng số tiền: </span>
+                                <span style={{ fontSize: 20, color: themeColor, fontWeight: 'bold' }}>
+                                    {Number(order.TongTien).toLocaleString()}₫
+                                </span>
+                            </div>
+                            <div style={{ marginTop: 10 }}>
+                                <button style={{ ...styles.btnPrimary, backgroundColor: themeColor }}>Mua lại</button>
+                            </div>
+                        </div>
+                    </div>
+                ))
             )}
         </div>
     );
 };
 
-const thStyle = { padding: 12, borderBottom: "2px solid #ddd" };
-const tdStyle = { padding: 12 };
+// Styles 
+const styles = {
+    orderCard: { background: '#fff', marginBottom: 15, padding: 20, borderRadius: 2, boxShadow: '0 1px 1px rgba(0,0,0,0.05)' },
+    orderHeader: { display: 'flex', justifyContent: 'space-between', paddingBottom: 10, borderBottom: '1px solid #f1f1f1' },
+    productRow: { display: 'flex', padding: '15px 0', borderBottom: '1px solid #f1f1f1', alignItems: 'center' },
+    productImg: { width: 70, height: 70, objectFit: 'cover', border: '1px solid #eee' },
+    orderFooter: { textAlign: 'right', paddingTop: 15 },
+    btnPrimary: { padding: '8px 25px', color: '#fff', border: 'none', borderRadius: 2, cursor: 'pointer' },
+    emptyBox: { textAlign: 'center', background: '#fff', padding: '40px', borderRadius: 2 }
+};
 
 export default UserOrders;
