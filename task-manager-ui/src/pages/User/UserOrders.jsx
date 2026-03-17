@@ -31,7 +31,7 @@ const UserOrders = () => {
 
     return (
         <div style={{ maxWidth: 1000, margin: '0 auto', padding: '20px 0' }}>
-            <h2 style={{ marginBottom: 20 }}>📦 Lịch sử đơn hàng</h2>
+            <h2 style={{ marginBottom: 20 }}>Đơn hàng đã giao</h2>
 
             {orders.length === 0 ? (
                 <div style={styles.emptyBox}>

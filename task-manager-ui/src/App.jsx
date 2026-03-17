@@ -80,12 +80,12 @@ function App() {
                   
                   {user.role !== "admin" && (
                     <Link to="/user/orders" style={linkStyle}>
-                      Đơn đã đặt
+                      Lịch sử mua hàng
                     </Link>
                   )}
 
                   <span>Chào, {user.name}</span>
-                  
+
                   <button onClick={logout} style={btnLogoutStyle}>
                     Thoát
                   </button>
