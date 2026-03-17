@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\User\ProductController;
+use App\Http\Controllers\Api\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,3 +52,13 @@ Route::get('/admin/dashboard', function () {
     ]);
 
 });
+
+/*
+|--------------------------------------------------------------------------
+| CART API
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/cart/{idUser}', [CartController::class, 'getCart']);
+Route::post('/cart/update', [CartController::class, 'updateQty']);
+Route::post('/cart/remove', [CartController::class, 'removeItem']);
