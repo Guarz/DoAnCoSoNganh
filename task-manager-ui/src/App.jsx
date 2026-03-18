@@ -15,10 +15,10 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import ProductManagement from "./pages/Admin/ProductManagement";
 import AdminOrders from "./pages/Admin/AdminOrders";
 
-import HomePage from "./pages/HomePage";
+
 import CartPage from "./pages/CartPage";
 import UserOrders from "./pages/User/UserOrders";
-
+import HomePage from "./pages/User/HomePage";
 function App() {
 
   const [user, setUser] = useState(() => {
@@ -71,12 +71,17 @@ function App() {
 
               {/* USER */}
               {user?.role !== "admin" && (
-                <Link to="/cart" style={linkStyle}>
-                  Giỏ hàng
-                </Link>
+                <>
+                  <Link to="/user/home" style={linkStyle}>
+                    Trang chủ
+                  </Link>
+                  
+                  <Link to="/cart" style={linkStyle}>
+                    Giỏ hàng
+                  </Link>
+                </>
               )}
 
-              {/* LOGIN / USER */}
               {user ? (
                 <>
                   {user.role !== "admin" && (
@@ -85,7 +90,7 @@ function App() {
                     </Link>
                   )}
 
-                  <span>Chào, {user.name}</span>
+                  <span> {user.name}</span>
 
                   <button onClick={logout} style={btnLogoutStyle}>
                     Thoát
@@ -103,9 +108,10 @@ function App() {
 
         {/* ROUTER */}
         <Routes>
-
-          {/* USER */}
+          <Route path="/user/home" element={<HomePage />} />
           <Route path="/" element={<HomePage />} />
+          {/* USER */}
+          
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route path="/cart" element={<CartPage />} />
 
@@ -113,7 +119,7 @@ function App() {
             path="/user/orders"
             element={user ? <UserOrders /> : <Navigate to="/login" />}
           />
-
+          <Route path="/user" element={<Navigate to="/" replace />} />
           {/* ADMIN */}
 
           <Route
