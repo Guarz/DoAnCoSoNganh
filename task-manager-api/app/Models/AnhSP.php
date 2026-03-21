@@ -3,14 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\SanPham;
 
 class AnhSP extends Model
 {
-    protected $table = 'AnhSP';
+    protected $table = 'anhsp';
+
     protected $primaryKey = 'IdAnh';
-    public function SanPham()
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'HinhAnh'
+    ];
+
+    // Một ảnh có thể thuộc nhiều sản phẩm
+    public function sanpham()
     {
-        // Một sản phẩm có nhiều chi tiết 
         return $this->hasMany(SanPham::class, 'IdAnh', 'IdAnh');
     }
 }

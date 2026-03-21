@@ -1,36 +1,54 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../style/product.css";
 
 function ProductManagement() {
+
+    const navigate = useNavigate();
 
     const [products, setProducts] = useState([]);
 
     const [product, setProduct] = useState({
         name: "",
-        code: "",
-        category: "",
-        quantity: "",
         price: "",
-        salePrice: "",
-        size: "",
-        color: "",
         shortDesc: "",
-        detailDesc: "",
-        image: ""
+        image: null
     });
 
     const [editingId, setEditingId] = useState(null);
 
+
+    // =========================
+    // LOAD DANH SÁCH SẢN PHẨM
+    // =========================
+    const fetchProducts = async () => {
+
+        try {
+
+            const res = await fetch("http://localhost:8000/api/admin/products");
+
+            const data = await res.json();
+
+            setProducts(data);
+
+        } catch (err) {
+
+            console.log("Lỗi load sản phẩm:", err);
+
+        }
+
+    };
+
     useEffect(() => {
 
-        const saved = localStorage.getItem("products");
-
-        if (saved) {
-            setProducts(JSON.parse(saved));
-        }
+        fetchProducts();
 
     }, []);
 
+
+    // =========================
+    // INPUT
+    // =========================
     const handleChange = (e) => {
 
         setProduct({
@@ -40,64 +58,108 @@ function ProductManagement() {
 
     };
 
+
+    // =========================
+    // IMAGE
+    // =========================
     const handleImage = (e) => {
 
         const file = e.target.files[0];
 
         if (file) {
+
             setProduct({
                 ...product,
-                image: file.name
+                image: file
             });
+
         }
 
     };
 
+
+    // =========================
+    // RESET FORM
+    // =========================
     const resetForm = () => {
 
         setProduct({
             name: "",
-            code: "",
-            category: "",
-            quantity: "",
             price: "",
-            salePrice: "",
-            size: "",
-            color: "",
             shortDesc: "",
-            detailDesc: "",
-            image: ""
+            image: null
         });
 
+        setEditingId(null);
+
     };
 
-    // THÊM
-    const handleAddProduct = () => {
+
+    // =========================
+    // THÊM SẢN PHẨM
+    // =========================
+    const handleAddProduct = async () => {
 
         if (!product.name || !product.price) {
+
             alert("Nhập đầy đủ thông tin");
             return;
+
         }
 
-        const newProduct = {
-            id: Date.now(),
-            ...product
-        };
+        const formData = new FormData();
 
-        const updated = [...products, newProduct];
+        formData.append("name", product.name);
+        formData.append("price", product.price);
+        formData.append("shortDesc", product.shortDesc);
 
-        setProducts(updated);
+        if (product.image) {
+            formData.append("image", product.image);
+        }
 
-        localStorage.setItem("products", JSON.stringify(updated));
+        try {
 
-        resetForm();
+            const res = await fetch("http://localhost:8000/api/admin/products", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+
+                alert("Thêm sản phẩm thành công 🎉");
+
+                fetchProducts();
+                resetForm();
+
+            } else {
+
+                console.log(data);
+                alert("Thêm sản phẩm thất bại");
+
+            }
+
+        } catch (err) {
+
+            console.log("Lỗi thêm:", err);
+
+        }
 
     };
 
+
+    // =========================
     // SỬA
+    // =========================
     const handleEdit = (p) => {
 
-        setProduct(p);
+        setProduct({
+            name: p.name,
+            price: p.price,
+            shortDesc: p.description || "",
+            image: null
+        });
 
         setEditingId(p.id);
 
@@ -105,79 +167,117 @@ function ProductManagement() {
 
     };
 
+
+    // =========================
     // CẬP NHẬT
-    const handleUpdateProduct = () => {
+    // =========================
+    const handleUpdateProduct = async () => {
 
-        const updated = products.map(p =>
-            p.id === editingId ? { ...product, id: editingId } : p
-        );
+        try {
 
-        setProducts(updated);
+            const res = await fetch(`http://localhost:8000/api/admin/products/${editingId}`, {
 
-        localStorage.setItem("products", JSON.stringify(updated));
+                method: "PUT",
 
-        setEditingId(null);
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-        resetForm();
+                body: JSON.stringify({
+                    name: product.name,
+                    price: product.price,
+                    description: product.shortDesc
+                })
+
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+
+                alert("Cập nhật thành công");
+
+                fetchProducts();
+                resetForm();
+
+            }
+
+        } catch (err) {
+
+            console.log("Lỗi update:", err);
+
+        }
 
     };
 
+
+    // =========================
     // XÓA
-    const handleDelete = (id) => {
+    // =========================
+    const handleDelete = async (id) => {
 
-        const updated = products.filter(p => p.id !== id);
+        if (!window.confirm("Bạn có chắc muốn xóa?")) return;
 
-        setProducts(updated);
+        try {
 
-        localStorage.setItem("products", JSON.stringify(updated));
+            const res = await fetch(`http://localhost:8000/api/admin/products/${id}`, {
+                method: "DELETE"
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+
+                alert("Đã xóa sản phẩm");
+
+                fetchProducts();
+
+            }
+
+        } catch (err) {
+
+            console.log("Lỗi delete:", err);
+
+        }
 
     };
+
 
     return (
 
         <div className="product-page">
 
-            <h2 className="title">🌸 Thông tin sản phẩm</h2>
+            <h2 className="title">🌸 Quản lý sản phẩm</h2>
 
             <div className="product-card">
 
                 <div className="form-grid">
 
-                    <input name="name" placeholder="Tên sản phẩm" value={product.name} onChange={handleChange} />
+                    <input
+                        name="name"
+                        placeholder="Tên sản phẩm"
+                        value={product.name}
+                        onChange={handleChange}
+                    />
 
-                    <input name="code" placeholder="Mã sản phẩm" value={product.code} onChange={handleChange} />
-
-                    <input name="category" placeholder="Danh mục" value={product.category} onChange={handleChange} />
-
-                    <input name="quantity" placeholder="Số lượng" value={product.quantity} onChange={handleChange} />
-
-                    <input name="price" placeholder="Giá gốc" value={product.price} onChange={handleChange} />
-
-                    <input name="salePrice" placeholder="Giá khuyến mãi" value={product.salePrice} onChange={handleChange} />
-
-                    <input name="size" placeholder="Size" value={product.size} onChange={handleChange} />
-
-                    <input name="color" placeholder="Màu sắc" value={product.color} onChange={handleChange} />
-
-                    <input type="file" onChange={handleImage} />
-
-                </div>
-
-                <div className="desc-box">
+                    <input
+                        name="price"
+                        placeholder="Giá"
+                        value={product.price}
+                        onChange={handleChange}
+                    />
 
                     <input
                         name="shortDesc"
-                        placeholder="Mô tả ngắn"
+                        placeholder="Mô tả"
                         value={product.shortDesc}
                         onChange={handleChange}
                     />
 
-                    <textarea
-                        name="detailDesc"
-                        placeholder="Mô tả chi tiết"
-                        value={product.detailDesc}
-                        onChange={handleChange}
-                    ></textarea>
+                    <input
+                        type="file"
+                        onChange={handleImage}
+                    />
 
                 </div>
 
@@ -185,7 +285,9 @@ function ProductManagement() {
                     className="add-btn"
                     onClick={editingId ? handleUpdateProduct : handleAddProduct}
                 >
+
                     {editingId ? "Cập nhật sản phẩm" : "Thêm sản phẩm"}
+
                 </button>
 
             </div>
@@ -208,10 +310,12 @@ function ProductManagement() {
                         <thead>
 
                             <tr>
+
+                                <th>Ảnh</th>
                                 <th>Tên</th>
                                 <th>Giá</th>
-                                <th>Số lượng</th>
                                 <th>Hành động</th>
+
                             </tr>
 
                         </thead>
@@ -222,11 +326,31 @@ function ProductManagement() {
 
                                 <tr key={p.id}>
 
+                                    <td>
+
+                                        {p.image ? (
+
+                                            <img
+                                                src={`data:image/jpeg;base64,${p.image}`}
+                                                width="60"
+                                                height="60"
+                                                style={{
+                                                    objectFit: "cover",
+                                                    borderRadius: "6px"
+                                                }}
+                                            />
+
+                                        ) : (
+
+                                            <span>Không ảnh</span>
+
+                                        )}
+
+                                    </td>
+
                                     <td>{p.name}</td>
 
-                                    <td>{p.price}</td>
-
-                                    <td>{p.quantity}</td>
+                                    <td>{Number(p.price).toLocaleString()} VNĐ</td>
 
                                     <td>
 
@@ -242,6 +366,12 @@ function ProductManagement() {
                                             onClick={() => handleDelete(p.id)}
                                         >
                                             Xóa
+                                        </button>
+
+                                        <button
+                                            onClick={() => navigate(`/admin/product/${p.id}`)}
+                                        >
+                                            Chi tiết
                                         </button>
 
                                     </td>

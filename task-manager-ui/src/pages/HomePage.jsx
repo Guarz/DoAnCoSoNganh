@@ -2,45 +2,92 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 function HomePage() {
+
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/api/get-products")
-            .then(res => setProducts(res.data))
-            .catch(err => console.error("Lỗi load sản phẩm:", err));
+
+        axios.get("http://localhost:8000/api/user/products")
+
+            .then(res => {
+
+                setProducts(res.data);
+
+            })
+
+            .catch(err => {
+
+                console.error("Lỗi load sản phẩm:", err);
+
+            });
+
     }, []);
 
+
     return (
+
         <div style={wrapper}>
+
             <h2 style={title}>SẢN PHẨM MỚI NHẤT</h2>
 
             <div style={grid}>
+
                 {products.map(p => (
-                    <div key={p.IdSP} style={card}>
-                        <img
-                            src={
-                                p.HinhAnh
-                                    ? `http://localhost:8000/storage/${p.HinhAnh}`
-                                    : "https://via.placeholder.com/300x400"
-                            }
-                            style={image}
-                        />
+
+                    <div key={p.id} style={card}>
+
+                        {/* ẢNH */}
+
+                        {p.image ? (
+
+                            <img
+                                src={`data:image/jpeg;base64,${p.image}`}
+                                style={image}
+                            />
+
+                        ) : (
+
+                            <img
+                                src="https://via.placeholder.com/300x400"
+                                style={image}
+                            />
+
+                        )}
+
 
                         <div style={cardBody}>
-                            <h3>{p.TenSP}</h3>
+
+                            <h3>{p.name}</h3>
+
                             <p style={price}>
-                                {new Intl.NumberFormat("vi-VN").format(p.Gia)} VNĐ
+
+                                {new Intl.NumberFormat("vi-VN").format(p.price)} VNĐ
+
                             </p>
-                            <button style={btnBuy}>Mua ngay</button>
+
+                            <button style={btnBuy}>
+
+                                Mua ngay
+
+                            </button>
+
                         </div>
+
                     </div>
+
                 ))}
+
             </div>
+
         </div>
+
     );
+
 }
 
+
 /* ===== STYLE ===== */
+
 const wrapper = {
     padding: 30,
     maxWidth: 1200,

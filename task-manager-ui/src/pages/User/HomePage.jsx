@@ -5,7 +5,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/admin/products") 
+    fetch("http://127.0.0.1:8000/api/admin/products")
       .then((res) => res.json())
       .then((data) => {
         setProducts(Array.isArray(data) ? data : []);
@@ -40,11 +40,11 @@ export default function HomePage() {
             {products.map((p) => (
               <div key={p.id} style={productCard}>
                 <div style={imgContainer}>
- 
-                  <img 
-                    src={`https://loremflickr.com/320/240/fashion?lock=${p.id}`} 
-                    alt={p.name} 
-                    style={imgStyle} 
+
+                  <img
+                    src={`https://loremflickr.com/320/240/fashion?lock=${p.id}`}
+                    alt={p.name}
+                    style={imgStyle}
                   />
                 </div>
                 <h4 style={pName}>{p.name}</h4>

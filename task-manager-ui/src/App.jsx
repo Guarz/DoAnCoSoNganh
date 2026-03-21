@@ -13,12 +13,13 @@ import Login from "./pages/Login";
 import AdminHome from "./pages/Admin/AdminHome";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import ProductManagement from "./pages/Admin/ProductManagement";
+import ProductDetail from "./pages/Admin/ProductDetail";
 import AdminOrders from "./pages/Admin/AdminOrders";
-
 
 import CartPage from "./pages/CartPage";
 import UserOrders from "./pages/User/UserOrders";
 import HomePage from "./pages/User/HomePage";
+
 function App() {
 
   const [user, setUser] = useState(() => {
@@ -47,12 +48,11 @@ function App() {
 
             <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
 
-
-              {/* MENU ADMIN */}
+              {/* ADMIN MENU */}
               {user?.role === "admin" && (
                 <>
                   <Link to="/admin/home" style={linkStyle}>
-                    Trang chủ 
+                    Trang chủ
                   </Link>
 
                   <Link to="/admin" style={linkStyle}>
@@ -69,13 +69,13 @@ function App() {
                 </>
               )}
 
-              {/* USER */}
+              {/* USER MENU */}
               {user?.role !== "admin" && (
                 <>
                   <Link to="/user/home" style={linkStyle}>
                     Trang chủ
                   </Link>
-                  
+
                   <Link to="/cart" style={linkStyle}>
                     Giỏ hàng
                   </Link>
@@ -90,7 +90,7 @@ function App() {
                     </Link>
                   )}
 
-                  <span> {user.name}</span>
+                  <span>{user.name}</span>
 
                   <button onClick={logout} style={btnLogoutStyle}>
                     Thoát
@@ -108,18 +108,22 @@ function App() {
 
         {/* ROUTER */}
         <Routes>
-          <Route path="/user/home" element={<HomePage />} />
-          <Route path="/" element={<HomePage />} />
+
           {/* USER */}
-          
+          <Route path="/" element={<HomePage />} />
+          <Route path="/user/home" element={<HomePage />} />
+
           <Route path="/login" element={<Login setUser={setUser} />} />
+
           <Route path="/cart" element={<CartPage />} />
 
           <Route
             path="/user/orders"
             element={user ? <UserOrders /> : <Navigate to="/login" />}
           />
+
           <Route path="/user" element={<Navigate to="/" replace />} />
+
           {/* ADMIN */}
 
           <Route
@@ -145,6 +149,16 @@ function App() {
             element={
               user?.role === "admin"
                 ? <ProductManagement />
+                : <Navigate to="/login" />
+            }
+          />
+
+          {/* CHI TIẾT SẢN PHẨM */}
+          <Route
+            path="/admin/product/:id"
+            element={
+              user?.role === "admin"
+                ? <ProductDetail />
                 : <Navigate to="/login" />
             }
           />
