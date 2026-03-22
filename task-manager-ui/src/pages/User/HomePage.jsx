@@ -1,11 +1,9 @@
 import React from "react";
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
 import "../../style/HomePage.css";
 
 const HomePage = () => {
   return (
-    <div className="d-flex flex-column min-vh-100 bg-light">
+    <div className="d-flex flex-column min-vh-100">
       <main className="flex-grow-1 container py-5">
         <section className="row align-items-center mb-5 bg-white p-5 rounded-4 shadow-sm">
           <div className="col-md-6 text-center text-md-start mb-4 mb-md-0">
@@ -26,7 +24,6 @@ const HomePage = () => {
             </div>
           </div>
           <div className="col-md-6 text-center">
-            {/* Hình ảnh minh họa Hero (dùng placeholder) */}
             <img
               src="https://via.placeholder.com/500x350/ffebee/d63384?text=Banner+Shop+A"
               alt="Hero Banner"

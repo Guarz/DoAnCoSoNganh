@@ -7,7 +7,6 @@ const UserLayout = () => {
   return (
     <div className="d-flex flex-column min-vh-100">
       <Header />
-
       <main className="flex-grow-1">
         {/* Đây là "cửa sổ" để HomePage, CartPage... hiện ra */}
         <Outlet />

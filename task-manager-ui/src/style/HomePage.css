@@ -1,94 +1,47 @@
-/* src/styles/HomePage.css */
+/* src/style/HomePage.css */
 
-/* 1. Hero Section */
-.hero-section {
-  background: linear-gradient(135deg, #fff5f8 0%, #ffffff 100%);
-  border-radius: 30px;
-  padding: 80px 40px;
-  margin-bottom: 50px;
-  border: 1px solid #fce4ec;
-  display: flex;
-  align-items: center;
+/* 1. Các khối nội dung (Cards/Sections) */
+.custom-section {
+  background-color: #ffffff !important; /* Trắng nổi bật trên nền hồng */
+  border-radius: 20px !important;
+  border: none !important;
+  box-shadow: 0 10px 25px rgba(74, 59, 62, 0.08) !important; /* Đổ bóng màu nâu nhạt */
 }
 
-.hero-title {
-  color: #d63384;
-  font-size: 3.5rem;
-  font-weight: 800;
-  line-height: 1.2;
-  margin-bottom: 20px;
-}
-
-/* 2. Nút bấm tùy chỉnh */
-.btn-primary-custom {
-  background-color: #d63384;
-  color: white;
+/* 2. Nút "Mua ngay" (Màu nhấn cực mạnh) */
+.btn-main {
+  background-color: #D63384 !important; /* Hồng đậm */
+  color: #ffffff !important;
   border: none;
   padding: 12px 35px;
   border-radius: 50px;
-  font-weight: 600;
+  font-weight: 700;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(214, 51, 132, 0.3);
 }
 
-.btn-primary-custom:hover {
-  background-color: #bc2a71;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(214, 51, 132, 0.4);
+.btn-main:hover {
+  background-color: #b0236a !important; /* Đậm hơn khi hover */
+  transform: scale(1.05);
 }
 
-.btn-secondary-custom {
-  border: 2px solid #d63384;
-  color: #d63384;
-  background-color: transparent;
+/* 3. Nút "Tìm hiểu thêm" (Trong suốt tinh tế) */
+.btn-sub {
+  background-color: transparent !important;
+  color: #4A3B3E !important; /* Màu nâu Espresso */
+  border: 2px solid #4A3B3E !important;
   padding: 12px 35px;
   border-radius: 50px;
   font-weight: 600;
-  transition: all 0.3s ease;
 }
 
-.btn-secondary-custom:hover {
-  background-color: #fdf2f7;
-  color: #d63384;
+.btn-sub:hover {
+  background-color: #4A3B3E !important;
+  color: #ffffff !important;
 }
 
-/* 3. Các thẻ giới thiệu (Cards) */
-.intro-card {
-  background-color: #fff;
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-  text-align: center;
-  height: 100%;
-  transition: all 0.3s ease;
-  border: 1px solid transparent;
-}
-
-.intro-card:hover {
-  transform: translateY(-10px);
-  border-color: #fce4ec;
-  box-shadow: 0 15px 40px rgba(214, 51, 132, 0.1);
-}
-
+/* 4. Icon và các Badge */
 .icon-circle {
-  width: 80px;
-  height: 80px;
-  background-color: #fdf2f7;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-  font-size: 2rem;
-}
-
-/* 4. Responsive cho Mobile */
-@media (max-width: 768px) {
-  .hero-title {
-    font-size: 2.2rem;
-  }
-  .hero-section {
-    padding: 40px 20px;
-    text-align: center;
-  }
+  background-color: #FFF5F7 !important; /* Hồng cực nhạt */
+  color: #D63384 !important;
+  border: 1px solid #FFC5D3;
 }

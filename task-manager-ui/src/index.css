@@ -1,14 +1,19 @@
 /* src/index.css */
-:root {
-  --primary-pink: #FFC5D3;
-  --dark-pink: #E0A4B3;
-  --light-pink: #FFF5F7;
-  --text-color: #4A3B3E;
-  --white: #ffffff;
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background-color: var(--light-pink); /* Nền nhạt giúp mắt dễ chịu hơn */
-  color: var(--text-color);
+  /* Giữ màu nền xám cực nhẹ như trong hình */
+  background-color: #FFC5D3;
+  color: #212529;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+a {
+  text-decoration: none;
 }
