@@ -1,0 +1,94 @@
+/* src/styles/HomePage.css */
+
+/* 1. Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #fff5f8 0%, #ffffff 100%);
+  border-radius: 30px;
+  padding: 80px 40px;
+  margin-bottom: 50px;
+  border: 1px solid #fce4ec;
+  display: flex;
+  align-items: center;
+}
+
+.hero-title {
+  color: #d63384;
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+/* 2. Nút bấm tùy chỉnh */
+.btn-primary-custom {
+  background-color: #d63384;
+  color: white;
+  border: none;
+  padding: 12px 35px;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(214, 51, 132, 0.3);
+}
+
+.btn-primary-custom:hover {
+  background-color: #bc2a71;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(214, 51, 132, 0.4);
+}
+
+.btn-secondary-custom {
+  border: 2px solid #d63384;
+  color: #d63384;
+  background-color: transparent;
+  padding: 12px 35px;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary-custom:hover {
+  background-color: #fdf2f7;
+  color: #d63384;
+}
+
+/* 3. Các thẻ giới thiệu (Cards) */
+.intro-card {
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  text-align: center;
+  height: 100%;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.intro-card:hover {
+  transform: translateY(-10px);
+  border-color: #fce4ec;
+  box-shadow: 0 15px 40px rgba(214, 51, 132, 0.1);
+}
+
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  background-color: #fdf2f7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 2rem;
+}
+
+/* 4. Responsive cho Mobile */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.2rem;
+  }
+  .hero-section {
+    padding: 40px 20px;
+    text-align: center;
+  }
+}

@@ -1,27 +1,14 @@
-/* Thiết lập font và màu nền cơ bản */
+/* src/index.css */
 :root {
-  font-family: Inter, system-ui, Arial, sans-serif;
-  line-height: 1.5;
-  color-scheme: light;
+  --primary-pink: #FFC5D3;
+  --dark-pink: #E0A4B3;
+  --light-pink: #FFF5F7;
+  --text-color: #4A3B3E;
+  --white: #ffffff;
 }
 
-/* 🟢 SỬA LỖI TẠI ĐÂY: Xóa flex center để giao diện tràn màn hình */
-html,
 body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #f4f7f6;
-  /* Màu nền xám nhạt cho toàn trang */
-}
-
-/* Đảm bảo container của React chiếm toàn bộ không gian */
-#root {
-  width: 100%;
-  min-height: 100vh;
-}
-
-* {
-  box-sizing: border-box;
+  background-color: var(--light-pink); /* Nền nhạt giúp mắt dễ chịu hơn */
+  color: var(--text-color);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }

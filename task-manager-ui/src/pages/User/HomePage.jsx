@@ -1,79 +1,116 @@
-import { useEffect, useState } from "react";
+import React from "react";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import "../../style/HomePage.css";
 
-export default function HomePage() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/admin/products")
-      .then((res) => res.json())
-      .then((data) => {
-        setProducts(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Lỗi lấy dữ liệu:", err);
-        setLoading(false);
-      });
-  }, []);
-
+const HomePage = () => {
   return (
-    <div style={contentWrapper}>
-      {/* SIDEBAR BÊN TRÁI */}
-      <aside style={sidebarStyle}>
-        <h3 style={sidebarTitle}>DANH MỤC</h3>
-        <div style={menuList}>
-          <div style={menuItem}> Áo </div>
-          <div style={menuItem}> Quần </div>
+    <div className="d-flex flex-column min-vh-100 bg-light">
+      <main className="flex-grow-1 container py-5">
+        <section className="row align-items-center mb-5 bg-white p-5 rounded-4 shadow-sm">
+          <div className="col-md-6 text-center text-md-start mb-4 mb-md-0">
+            <h1 className="display-4 fw-bold text-danger mb-3">
+              Chào Mừng Đến Với SHOP QUẦN ÁO A
+            </h1>
+            <p className="lead text-muted mb-4">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <div className="d-flex justify-content-center justify-content-md-start gap-3">
+              <button className="btn btn-danger btn-lg px-4 rounded-pill">
+                Mua Ngay
+              </button>
+              <button className="btn btn-outline-secondary btn-lg px-4 rounded-pill">
+                Tìm Hiểu Thêm
+              </button>
+            </div>
+          </div>
+          <div className="col-md-6 text-center">
+            {/* Hình ảnh minh họa Hero (dùng placeholder) */}
+            <img
+              src="https://via.placeholder.com/500x350/ffebee/d63384?text=Banner+Shop+A"
+              alt="Hero Banner"
+              className="img-fluid rounded-4 shadow"
+            />
+          </div>
+        </section>
 
-        </div>
-      </aside>
+        {/* Phần 2: Giới thiệu ngắn về Shop */}
+        <section className="mb-5 bg-white p-5 rounded-4 shadow-sm">
+          <div className="row">
+            <div className="col-md-8 offset-md-2 text-center">
+              <h2 className="fw-bold text-dark mb-4 border-bottom pb-2 d-inline-block">
+                Về Chúng Tôi
+              </h2>
+              <p className="text-muted fs-5 lh-lg">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+                enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+                nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+                sunt in culpa qui officia deserunt mollit anim id est laborum.
+              </p>
+            </div>
+          </div>
+        </section>
 
-      {/* DANH SÁCH SẢN PHẨM BÊN PHẢI */}
-      <main style={{ flex: 1 }}>
-        <h2 style={sectionTitle}>SẢN PHẨM MỚI NHẤT</h2>
-
-        {loading ? (
-          <p>Đang tải sản phẩm...</p>
-        ) : products.length > 0 ? (
-          <div style={productGrid}>
-            {products.map((p) => (
-              <div key={p.id} style={productCard}>
-                <div style={imgContainer}>
-
-                  <img
-                    src={`https://loremflickr.com/320/240/fashion?lock=${p.id}`}
-                    alt={p.name}
-                    style={imgStyle}
-                  />
+        {/* Phần 3: Tại sao chọn chúng tôi? */}
+        <section className="bg-white p-5 rounded-4 shadow-sm">
+          <h2 className="fw-bold text-dark mb-5 text-center">
+            Tại Sao Chọn SHOP QUẦN ÁO A?
+          </h2>
+          <div className="row g-4 text-center">
+            {/* Lý do 1 */}
+            <div className="col-md-4">
+              <div className="card h-100 border-0 shadow-sm bg-light-subtle rounded-3 p-3">
+                <div className="card-body">
+                  <i className="fas fa-tshirt text-danger fs-1 mb-3"></i>
+                  <h5 className="card-title fw-semibold text-danger">
+                    Mẫu Mã Đa Dạng
+                  </h5>
+                  <p className="card-text text-muted">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                    do eiusmod tempor incididunt.
+                  </p>
                 </div>
-                <h4 style={pName}>{p.name}</h4>
-                <p style={pPrice}>{Number(p.price).toLocaleString()}đ</p>
-                <button style={btnBuy}>Mua ngay</button>
               </div>
-            ))}
+            </div>
+            {/* Lý do 2 */}
+            <div className="col-md-4">
+              <div className="card h-100 border-0 shadow-sm bg-light-subtle rounded-3 p-3">
+                <div className="card-body">
+                  <i className="fas fa-shipping-fast text-danger fs-1 mb-3"></i>
+                  <h5 className="card-title fw-semibold text-danger">
+                    Giao Hàng Nhanh
+                  </h5>
+                  <p className="card-text text-muted">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                    do eiusmod tempor incididunt.
+                  </p>
+                </div>
+              </div>
+            </div>
+            {/* Lý do 3 */}
+            <div className="col-md-4">
+              <div className="card h-100 border-0 shadow-sm bg-light-subtle rounded-3 p-3">
+                <div className="card-body">
+                  <i className="fas fa-hand-holding-usd text-danger fs-1 mb-3"></i>
+                  <h5 className="card-title fw-semibold text-danger">
+                    Giá Cả Hợp Lý
+                  </h5>
+                  <p className="card-text text-muted">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                    do eiusmod tempor incididunt.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-        ) : (
-          <div style={{ textAlign: "center", color: "#888", marginTop: "50px" }}>
-            <p>Hiện chưa có sản phẩm nào.</p>
-          </div>
-        )}
+        </section>
       </main>
     </div>
   );
-}
+};
 
-/* ================= STYLE ================= */
-const contentWrapper = { display: "flex", maxWidth: "1200px", margin: "30px auto", gap: "30px", padding: "0 20px", alignItems: "flex-start" };
-const sidebarStyle = { width: "250px", background: "#fff", padding: "20px", borderRadius: "15px", boxShadow: "0 4px 15px rgba(0,0,0,0.05)" };
-const sidebarTitle = { fontSize: "18px", color: "#d63384", marginBottom: "20px", borderBottom: "2px solid #fdf2f7", paddingBottom: "10px" };
-const menuList = { display: "flex", flexDirection: "column", gap: "10px" };
-const menuItem = { padding: "12px", background: "#fdf2f7", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: "500" };
-const sectionTitle = { color: "#d63384", marginBottom: "25px", fontSize: "24px" };
-const productGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "25px" };
-const productCard = { background: "#fff", padding: "20px", borderRadius: "15px", textAlign: "center", boxShadow: "0 4px 12px rgba(0,0,0,0.03)", border: "1px solid #eee" };
-const imgContainer = { width: "100%", height: "160px", borderRadius: "10px", overflow: "hidden", marginBottom: "15px" };
-const imgStyle = { width: "100%", height: "100%", objectFit: "cover" };
-const pName = { fontSize: "16px", margin: "10px 0", height: "40px", overflow: "hidden", color: "#333" };
-const pPrice = { color: "#d63384", fontWeight: "bold", fontSize: "19px" };
-const btnBuy = { width: "100%", padding: "10px", background: "#333", color: "#fff", border: "none", borderRadius: "8px", marginTop: "10px", cursor: "pointer", fontWeight: "bold" };
+export default HomePage;
