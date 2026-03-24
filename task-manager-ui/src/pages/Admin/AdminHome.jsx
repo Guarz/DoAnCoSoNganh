@@ -1,7 +1,39 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 function AdminHome() {
+
+  const [data, setData] = useState({
+    total_products: 0,
+    total_orders: 0
+  });
+
+  useEffect(() => {
+
+    const loadDashboard = async () => {
+
+      try {
+
+        const res = await fetch("http://127.0.0.1:8000/api/admin/dashboard");
+
+        const result = await res.json();
+
+        setData(result);
+
+      } catch (err) {
+
+        console.log("Lỗi load dashboard:", err);
+
+      }
+
+    };
+
+    loadDashboard();
+
+  }, []);
+
   return (
+
     <div style={container}>
 
       <h1 style={title}>👋 Chào mừng Admin</h1>
@@ -12,7 +44,7 @@ function AdminHome() {
 
         <div style={card}>
           <h3>📦 Sản phẩm</h3>
-          <p style={number}>12</p>
+          <p style={number}>{data.total_products}</p>
           <Link to="/admin/products" style={link}>
             Quản lý
           </Link>
@@ -20,7 +52,7 @@ function AdminHome() {
 
         <div style={card}>
           <h3>🧾 Đơn hàng</h3>
-          <p style={number}>5</p>
+          <p style={number}>{data.total_orders}</p>
           <Link to="/admin/orders" style={link}>
             Quản lý
           </Link>
@@ -60,7 +92,6 @@ function AdminHome() {
 export default AdminHome;
 
 
-
 /* ================= STYLE ================= */
 
 const container = {
@@ -90,8 +121,7 @@ const card = {
   padding: 25,
   borderRadius: 15,
   boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
-  textAlign: "center",
-  transition: "0.3s"
+  textAlign: "center"
 };
 
 const number = {
