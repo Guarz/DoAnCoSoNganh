@@ -1,9 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\User\ProductController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -231,3 +232,5 @@ Route::post('/admin/products', function (Request $request) {
         ]);
     }
 });
+
+Route::post('/login', [AuthController::class, 'login']);
