@@ -11,13 +11,15 @@ import CartPage from "./pages/CartPage";
 import UserOrders from "./pages/User/UserOrders";
 import UserProductDetail from "./pages/User/ProductDetail";
 import ProductList from "./pages/User/ProductList";
-import Checkout from './pages/User/Checkout';
+import Checkout from "./pages/User/Checkout";
+
 // Pages ADMIN
 import AdminHome from "./pages/Admin/AdminHome";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import ProductManagement from "./pages/Admin/ProductManagement";
 import ProductDetail from "./pages/Admin/ProductDetail";
 import AdminOrders from "./pages/Admin/AdminOrders";
+import CategoryManagement from "./pages/Admin/CategoryManagement";
 
 function App() {
 
@@ -26,34 +28,30 @@ function App() {
     return u ? JSON.parse(u) : null;
   });
 
+  // ✅ CHECK ADMIN
+  const isAdmin = user?.role === "admin";
+
   return (
     <Router>
 
       <Routes>
 
-        {/* ================= USER LAYOUT ================= */}
+        {/* ================= USER ================= */}
         <Route element={<UserLayout />}>
 
           <Route path="/" element={<HomePage />} />
-
-          <Route path="/cart" element={<CartPage />} />
-
-          <Route
-            path="/user/orders"
-            element={user ? <UserOrders /> : <Navigate to="/login" />}
-          />
           <Route path="/home" element={<HomePage />} />
           <Route path="/products" element={<ProductList />} />
           <Route path="/product/:id" element={<UserProductDetail />} />
-          <Route path="/checkout" element={<Checkout />} />
           <Route path="/cart" element={<CartPage />} />
-          <Route 
-            path="/orders" 
-            element={user ? <UserOrders /> : <Navigate to="/login" replace />} 
+          <Route path="/checkout" element={<Checkout />} />
+
+          <Route
+            path="/orders"
+            element={user ? <UserOrders /> : <Navigate to="/login" replace />}
           />
 
         </Route>
-
 
         {/* ================= LOGIN ================= */}
         <Route
@@ -61,64 +59,60 @@ function App() {
           element={<Login setUser={setUser} />}
         />
 
-
         {/* ================= ADMIN ================= */}
-
-        <Route
-          path="/admin/home"
-          element={
-            user?.role === "admin"
-              ? <AdminHome />
-              : <Navigate to="/login" />
-          }
-        />
 
         <Route
           path="/admin"
           element={
-            user?.role === "admin"
-              ? <AdminDashboard />
-              : <Navigate to="/login" />
+            isAdmin ? <AdminDashboard /> : <Navigate to="/login" replace />
+          }
+        />
+
+        <Route
+          path="/admin/home"
+          element={
+            isAdmin ? <AdminHome /> : <Navigate to="/login" replace />
           }
         />
 
         <Route
           path="/admin/products"
           element={
-            user?.role === "admin"
-              ? <ProductManagement />
-              : <Navigate to="/login" />
+            isAdmin ? <ProductManagement /> : <Navigate to="/login" replace />
           }
         />
 
         <Route
           path="/admin/product/:id"
           element={
-            user?.role === "admin"
-              ? <ProductDetail />
-              : <Navigate to="/login" />
+            isAdmin ? <ProductDetail /> : <Navigate to="/login" replace />
           }
         />
 
         <Route
           path="/admin/orders"
           element={
-            user?.role === "admin"
-              ? <AdminOrders />
-              : <Navigate to="/login" />
+            isAdmin ? <AdminOrders /> : <Navigate to="/login" replace />
           }
         />
 
-
-        {/* ================= 404 ================= */}
-
         <Route
-          path="*"
-          element={<h2 style={{ padding: 30 }}>404 - Không tìm thấy trang</h2>}
+          path="/admin/categories"
+          element={
+            isAdmin ? <CategoryManagement /> : <Navigate to="/login" replace />
+          }
         />
 
-        <Route path="/login" element={<Login setUser={setUser} />} />
-        <Route path="*" element={<h2 style={{ padding: 50, textAlign: 'center' }}>404 - Không tìm thấy trang</h2>} />
+        {/* ================= 404 ================= */}
+        <Route
+          path="*"
+          element={
+            <h2 style={{ padding: 50, textAlign: "center" }}>
+              404 - Không tìm thấy trang
+            </h2>
+          }
+        />
+
       </Routes>
 
     </Router>

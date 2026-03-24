@@ -46,8 +46,108 @@ Route::get('/admin/dashboard', function () {
 
 
 // =============================
-// LẤY DANH SÁCH SẢN PHẨM
+// 🔥 DANH MỤC (CATEGORY)
 // =============================
+
+// LẤY DANH SÁCH
+Route::get('/admin/categories', function () {
+
+    $categories = DB::table('loaisp')
+        ->select(
+            'IdLoai as id',
+            'TenLoai as name'
+        )
+        ->orderBy('IdLoai', 'desc')
+        ->get();
+
+    return response()->json($categories);
+});
+
+
+// =============================
+// ✅ FIX LỖI 500 Ở ĐÂY
+// =============================
+Route::post('/admin/categories', function (Request $request) {
+
+    try {
+
+        // 🔥 đọc JSON đúng cách
+        $data = json_decode($request->getContent(), true);
+        $name = $data['name'] ?? null;
+
+        if (!$name) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Thiếu tên danh mục'
+            ]);
+        }
+
+        $id = DB::table('loaisp')->insertGetId([
+            'TenLoai' => $name
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'id' => $id
+        ]);
+
+    } catch (\Exception $e) {
+
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ]);
+    }
+});
+
+
+// CẬP NHẬT DANH MỤC
+Route::put('/admin/categories/{id}', function (Request $request, $id) {
+
+    try {
+
+        $data = json_decode($request->getContent(), true);
+        $name = $data['name'] ?? null;
+
+        if (!$name) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Thiếu tên'
+            ]);
+        }
+
+        DB::table('loaisp')
+            ->where('IdLoai', $id)
+            ->update([
+                'TenLoai' => $name
+            ]);
+
+        return response()->json(['success' => true]);
+
+    } catch (\Exception $e) {
+
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ]);
+    }
+});
+
+
+// XÓA DANH MỤC
+Route::delete('/admin/categories/{id}', function ($id) {
+
+    DB::table('loaisp')->where('IdLoai', $id)->delete();
+
+    return response()->json(['success' => true]);
+});
+
+
+// =============================
+// SẢN PHẨM
+// =============================
+
+// LẤY DANH SÁCH
 Route::get('/admin/products', function () {
 
     $products = DB::table('sanpham')
@@ -71,41 +171,6 @@ Route::get('/admin/products', function () {
     }
 
     return response()->json($products);
-
-});
-
-
-// =============================
-// CHI TIẾT SẢN PHẨM
-// =============================
-Route::get('/admin/products/{id}', function ($id) {
-
-    $product = DB::table('sanpham')
-        ->join('chitietsanpham', 'sanpham.IdCT', '=', 'chitietsanpham.IdCT')
-        ->leftJoin('anhsp', 'sanpham.IdAnh', '=', 'anhsp.IdAnh')
-        ->select(
-            'sanpham.IdSP as id',
-            'sanpham.TenSP as name',
-            'sanpham.MoTa as description',
-            'chitietsanpham.Gia as price',
-            'anhsp.HinhAnh as image'
-        )
-        ->where('sanpham.IdSP', $id)
-        ->first();
-
-    if (!$product) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Không tìm thấy sản phẩm'
-        ]);
-    }
-
-    if ($product->image) {
-        $product->image = base64_encode($product->image);
-    }
-
-    return response()->json($product);
-
 });
 
 
@@ -119,38 +184,30 @@ Route::post('/admin/products', function (Request $request) {
         DB::beginTransaction();
 
         if (!$request->name || !$request->price) {
-
             return response()->json([
-                'success' => false,
-                'message' => 'Thiếu name hoặc price'
+                'success' => false
             ]);
-
         }
 
-        // LƯU ẢNH
         $imageId = null;
 
         if ($request->hasFile('image')) {
-
             $file = $request->file('image');
             $imageData = file_get_contents($file);
 
             $imageId = DB::table('anhsp')->insertGetId([
                 'HinhAnh' => $imageData
             ]);
-
         }
 
-        // TẠO CHI TIẾT SẢN PHẨM
         $detailId = DB::table('chitietsanpham')->insertGetId([
             'Gia' => $request->price,
             'IdSize' => 1
         ]);
 
-        // TẠO SẢN PHẨM
         $productId = DB::table('sanpham')->insertGetId([
             'TenSP' => $request->name,
-            'MoTa' => $request->shortDesc ?? 'Chưa có mô tả',
+            'MoTa' => $request->shortDesc ?? '',
             'NgayTao' => now(),
             'IdLoai' => 1,
             'IdCT' => $detailId,
@@ -161,7 +218,6 @@ Route::post('/admin/products', function (Request $request) {
 
         return response()->json([
             'success' => true,
-            'message' => 'Thêm sản phẩm thành công',
             'id' => $productId
         ]);
 
@@ -173,114 +229,5 @@ Route::post('/admin/products', function (Request $request) {
             'success' => false,
             'error' => $e->getMessage()
         ]);
-
     }
-
-});
-
-
-// =============================
-// CẬP NHẬT SẢN PHẨM
-// =============================
-Route::put('/admin/products/{id}', function (Request $request, $id) {
-
-    try {
-
-        $product = DB::table('sanpham')
-            ->where('IdSP', $id)
-            ->first();
-
-        if (!$product) {
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Không tìm thấy sản phẩm'
-            ]);
-
-        }
-
-        DB::beginTransaction();
-
-        DB::table('sanpham')
-            ->where('IdSP', $id)
-            ->update([
-                'TenSP' => $request->name,
-                'MoTa' => $request->description ?? 'Chưa có mô tả'
-            ]);
-
-        DB::table('chitietsanpham')
-            ->where('IdCT', $product->IdCT)
-            ->update([
-                'Gia' => $request->price
-            ]);
-
-        DB::commit();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Cập nhật thành công'
-        ]);
-
-    } catch (\Exception $e) {
-
-        DB::rollBack();
-
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage()
-        ]);
-
-    }
-
-});
-
-
-// =============================
-// XÓA SẢN PHẨM
-// =============================
-Route::delete('/admin/products/{id}', function ($id) {
-
-    try {
-
-        $product = DB::table('sanpham')
-            ->where('IdSP', $id)
-            ->first();
-
-        if (!$product) {
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Không tìm thấy sản phẩm'
-            ]);
-
-        }
-
-        DB::beginTransaction();
-
-        DB::table('chitietsanpham')
-            ->where('IdCT', $product->IdCT)
-            ->delete();
-
-        DB::table('sanpham')
-            ->where('IdSP', $id)
-            ->delete();
-
-        DB::commit();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Đã xóa sản phẩm'
-        ]);
-
-    } catch (\Exception $e) {
-
-        DB::rollBack();
-
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage()
-        ]);
-
-    }
-
 });
