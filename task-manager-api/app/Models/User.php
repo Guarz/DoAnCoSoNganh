@@ -14,6 +14,8 @@ class User extends Authenticatable
         'Ten',
         'Email',
         'Password',
+        'DiaChi',
+        'DienThoai',
     ];
     protected $hidden = [
         'Password',
@@ -21,6 +23,7 @@ class User extends Authenticatable
     ];
     protected $table = 'User';
     protected $primaryKey = 'IdUser';
+    public $incrementing = true;
     public function GioHang()
     {
         return $this->hasOne(GioHang::class, 'IdGH', 'IdGH');

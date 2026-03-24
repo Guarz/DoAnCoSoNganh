@@ -179,7 +179,6 @@ Route::get('/admin/products', function () {
 // THÊM SẢN PHẨM
 // =============================
 Route::post('/admin/products', function (Request $request) {
-
     try {
 
         DB::beginTransaction();
@@ -189,9 +188,7 @@ Route::post('/admin/products', function (Request $request) {
                 'success' => false
             ]);
         }
-
         $imageId = null;
-
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $imageData = file_get_contents($file);
@@ -234,3 +231,5 @@ Route::post('/admin/products', function (Request $request) {
 });
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::put('/user/update/{id}', [AuthController::class, 'updateProfile']);

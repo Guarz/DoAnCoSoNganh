@@ -11,6 +11,7 @@ import UserLayout from "./layouts/UserLayout";
 
 // Pages Auth
 import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
 
 // Pages USER
 // import Login from "./pages/Login";
@@ -20,6 +21,7 @@ import UserOrders from "./pages/User/UserOrders";
 import UserProductDetail from "./pages/User/ProductDetail";
 import ProductList from "./pages/User/ProductList";
 import Checkout from "./pages/User/Checkout";
+import Profile from "./pages/User/Profile";
 
 // Pages ADMIN
 import AdminHome from "./pages/Admin/AdminHome";
@@ -50,7 +52,12 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
+          <Route
+            path="/profile"
+            element={user ? <Profile /> : <Navigate to="/login" replace />}
+          />
           <Route
             path="/orders"
             element={user ? <UserOrders /> : <Navigate to="/login" replace />}
