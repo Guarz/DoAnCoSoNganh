@@ -1,11 +1,22 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useOutletContext } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   // Lấy user và setUser từ OutletContext (giống như cách làm với giỏ hàng)
   const { user, setUser } = useOutletContext();
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    // Nếu không có user (chưa đăng nhập), đá về trang login ngay
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+
+  if (!user) return null;
   const [formData, setFormData] = useState({
     ten: user?.name || "",
     diachi: user?.address || "",
