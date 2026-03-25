@@ -8,24 +8,24 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes
+| API Routes - SHOP QUẦN ÁO
 |--------------------------------------------------------------------------
 */
 
 // =============================
-// 👤 USER API (Dành cho khách hàng)
+// 🔑 AUTHENTICATION
+// =============================
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::put('/user/update/{id}', [AuthController::class, 'updateProfile']);
+
+// =============================
+// 👤 USER API (Khách hàng)
 // =============================
 Route::prefix('user')->group(function () {
     Route::get('products', [ProductController::class, 'index']);
     Route::get('products/{id}', [ProductController::class, 'show']);
 });
-
-// =============================
-// 🔑 AUTHENTICATION (Đăng nhập/Đăng ký)
-// =============================
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
-Route::put('/user/update/{id}', [AuthController::class, 'updateProfile']);
 
 // =============================
 // 📊 ADMIN DASHBOARD (Thống kê)
@@ -42,192 +42,154 @@ Route::get('/admin/dashboard', function () {
 // =============================
 // 🔥 QUẢN LÝ DANH MỤC (CATEGORY)
 // =============================
+Route::prefix('admin/categories')->group(function () {
+    Route::get('/', function () {
+        return response()->json(DB::table('loaisp')
+            ->select('IdLoai as id', 'TenLoai as name')
+            ->orderBy('IdLoai', 'desc')
+            ->get());
+    });
 
-// Lấy danh sách danh mục
-Route::get('/admin/categories', function () {
-    $categories = DB::table('loaisp')
-        ->select('IdLoai as id', 'TenLoai as name')
-        ->orderBy('IdLoai', 'desc')
-        ->get();
-    return response()->json($categories);
-});
-
-// Thêm danh mục
-Route::post('/admin/categories', function (Request $request) {
-    try {
-        $data = json_decode($request->getContent(), true);
-        $name = $data['name'] ?? null;
-
-        if (!$name) {
+    Route::post('/', function (Request $request) {
+        $name = $request->name;
+        if (!$name)
             return response()->json(['success' => false, 'message' => 'Thiếu tên danh mục']);
-        }
-
         $id = DB::table('loaisp')->insertGetId(['TenLoai' => $name]);
         return response()->json(['success' => true, 'id' => $id]);
-    } catch (\Exception $e) {
-        return response()->json(['success' => false, 'error' => $e->getMessage()]);
-    }
-});
+    });
 
-// Cập nhật danh mục
-Route::put('/admin/categories/{id}', function (Request $request, $id) {
-    try {
-        $data = json_decode($request->getContent(), true);
-        $name = $data['name'] ?? null;
-        if (!$name)
-            return response()->json(['success' => false, 'message' => 'Thiếu tên']);
-
-        DB::table('loaisp')->where('IdLoai', $id)->update(['TenLoai' => $name]);
+    Route::put('/{id}', function (Request $request, $id) {
+        DB::table('loaisp')->where('IdLoai', $id)->update(['TenLoai' => $request->name]);
         return response()->json(['success' => true]);
-    } catch (\Exception $e) {
-        return response()->json(['success' => false, 'error' => $e->getMessage()]);
-    }
-});
+    });
 
-// Xóa danh mục
-Route::delete('/admin/categories/{id}', function ($id) {
-    DB::table('loaisp')->where('IdLoai', $id)->delete();
-    return response()->json(['success' => true]);
+    Route::delete('/{id}', function ($id) {
+        DB::table('loaisp')->where('IdLoai', $id)->delete();
+        return response()->json(['success' => true]);
+    });
 });
 
 // =============================
 // 🛒 QUẢN LÝ SẢN PHẨM (PRODUCTS)
 // =============================
+Route::prefix('admin/products')->group(function () {
 
-// Lấy danh sách sản phẩm (Admin)
-Route::get('/admin/products', function () {
-    $products = DB::table('sanpham')
-        ->join('chitietsanpham', 'sanpham.IdCT', '=', 'chitietsanpham.IdCT')
-        ->leftJoin('anhsp', 'sanpham.IdAnh', '=', 'anhsp.IdAnh')
-        ->select(
-            'sanpham.IdSP as id',
-            'sanpham.TenSP as name',
-            'sanpham.MoTa as description',
-            'chitietsanpham.Gia as price',
-            'sanpham.NgayTao as created_at',
-            'anhsp.HinhAnh as image'
-        )
-        ->orderBy('sanpham.IdSP', 'desc')
-        ->get();
+    // 1. Lấy danh sách sản phẩm
+    Route::get('/', function () {
+        $products = DB::table('sanpham')
+            ->join('chitietsanpham', 'sanpham.IdCT', '=', 'chitietsanpham.IdCT')
+            ->leftJoin('anhsp', 'sanpham.IdAnh', '=', 'anhsp.IdAnh')
+            ->leftJoin('loaisp', 'sanpham.IdLoai', '=', 'loaisp.IdLoai')
+            ->select(
+                'sanpham.IdSP as id',
+                'sanpham.TenSP as name',
+                'sanpham.MoTa as description',
+                'sanpham.IdLoai as categoryId', // Thêm categoryId để React dễ xử lý edit
+                'chitietsanpham.Gia as price',
+                'loaisp.TenLoai as category_name',
+                'anhsp.HinhAnh as image'
+            )
+            ->orderBy('sanpham.IdSP', 'desc')
+            ->get();
 
-    foreach ($products as $p) {
-        if ($p->image) {
-            $p->image = base64_encode($p->image);
+        foreach ($products as $p) {
+            if ($p->image)
+                $p->image = base64_encode($p->image);
         }
-    }
-    return response()->json($products);
-});
+        return response()->json($products);
+    });
 
-// Lấy chi tiết 1 sản phẩm
-Route::get('/admin/products/{id}', function ($id) {
-    $product = DB::table('sanpham')
-        ->join('chitietsanpham', 'sanpham.IdCT', '=', 'chitietsanpham.IdCT')
-        ->leftJoin('anhsp', 'sanpham.IdAnh', '=', 'anhsp.IdAnh')
-        ->select(
-            'sanpham.IdSP as id',
-            'sanpham.TenSP as name',
-            'sanpham.MoTa as description',
-            'chitietsanpham.Gia as price',
-            'sanpham.NgayTao as created_at',
-            'anhsp.HinhAnh as image'
-        )
-        ->where('sanpham.IdSP', $id)
-        ->first();
+    // 2. Thêm sản phẩm mới
+    Route::post('/', function (Request $request) {
+        try {
+            DB::beginTransaction();
 
-    if ($product) {
-        if ($product->image) {
-            $product->image = base64_encode($product->image);
-        }
-        return response()->json($product);
-    }
-    return response()->json(['message' => 'Không tìm thấy sản phẩm'], 404);
-});
+            if (!$request->name || !$request->price) {
+                return response()->json(['success' => false, 'message' => 'Thiếu tên hoặc giá']);
+            }
 
-// Thêm sản phẩm mới
-Route::post('/admin/products', function (Request $request) {
-    try {
-        DB::beginTransaction();
+            // Xử lý ảnh (ID mặc định = 1)
+            $imageId = 1;
+            if ($request->hasFile('image')) {
+                $imageData = file_get_contents($request->file('image'));
+                $imageId = DB::table('anhsp')->insertGetId(['HinhAnh' => $imageData]);
+            }
 
-        // 1. Kiểm tra đầu vào
-        if (!$request->name || !$request->price) {
-            return response()->json(['success' => false, 'message' => 'Thiếu tên hoặc giá']);
-        }
-
-        // 2. Xử lý ảnh (Database yêu cầu IdAnh NOT NULL)
-        $imageId = 1; // ID ảnh mặc định
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $imageData = file_get_contents($file);
-            $imageId = DB::table('anhsp')->insertGetId(['HinhAnh' => $imageData]);
-        }
-
-        // 3. Xử lý Size và Chi tiết sản phẩm
-        $validSizeId = DB::table('sizesp')->value('IdSize') ?? 1;
-        $detailId = DB::table('chitietsanpham')->insertGetId([
-            'Gia' => $request->price,
-            'IdSize' => $validSizeId
-        ]);
-
-        // 4. Xử lý Loại sản phẩm
-        $validCategoryId = DB::table('loaisp')->value('IdLoai') ?? 1;
-
-        // 5. Lưu vào bảng sanpham
-        $productId = DB::table('sanpham')->insertGetId([
-            'TenSP' => $request->name,
-            'MoTa' => $request->shortDesc ?? '',
-            'NgayTao' => now(),
-            'IdLoai' => $validCategoryId,
-            'IdCT' => $detailId,
-            'IdAnh' => $imageId
-        ]);
-
-        DB::commit();
-        return response()->json(['success' => true, 'id' => $productId]);
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json(['success' => false, 'error' => $e->getMessage()]);
-    }
-});
-
-// Cập nhật sản phẩm
-Route::put('/admin/products/{id}', function (Request $request, $id) {
-    try {
-        DB::beginTransaction();
-
-        $product = DB::table('sanpham')->where('IdSP', $id)->first();
-        if (!$product) {
-            return response()->json(['success' => false, 'message' => 'Sản phẩm không tồn tại']);
-        }
-
-        // Cập nhật giá
-        DB::table('chitietsanpham')
-            ->where('IdCT', $product->IdCT)
-            ->update(['Gia' => $request->price]);
-
-        // Cập nhật ảnh nếu có file mới
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $imageData = file_get_contents($file);
-            DB::table('anhsp')
-                ->where('IdAnh', $product->IdAnh)
-                ->update(['HinhAnh' => $imageData]);
-        }
-
-        // Cập nhật thông tin chung
-        DB::table('sanpham')
-            ->where('IdSP', $id)
-            ->update([
-                'TenSP' => $request->name,
-                'MoTa' => $request->shortDesc ?? '',
-                'IdLoai' => DB::table('loaisp')->value('IdLoai') ?? $product->IdLoai
+            // Xử lý giá
+            $validSizeId = DB::table('sizesp')->value('IdSize') ?? 1;
+            $detailId = DB::table('chitietsanpham')->insertGetId([
+                'Gia' => $request->price,
+                'IdSize' => $validSizeId
             ]);
 
-        DB::commit();
-        return response()->json(['success' => true]);
+            $categoryId = $request->categoryId ?? (DB::table('loaisp')->value('IdLoai') ?? 1);
 
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json(['success' => false, 'error' => $e->getMessage()]);
-    }
+            $productId = DB::table('sanpham')->insertGetId([
+                'TenSP' => $request->name,
+                'MoTa' => $request->description ?? '',
+                'NgayTao' => now(),
+                'IdLoai' => $categoryId,
+                'IdCT' => $detailId,
+                'IdAnh' => $imageId
+            ]);
+
+            DB::commit();
+            return response()->json(['success' => true, 'id' => $productId]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'error' => $e->getMessage()]);
+        }
+    });
+
+    // 3. Cập nhật sản phẩm (Logic mới bổ sung)
+    Route::put('/{id}', function (Request $request, $id) {
+        try {
+            DB::beginTransaction();
+
+            $product = DB::table('sanpham')->where('IdSP', $id)->first();
+            if (!$product)
+                return response()->json(['success' => false, 'message' => 'Sản phẩm không tồn tại']);
+
+            // Cập nhật giá ở bảng chi tiết
+            DB::table('chitietsanpham')
+                ->where('IdCT', $product->IdCT)
+                ->update(['Gia' => $request->price]);
+
+            // Cập nhật ảnh nếu có file mới
+            $imageId = $product->IdAnh;
+            if ($request->hasFile('image')) {
+                $imageData = file_get_contents($request->file('image'));
+                $imageId = DB::table('anhsp')->insertGetId(['HinhAnh' => $imageData]);
+            }
+
+            // Cập nhật thông tin chính
+            DB::table('sanpham')->where('IdSP', $id)->update([
+                'TenSP' => $request->name,
+                'MoTa' => $request->description ?? '',
+                'IdLoai' => $request->categoryId,
+                'IdAnh' => $imageId,
+                'NgayTao' => now()
+            ]);
+
+            DB::commit();
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'error' => $e->getMessage()]);
+        }
+    });
+
+    // 4. Xóa sản phẩm
+    Route::delete('/{id}', function ($id) {
+        try {
+            $product = DB::table('sanpham')->where('IdSP', $id)->first();
+            if ($product) {
+                DB::table('sanpham')->where('IdSP', $id)->delete();
+                return response()->json(['success' => true]);
+            }
+            return response()->json(['success' => false, 'message' => 'Không tìm thấy sản phẩm']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()]);
+        }
+    });
 });
