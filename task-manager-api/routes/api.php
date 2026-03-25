@@ -1,9 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\User\ProductController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -143,9 +144,13 @@ Route::post('/admin/products', function (Request $request) {
         if (!$request->name || !$request->price) {
             return response()->json(['success' => false, 'message' => 'Thiếu tên hoặc giá']);
         }
+<<<<<<< HEAD
 
         // 2. Xử lý ảnh (Database yêu cầu IdAnh NOT NULL)
         $imageId = 1; // Mặc định ID 1 nếu không có ảnh
+=======
+        $imageId = null;
+>>>>>>> dd6d5d80ca8d9332428e88b1f965c4b150759ba7
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $imageData = file_get_contents($file);
@@ -231,3 +236,7 @@ Route::put('/admin/products/{id}', function (Request $request, $id) {
         ]);
     }
 });
+
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::put('/user/update/{id}', [AuthController::class, 'updateProfile']);

@@ -1,0 +1,103 @@
+/* src/style/Login.css */
+
+.login-wrapper {
+    background-color: var(--primary-pink); /* #FFC5D3 từ index.css */
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-card {
+    background-color: #ffffff;
+    display: flex;
+    width: 100%;
+    max-width: 900px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: none;
+}
+
+/* Phần bên trái có ảnh */
+.login-left {
+    flex: 1;
+    background-color: #fdf2f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-left img {
+    max-width: 80%;
+    height: auto;
+}
+
+/* Phần bên phải có form */
+.login-right {
+    flex: 1.2;
+    padding: 50px;
+}
+
+.login-title {
+    color: #d63384;
+    font-weight: 800;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.login-subtitle {
+    color: #6c757d;
+    margin-bottom: 30px;
+}
+
+/* Tùy chỉnh Input */
+.custom-input {
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    padding: 12px;
+    transition: 0.3s;
+}
+
+.custom-input:focus {
+    border-color: #d63384;
+    box-shadow: 0 0 0 0.25rem rgba(214, 51, 132, 0.1);
+}
+
+/* Nút Submit */
+.btn-login-submit {
+    width: 100%;
+    background-color: #d63384;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(214, 51, 132, 0.3);
+}
+
+.btn-login-submit:hover {
+    background-color: #b0236a;
+    transform: translateY(-2px);
+}
+
+.forgot-link, .register-text a {
+    color: #d63384;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.register-text {
+    text-align: center;
+    margin-top: 25px;
+    color: #6c757d;
+}
+
+/* Responsive cho Mobile */
+@media (max-width: 768px) {
+    .login-right {
+        padding: 30px;
+    }
+}

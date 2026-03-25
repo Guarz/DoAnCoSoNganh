@@ -1,17 +1,27 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { useState } from "react";
 
 // Layouts
 import UserLayout from "./layouts/UserLayout";
 
+// Pages Auth
+import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
+
 // Pages USER
-import Login from "./pages/Login";
+// import Login from "./pages/Login";
 import HomePage from "./pages/User/HomePage";
 import CartPage from "./pages/CartPage";
 import UserOrders from "./pages/User/UserOrders";
 import UserProductDetail from "./pages/User/ProductDetail";
 import ProductList from "./pages/User/ProductList";
 import Checkout from "./pages/User/Checkout";
+import Profile from "./pages/User/Profile";
 
 // Pages ADMIN
 import AdminHome from "./pages/Admin/AdminHome";
@@ -22,7 +32,6 @@ import AdminOrders from "./pages/Admin/AdminOrders";
 import CategoryManagement from "./pages/Admin/CategoryManagement";
 
 function App() {
-
   const [user, setUser] = useState(() => {
     const u = localStorage.getItem("user");
     return u ? JSON.parse(u) : null;
@@ -33,31 +42,27 @@ function App() {
 
   return (
     <Router>
-
       <Routes>
-
         {/* ================= USER ================= */}
-        <Route element={<UserLayout />}>
-
+        <Route element={<UserLayout user={user} setUser={setUser} />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/products" element={<ProductList />} />
           <Route path="/product/:id" element={<UserProductDetail />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
+          <Route
+            path="/profile"
+            element={user ? <Profile /> : <Navigate to="/login" replace />}
+          />
           <Route
             path="/orders"
             element={user ? <UserOrders /> : <Navigate to="/login" replace />}
           />
-
         </Route>
-
-        {/* ================= LOGIN ================= */}
-        <Route
-          path="/login"
-          element={<Login setUser={setUser} />}
-        />
 
         {/* ================= ADMIN ================= */}
 
@@ -70,9 +75,7 @@ function App() {
 
         <Route
           path="/admin/home"
-          element={
-            isAdmin ? <AdminHome /> : <Navigate to="/login" replace />
-          }
+          element={isAdmin ? <AdminHome /> : <Navigate to="/login" replace />}
         />
 
         <Route
@@ -91,9 +94,7 @@ function App() {
 
         <Route
           path="/admin/orders"
-          element={
-            isAdmin ? <AdminOrders /> : <Navigate to="/login" replace />
-          }
+          element={isAdmin ? <AdminOrders /> : <Navigate to="/login" replace />}
         />
 
         <Route
@@ -112,9 +113,7 @@ function App() {
             </h2>
           }
         />
-
       </Routes>
-
     </Router>
   );
 }
