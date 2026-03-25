@@ -1,146 +1,139 @@
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+// Cài đặt bằng lệnh: npm install recharts
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 function AdminHome() {
-
-  const [data, setData] = useState({
+  // 1. State lưu trữ số liệu thống kê
+  const [stats, setStats] = useState({
     total_products: 0,
-    total_orders: 0
+    total_categories: 0,
+    total_orders: 0,
+    total_users: 0
   });
 
+  // 2. Dữ liệu mẫu cho biểu đồ (Bạn có thể fetch từ API sau)
+  const chartData = [
+    { name: 'T1', value: 40 },
+    { name: 'T2', value: 65 },
+    { name: 'T3', value: 30 },
+    { name: 'T4', value: 85 },
+    { name: 'T5', value: 55 },
+    { name: 'T6', value: 70 },
+  ];
+
+  // 3. Gọi API lấy dữ liệu thực tế từ Laravel
   useEffect(() => {
-
-    const loadDashboard = async () => {
-
+    const fetchDashboardData = async () => {
       try {
-
-        const res = await fetch("http://127.0.0.1:8000/api/admin/dashboard");
-
-        const result = await res.json();
-
-        setData(result);
-
+        // Thêm timestamp để ép trình duyệt tải dữ liệu mới nhất, giúp số 1 nhảy lên số 3 ngay lập tức
+        const res = await fetch(`http://127.0.0.1:8000/api/admin/dashboard?t=${Date.now()}`);
+        const data = await res.json();
+        setStats(data);
       } catch (err) {
-
-        console.log("Lỗi load dashboard:", err);
-
+        console.error("Lỗi kết nối API Dashboard:", err);
       }
-
     };
-
-    loadDashboard();
-
+    fetchDashboardData();
   }, []);
 
   return (
+    <div style={containerStyle}>
+      <header style={headerStyle}>
+        <h1 style={{ fontSize: "24px", fontWeight: "bold", color: "#333" }}>📊 HỆ THỐNG QUẢN TRỊ</h1>
+        <p style={{ color: "#666" }}>Chào mừng bạn quay trở lại hệ thống quản lý</p>
+      </header>
 
-    <div style={container}>
-
-      <h1 style={title}>👋 Chào mừng Admin</h1>
-      <p style={subtitle}>Hệ thống quản lý cửa hàng quần áo</p>
-
-      {/* CARD THỐNG KÊ */}
-      <div style={cardContainer}>
-
-        <div style={card}>
-          <h3>📦 Sản phẩm</h3>
-          <p style={number}>{data.total_products}</p>
-          <Link to="/admin/products" style={link}>
-            Quản lý
-          </Link>
+      {/* 4 Ô THỐNG KÊ (Khớp với image_60f31f.png) */}
+      <div style={statsGridStyle}>
+        <div style={cardStyle}>
+          <div style={iconBoxStyle}>📦</div>
+          <div>
+            <p style={numberStyle}>{stats.total_products}</p>
+            <p style={labelStyle}>Sản phẩm</p>
+          </div>
         </div>
 
-        <div style={card}>
-          <h3>🧾 Đơn hàng</h3>
-          <p style={number}>{data.total_orders}</p>
-          <Link to="/admin/orders" style={link}>
-            Quản lý
-          </Link>
+        <div style={cardStyle}>
+          <div style={iconBoxStyle}>📂</div>
+          <div>
+            <p style={numberStyle}>{stats.total_categories}</p>
+            <p style={labelStyle}>Danh mục</p>
+          </div>
         </div>
 
-        <div style={card}>
-          <h3>📊 Dashboard</h3>
-          <p>Xem thống kê</p>
-          <Link to="/admin" style={link}>
-            Mở
-          </Link>
+        <div style={cardStyle}>
+          <div style={iconBoxStyle}>📄</div>
+          <div>
+            <p style={numberStyle}>{stats.total_orders}</p>
+            <p style={labelStyle}>Đơn hàng</p>
+          </div>
         </div>
 
+        <div style={cardStyle}>
+          <div style={iconBoxStyle}>👤</div>
+          <div>
+            <p style={numberStyle}>{stats.total_users}</p>
+            <p style={labelStyle}>Người dùng</p>
+          </div>
+        </div>
+      </div>
+
+      {/* KHU VỰC BIỂU ĐỒ - FIX LỖI CHIỀU CAO (image_6157dd.jpg) */}
+      <div style={chartContainerStyle}>
+        <h3 style={{ marginBottom: "20px", fontSize: "18px" }}>📈 Biểu đồ tăng trưởng đơn hàng</h3>
+
+        {/* Bắt buộc bọc trong div có height để ResponsiveContainer hoạt động */}
+        <div style={{ width: '100%', height: 350 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#888' }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#888' }} />
+              <Tooltip cursor={{ fill: '#f5f5f5' }} />
+              <Bar dataKey="value" fill="#ff4d8d" radius={[6, 6, 0, 0]} barSize={45} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* TRUY CẬP NHANH */}
-      <div style={{ marginTop: 40 }}>
-        <h2>⚡ Truy cập nhanh</h2>
-
-        <div style={{ display: "flex", gap: 20, marginTop: 15 }}>
-
-          <Link to="/admin/products" style={btn}>
-            ➕ Thêm sản phẩm
-          </Link>
-
-          <Link to="/admin/orders" style={btn}>
-            📦 Quản lý đơn hàng
-          </Link>
-
-        </div>
+      <div style={{ marginTop: "30px", display: "flex", gap: "15px" }}>
+        <Link to="/admin/products" style={btnStyle}>Quản lý sản phẩm</Link>
+        <Link to="/admin/categories" style={btnStyle}>Quản lý danh mục</Link>
+        <Link to="/" style={btnOutlineStyle}>Quay lại cửa hàng</Link>
       </div>
-
     </div>
   );
 }
 
 export default AdminHome;
 
+/* ================= STYLE CHUẨN GIAO DIỆN ================= */
+const containerStyle = { padding: "30px", backgroundColor: "#f8faff", minHeight: "100vh", fontFamily: "sans-serif" };
+const headerStyle = { marginBottom: "30px" };
+const statsGridStyle = { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" };
 
-/* ================= STYLE ================= */
-
-const container = {
-  maxWidth: 1100,
-  margin: "40px auto",
-  padding: 20
+const cardStyle = {
+  backgroundColor: "#fff", padding: "20px", borderRadius: "15px",
+  boxShadow: "0 4px 15px rgba(0,0,0,0.05)", display: "flex", alignItems: "center", gap: "15px"
 };
 
-const title = {
-  fontSize: 36,
-  fontWeight: "bold"
+const iconBoxStyle = { fontSize: "30px", backgroundColor: "#f0f2f5", padding: "12px", borderRadius: "12px" };
+const numberStyle = { fontSize: "28px", fontWeight: "bold", color: "#ff4d8d", margin: 0 };
+const labelStyle = { color: "#888", fontSize: "14px", margin: 0 };
+
+const chartContainerStyle = {
+  marginTop: "30px", backgroundColor: "#fff", padding: "25px",
+  borderRadius: "20px", boxShadow: "0 4px 20px rgba(0,0,0,0.06)"
 };
 
-const subtitle = {
-  color: "#666",
-  marginBottom: 30
+const btnStyle = {
+  padding: "12px 25px", backgroundColor: "#ff4d8d", color: "#fff",
+  textDecoration: "none", borderRadius: "10px", fontWeight: "bold", boxShadow: "0 4px 10px rgba(255, 77, 141, 0.3)"
 };
 
-const cardContainer = {
-  display: "grid",
-  gridTemplateColumns: "repeat(3,1fr)",
-  gap: 20
-};
-
-const card = {
-  background: "#fff",
-  padding: 25,
-  borderRadius: 15,
-  boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
-  textAlign: "center"
-};
-
-const number = {
-  fontSize: 28,
-  fontWeight: "bold",
-  margin: "10px 0"
-};
-
-const link = {
-  color: "#d63384",
-  textDecoration: "none",
-  fontWeight: "bold"
-};
-
-const btn = {
-  background: "linear-gradient(135deg,#ff4d8d,#d63384)",
-  color: "white",
-  padding: "12px 20px",
-  borderRadius: 10,
-  textDecoration: "none",
-  fontWeight: "bold"
+const btnOutlineStyle = {
+  padding: "12px 25px", border: "2px solid #ff4d8d", color: "#ff4d8d",
+  textDecoration: "none", borderRadius: "10px", fontWeight: "bold"
 };
