@@ -114,7 +114,7 @@ function ProductManagement() {
         formData.append("categoryId", product.categoryId);
 
         // Trick cho Laravel: Dùng POST nhưng giả lập PUT để nhận được file
-        formData.append("_method", "PUT");
+        formData.append("_method", "PUT"); 
 
         if (product.image) {
             formData.append("image", product.image);

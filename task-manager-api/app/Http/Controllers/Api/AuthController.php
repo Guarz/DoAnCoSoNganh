@@ -55,7 +55,7 @@ class AuthController extends Controller
         $request->validate([
             'ten' => 'required|string|max:255',
             'email' => 'required|email|unique:user,Email', // Kiểm tra trùng email trong bảng user
-            'password' => 'required|min:6',
+            'password' => 'required',
         ]);
 
         // Tạo user mới với mật khẩu thô

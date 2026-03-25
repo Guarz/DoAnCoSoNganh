@@ -36,13 +36,9 @@ class ProductController extends Controller
             foreach ($products as $p) {
 
                 if ($p->image) {
-
                     $p->image = base64_encode($p->image);
-
                 }
-
             }
-
             return response()->json($products);
 
         } catch (\Exception $e) {
