@@ -2,92 +2,58 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DonHang;
+use App\Models\ChiTietDonHang;
+use App\Models\User; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
     public function store(Request $request)
     {
-
         $request->validate([
-            'IdUser' => 'required|integer',
-            'TongTien' => 'required|numeric',
-            'IdPT' => 'required|integer',
-            'DiaChiDat' => 'required|string',
+            'IdUser' => 'required',
             'ChiTietDonHang' => 'required|array',
         ]);
 
-        $user = DB::table('user')->where('IdUser', $request->IdUser)->first();
+        return DB::transaction(function () use ($request) {
+            // Tạo đơn hàng
+            $donHang = new DonHang();
+            $donHang->IdUser = $request->IdUser;
+            $donHang->DiaChiDat = $request->DiaChiDat;
+            $donHang->IdTT = 1;
+            $donHang->NgayDat = now();
+            $donHang->save();
 
-        if (!$user) {
-            return response()->json(['status' => 'error', 'message' => 'Người dùng không tồn tại'], 404);
-        }
-
-        DB::beginTransaction();
-        try {
-            $donHangId = DB::table('donhang')->insertGetId([
-                'IdUser'    => $request->IdUser,
-                'DiaChiDat' => $request->DiaChiDat, 
-                'TongTien'  => $request->TongTien,
-                'IdPT'      => $request->IdPT,
-                'IdTT'      => 1,
-                'NgayDat'   => now(),
-            ]);
-
-            // 3. LƯU CHI TIẾT ĐƠN HÀNG
-            $chiTietData = [];
-            foreach ($request->ChiTietDonHang as $item) {
-                $chiTietData[] = [
-                    'IdDH'      => $donHangId,
-                    'IdSP'      => $item['IdSP'],
-                    'SoLuong'   => $item['SoLuong'],
+            $chiTiet = collect($request->ChiTietDonHang)->map(function ($item) use ($donHang) {
+                return [
+                    'IdDH'     => $donHang->IdDH,
+                    'IdSP'     => $item['IdSP'],
+                    'SoLuong'  => $item['SoLuong'],
+                    'TongTien' => $item['Gia'] * $item['SoLuong'],
                 ];
-            }
-            DB::table('chitietdonhang')->insert($chiTietData);
+            })->toArray();
 
-            DB::commit();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Đặt hàng thành công!',
-                'user_name' => $user->Ten 
-            ], 200);
+            ChiTietDonHang::insert($chiTiet);
 
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
-        }
+            return response()->json(['status' => 'success', 'message' => 'Đặt hàng thành công!']);
+        });
     }
 
-    public function getOrdersByUser($idUser)
+    public function getOrdersByUser($id)
     {
-        try {
-            $orders = DB::table('donhang')
-                ->where('IdUser', $idUser)
-                ->orderBy('NgayDat', 'desc')
-                ->get();
+        $orders = DonHang::with('chiTiet.sanPham')
+            ->where('IdUser', $id)
+            ->orderBy('IdDH', 'desc')
+            ->get();
 
-            foreach ($orders as $order) {
-                $order->details = DB::table('chitietdonhang')
-                    ->join('sanpham', 'chitietdonhang.IdSP', '=', 'sanpham.IdSP')
-                    ->leftJoin('anhsp', 'sanpham.IdSP', '=', 'anhsp.IdSP')
-                    ->where('chitietdonhang.IdDH', $order->IdDH) 
-                    ->select(
-                        'chitietdonhang.*', 
-                        'sanpham.TenSP', 
-                        'sanpham.GiaBan',
-                        'anhsp.HinhAnh' 
-                    )
-                    ->get();
- 
-                $order->TrangThai = "Chờ xác nhận"; 
-            }
+        $orders->each(function ($order) {
+            $order->details = $order->chiTiet; 
+            $order->TongTien = $order->chiTiet->sum('TongTien');
+            $order->TrangThai = ($order->IdTT == 1) ? 'Chờ xác nhận' : 'Đã xác nhận';
+        });
 
-            return response()->json($orders, 200);
-
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return response()->json($orders);
     }
 }

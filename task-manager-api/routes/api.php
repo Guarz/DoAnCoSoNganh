@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\User\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\OrderController;
 /*
 |--------------------------------------------------------------------------
 | API Routes - SHOP QUẦN ÁO
@@ -204,3 +204,6 @@ Route::prefix('admin/products')->group(function () {
         }
     });
 });
+
+Route::post('/orders', [OrderController::class, 'store']);
+Route::get('/orders/{id}', [OrderController::class, 'getOrdersByUser']);

@@ -79,12 +79,6 @@ const Checkout = () => {
         }
     };
 
-    // THÔNG TIN TÀI KHOẢN NGÂN HÀNG DEMO
-    const BANK_ID = "970436"; // Mã Vietcombank (Có thể tra mã khác trên vietqr.io)
-    const ACCOUNT_NO = "0123456789"; // Số tài khoản của bạn
-    const ACCOUNT_NAME = "NGUYEN VAN A"; // Tên chủ tài khoản (viết hoa không dấu)
-    const DESCRIPTION = `ThanhToan_${formData.phone}`; // Nội dung chuyển tiền
-
     return (
         <div className="container mt-5 pb-5 checkout-page relative">
             <h2 className="text-center page-title mb-5">THANH TOÁN ĐƠN HÀNG</h2>
@@ -163,12 +157,6 @@ const Checkout = () => {
                                     <input className="form-check-input ms-1" type="radio" name="payment" id="cod" value="COD" checked={paymentMethod === 'COD'} onChange={(e) => setPaymentMethod(e.target.value)} />
                                     <label className="form-check-label ms-2 fw-bold" htmlFor="cod">
                                         Thanh toán khi nhận hàng (COD)
-                                    </label>
-                                </div>
-                                <div className="form-check p-3 border rounded payment-option">
-                                    <input className="form-check-input ms-1" type="radio" name="payment" id="bank" value="BANK" checked={paymentMethod === 'BANK'} onChange={(e) => setPaymentMethod(e.target.value)} />
-                                    <label className="form-check-label ms-2 fw-bold" htmlFor="bank">
-                                        Chuyển khoản / Quét mã QR
                                     </label>
                                 </div>
                             </div>

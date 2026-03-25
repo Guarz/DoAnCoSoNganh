@@ -30,14 +30,12 @@ const UserProductDetail = () => {
         const qtyToAdd = Number(quantity) || 1;
 
         if (existingItemIndex !== -1) {
-            // THAY DÒNG NÀY: Thay vì += (cộng dồn), ta dùng = (ghi đè)
-            // cart[existingItemIndex].quantity += qtyToAdd; <-- Dòng cũ đây
             
-            cart[existingItemIndex].quantity = qtyToAdd; // Dòng mới: Chọn bao nhiêu lấy bấy nhiêu
+            cart[existingItemIndex].quantity = qtyToAdd; 
             
             console.log("Đã cập nhật số lượng mới là:", qtyToAdd);
         } else {
-            // NẾU CHƯA CÓ: Thêm mới bình thường
+            
             cart.push({
                 id: product.id,
                 name: product.name,
@@ -128,13 +126,13 @@ const UserProductDetail = () => {
         type="text" 
         className="form-control text-center fw-bold" 
         value={quantity} 
-        readOnly // Để người dùng chỉ bấm nút, tránh gõ nhầm chữ
+        readOnly 
     />
 
     <button 
         className="btn btn-outline-secondary fw-bold" 
         type="button" 
-        // BỌC THÊM Number() Ở ĐÂY
+    
         onClick={() => setQuantity(prev => Number(prev) + 1)}
     >
         +

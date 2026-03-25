@@ -16,15 +16,25 @@ const UserOrders = () => {
     }, []);
 
     const fetchOrders = async () => {
-        try {
-            const response = await axios.get(`http://127.0.0.1:8000/api/orders/${user.id}`);
-            setOrders(response.data); 
+    try {
+        if (!user || (!user.id && !user.IdUser)) {
+            console.error("Không tìm thấy ID người dùng trong localStorage");
             setLoading(false);
-        } catch (error) {
-            console.error("Lỗi lấy đơn hàng:", error);
-            setLoading(false);
+            return;
         }
-    };
+
+        const userId = user.id || user.IdUser;
+        
+        const response = await axios.get(`http://127.0.0.1:8000/api/orders/${userId}`);
+        console.log("Dữ liệu nhận về:", response.data);
+        
+        setOrders(Array.isArray(response.data) ? response.data : []);
+        setLoading(false);
+    } catch (error) {
+        console.error("Lỗi lấy đơn hàng:", error);
+        setLoading(false);
+    }
+};
 
     if (loading) return <div style={{ padding: 20, textAlign: 'center' }}>Đang tải...</div>;
 
@@ -49,22 +59,17 @@ const UserOrders = () => {
                             {order.details && order.details.map((item, idx) => (
                                 <div key={idx} style={styles.productRow}>
                                     <div style={{ display: 'flex', flex: 1 }}>
-                          
                                         <img 
+                                            
                                             src={item.HinhAnh || 'https://via.placeholder.com/80'} 
-                                            alt={item.TenSP || "Product"} 
+                                            alt={item.TenSP} 
                                             style={styles.productImg} 
+                                            onError={(e) => { e.target.src = 'https://via.placeholder.com/80' }}
                                         />
-                                        
                                         <div style={{ marginLeft: 15 }}>
-                    
                                             <div style={{ fontWeight: '500' }}>{item.TenSP}</div>
                                             <div style={{ color: '#888', fontSize: 13 }}>Số lượng: x{item.SoLuong}</div>
                                         </div>
-                                        
-                                    </div>
-                                    <div style={{ fontWeight: 'bold' }}>
-                                        {Number(item.GiaBan).toLocaleString()}₫
                                     </div>
                                 </div>
                             ))}

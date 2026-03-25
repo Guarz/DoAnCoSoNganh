@@ -6,18 +6,18 @@ import './ProductList.css';
 const ProductList = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    
-    // 1. Tạo State để lưu danh mục đang được chọn (Mặc định là "Tất cả")
     const [selectedCategory, setSelectedCategory] = useState("Tất cả");
 
     useEffect(() => {
         axios.get('http://127.0.0.1:8000/api/user/products')
             .then(res => {
-                if (Array.isArray(res.data)) {
-                    setProducts(res.data);
-                } else if (res.data.success) {
-                    setProducts(res.data.data);
-                }
+                // Kiểm tra nhiều trường hợp dữ liệu để không bị trống
+                let data = [];
+                if (Array.isArray(res.data)) data = res.data;
+                else if (res.data.success) data = res.data.data;
+                else if (res.data.products) data = res.data.products;
+
+                setProducts(data);
                 setLoading(false);
             })
             .catch(err => {
@@ -26,28 +26,32 @@ const ProductList = () => {
             });
     }, []);
 
-    // 2. Hàm xử lý lọc sản phẩm
-    const filteredProducts = selectedCategory === "Tất cả"
-        ? products
-        : products.filter(item => item.category === selectedCategory);
+    // Hàm chuẩn hóa dữ liệu: Đảm bảo dù API trả về tên cột gì thì React vẫn hiểu
+    const filteredProducts = products
+        .map(item => ({
+            id: item.id || item.IdSP,
+            name: item.name || item.TenSP,
+            price: item.price || (item.chi_tiet ? item.chi_tiet.Gia : (item.Gia || 0)),
+            category: item.category || (item.loai ? item.loai.TenLoai : (item.TenLoai || "Chưa phân loại")),
+            image: item.image || (item.anh ? item.anh.HinhAnh : item.HinhAnh)
+        }))
+        .filter(item => selectedCategory === "Tất cả" || item.category === selectedCategory);
 
     if (loading) return <div className="text-center mt-5" style={{color: '#d81b60'}}>Đang tải sản phẩm...</div>;
 
     return (
         <div className="container-fluid p-0 pb-5">
-            <h2 className="text-center page-title mb-4 mt-5">DANH SÁCH SẢN PHẨM</h2>
-
             {/* --- THANH DANH MỤC --- */}
             <div className="container mb-5">
                 <ul className="nav nav-pills justify-content-center category-pills">
-                    
+                    {/* Bạn nên lấy danh sách danh mục động từ products thay vì fix cứng */}
                     {["Tất cả", "Áo thun", "Sơ mi", "Quần jean", "Váy"].map((cat) => (
                         <li className="nav-item" key={cat}>
                             <button 
                                 className={`nav-link ${selectedCategory === cat ? 'active' : ''}`}
                                 onClick={() => setSelectedCategory(cat)}
                             >
-                                {cat === "Tất cả" ? "Tất cả quần áo" : cat}
+                                {cat}
                             </button>
                         </li>
                     ))}
@@ -57,44 +61,35 @@ const ProductList = () => {
             {/* --- LƯỚI SẢN PHẨM --- */}
             <div className="container">
                 <div className="row g-4"> 
-                
                     {filteredProducts.length > 0 ? (
                         filteredProducts.map((item) => {
-                            const imageSrc = item.image?.startsWith('data:image') 
-                                ? item.image 
-                                : `data:image/jpeg;base64,${item.image}`;
+                            // Xử lý ảnh base64 hoặc URL
+                            const imageSrc = item.image 
+                                ? (item.image.startsWith('data:image') ? item.image : `data:image/jpeg;base64,${item.image}`)
+                                : 'https://via.placeholder.com/300x400?text=No+Image';
 
                             return (
                                 <div key={item.id} className="col-12 col-sm-6 col-md-4 col-lg-3">
                                     <div className="card h-100 border-0 product-card shadow-sm">
                                         <Link to={`/product/${item.id}`} className="text-decoration-none">
-                                            <div className="position-relative overflow-hidden">
-                                                <img 
-                                                    src={imageSrc} 
-                                                    className="card-img-top product-img" 
-                                                    alt={item.name}
-                                                    onError={(e) => { e.target.src = 'https://via.placeholder.com/300x400?text=No+Image' }}
-                                                />
-                                            </div>
+                                            <img src={imageSrc} className="card-img-top product-img" alt={item.name} />
                                         </Link>
-                                        <div className="card-body d-flex flex-column text-center">
-                                            <span className="text-muted small mb-1 text-uppercase">{item.category}</span>
-                                            <h5 className="card-title fw-bold mb-2 text-dark">{item.name}</h5>
-                                            <div className="mt-auto">
-                                                <p className="fw-bold fs-5 mb-3" style={{color: '#d81b60'}}>
-                                                    {item.price?.toLocaleString('vi-VN')} đ
-                                                </p>
+                                        <div className="card-body text-center">
+                                            <span className="text-muted small text-uppercase">{item.category}</span>
+                                            <h5 className="card-title fw-bold text-dark">{item.name}</h5>
+                                            <p className="fw-bold fs-5" style={{color: '#d81b60'}}>
+                                                {Number(item.price).toLocaleString('vi-VN')} đ
                                                 <Link to={`/product/${item.id}`} className="btn btn-view-detail w-100 rounded-pill py-2 fw-bold">
                                                     XEM CHI TIẾT
                                                 </Link>
-                                            </div>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                             );
                         })
                     ) : (
-                        <div className="text-center w-100 mt-5 text-muted">Không có sản phẩm "{selectedCategory}" nào.</div>
+                        <div className="text-center w-100 mt-5">Không tìm thấy sản phẩm nào.</div>
                     )}
                 </div>
             </div>
