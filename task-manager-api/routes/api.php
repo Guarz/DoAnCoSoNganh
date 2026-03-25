@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // =============================
-// USER API
+// 👤 USER API (Dành cho khách hàng)
 // =============================
 Route::prefix('user')->group(function () {
     Route::get('products', [ProductController::class, 'index']);
@@ -21,7 +21,14 @@ Route::prefix('user')->group(function () {
 });
 
 // =============================
-// ADMIN DASHBOARD
+// 🔑 AUTHENTICATION (Đăng nhập/Đăng ký)
+// =============================
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::put('/user/update/{id}', [AuthController::class, 'updateProfile']);
+
+// =============================
+// 📊 ADMIN DASHBOARD (Thống kê)
 // =============================
 Route::get('/admin/dashboard', function () {
     return response()->json([
@@ -33,10 +40,10 @@ Route::get('/admin/dashboard', function () {
 });
 
 // =============================
-// 🔥 DANH MỤC (CATEGORY)
+// 🔥 QUẢN LÝ DANH MỤC (CATEGORY)
 // =============================
 
-// LẤY DANH SÁCH
+// Lấy danh sách danh mục
 Route::get('/admin/categories', function () {
     $categories = DB::table('loaisp')
         ->select('IdLoai as id', 'TenLoai as name')
@@ -45,7 +52,7 @@ Route::get('/admin/categories', function () {
     return response()->json($categories);
 });
 
-// THÊM DANH MỤC
+// Thêm danh mục
 Route::post('/admin/categories', function (Request $request) {
     try {
         $data = json_decode($request->getContent(), true);
@@ -62,7 +69,7 @@ Route::post('/admin/categories', function (Request $request) {
     }
 });
 
-// CẬP NHẬT DANH MỤC
+// Cập nhật danh mục
 Route::put('/admin/categories/{id}', function (Request $request, $id) {
     try {
         $data = json_decode($request->getContent(), true);
@@ -77,17 +84,17 @@ Route::put('/admin/categories/{id}', function (Request $request, $id) {
     }
 });
 
-// XÓA DANH MỤC
+// Xóa danh mục
 Route::delete('/admin/categories/{id}', function ($id) {
     DB::table('loaisp')->where('IdLoai', $id)->delete();
     return response()->json(['success' => true]);
 });
 
 // =============================
-// 🛒 SẢN PHẨM (PRODUCTS)
+// 🛒 QUẢN LÝ SẢN PHẨM (PRODUCTS)
 // =============================
 
-// LẤY DANH SÁCH SẢN PHẨM
+// Lấy danh sách sản phẩm (Admin)
 Route::get('/admin/products', function () {
     $products = DB::table('sanpham')
         ->join('chitietsanpham', 'sanpham.IdCT', '=', 'chitietsanpham.IdCT')
@@ -110,7 +117,8 @@ Route::get('/admin/products', function () {
     }
     return response()->json($products);
 });
-// LẤY CHI TIẾT 1 SẢN PHẨM
+
+// Lấy chi tiết 1 sản phẩm
 Route::get('/admin/products/{id}', function ($id) {
     $product = DB::table('sanpham')
         ->join('chitietsanpham', 'sanpham.IdCT', '=', 'chitietsanpham.IdCT')
@@ -132,10 +140,10 @@ Route::get('/admin/products/{id}', function ($id) {
         }
         return response()->json($product);
     }
-
     return response()->json(['message' => 'Không tìm thấy sản phẩm'], 404);
 });
-// THÊM SẢN PHẨM MỚI
+
+// Thêm sản phẩm mới
 Route::post('/admin/products', function (Request $request) {
     try {
         DB::beginTransaction();
@@ -144,32 +152,26 @@ Route::post('/admin/products', function (Request $request) {
         if (!$request->name || !$request->price) {
             return response()->json(['success' => false, 'message' => 'Thiếu tên hoặc giá']);
         }
-<<<<<<< HEAD
 
         // 2. Xử lý ảnh (Database yêu cầu IdAnh NOT NULL)
-        $imageId = 1; // Mặc định ID 1 nếu không có ảnh
-=======
-        $imageId = null;
->>>>>>> dd6d5d80ca8d9332428e88b1f965c4b150759ba7
+        $imageId = 1; // ID ảnh mặc định
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $imageData = file_get_contents($file);
             $imageId = DB::table('anhsp')->insertGetId(['HinhAnh' => $imageData]);
         }
 
-        // 3. Kiểm tra IdSize hợp lệ (Tránh lỗi Integrity constraint)
+        // 3. Xử lý Size và Chi tiết sản phẩm
         $validSizeId = DB::table('sizesp')->value('IdSize') ?? 1;
-
-        // 4. Tạo chi tiết sản phẩm
         $detailId = DB::table('chitietsanpham')->insertGetId([
             'Gia' => $request->price,
             'IdSize' => $validSizeId
         ]);
 
-        // 5. Kiểm tra IdLoai hợp lệ (Lấy ID đầu tiên từ danh sách bạn mới thêm)
+        // 4. Xử lý Loại sản phẩm
         $validCategoryId = DB::table('loaisp')->value('IdLoai') ?? 1;
 
-        // 6. Lưu vào bảng sanpham
+        // 5. Lưu vào bảng sanpham
         $productId = DB::table('sanpham')->insertGetId([
             'TenSP' => $request->name,
             'MoTa' => $request->shortDesc ?? '',
@@ -187,41 +189,37 @@ Route::post('/admin/products', function (Request $request) {
         return response()->json(['success' => false, 'error' => $e->getMessage()]);
     }
 });
-// CẬP NHẬT SẢN PHẨM (UPDATE)
+
+// Cập nhật sản phẩm
 Route::put('/admin/products/{id}', function (Request $request, $id) {
     try {
         DB::beginTransaction();
 
-        // 1. Tìm sản phẩm hiện tại để lấy ID chi tiết và ID ảnh
         $product = DB::table('sanpham')->where('IdSP', $id)->first();
         if (!$product) {
             return response()->json(['success' => false, 'message' => 'Sản phẩm không tồn tại']);
         }
 
-        // 2. Cập nhật giá trong bảng chitietsanpham
+        // Cập nhật giá
         DB::table('chitietsanpham')
             ->where('IdCT', $product->IdCT)
             ->update(['Gia' => $request->price]);
 
-        // 3. Xử lý ảnh mới (nếu có)
-        $imageId = $product->IdAnh;
+        // Cập nhật ảnh nếu có file mới
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $imageData = file_get_contents($file);
-
-            // Cập nhật lại hình ảnh trong bảng anhsp
             DB::table('anhsp')
                 ->where('IdAnh', $product->IdAnh)
                 ->update(['HinhAnh' => $imageData]);
         }
 
-        // 4. Cập nhật thông tin chính trong bảng sanpham
+        // Cập nhật thông tin chung
         DB::table('sanpham')
             ->where('IdSP', $id)
             ->update([
                 'TenSP' => $request->name,
                 'MoTa' => $request->shortDesc ?? '',
-                // Tự tìm IdLoai đầu tiên nếu bạn chưa làm dropdown chọn loại
                 'IdLoai' => DB::table('loaisp')->value('IdLoai') ?? $product->IdLoai
             ]);
 
@@ -230,13 +228,6 @@ Route::put('/admin/products/{id}', function (Request $request, $id) {
 
     } catch (\Exception $e) {
         DB::rollBack();
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage()
-        ]);
+        return response()->json(['success' => false, 'error' => $e->getMessage()]);
     }
 });
-
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
-Route::put('/user/update/{id}', [AuthController::class, 'updateProfile']);

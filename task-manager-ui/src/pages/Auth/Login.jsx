@@ -3,39 +3,49 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import "../../style/Login.css";
 
-// TOÀN BỘ CODE PHẢI NẰM TRONG HÀM NÀY
 const Login = ({ setUser }) => {
-  // 1. Khai báo các State và Hook bên trong hàm
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // 2. Hàm xử lý logic cũng phải nằm bên trong
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
+      // Gọi API đến Backend Laravel
       const response = await axios.post("http://127.0.0.1:8000/api/login", {
         email: email,
         password: password,
       });
 
       if (response.data.status === "success") {
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        setUser(response.data.user);
-        navigate("/");
+        const userData = response.data.user;
+
+        // 1. Lưu thông tin user vào localStorage để duy trì phiên đăng nhập
+        localStorage.setItem("user", JSON.stringify(userData));
+        
+        // 2. Cập nhật state setUser để App.jsx nhận biết isAdmin
+        setUser(userData);
+
+        // 3. LOGIC CHUYỂN HƯỚNG QUAN TRỌNG:
+        // Nếu là admin thì vào trang quản trị, ngược lại về trang chủ khách hàng
+        if (userData.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       }
     } catch (err) {
       console.error(err);
+      // Hiển thị lỗi từ backend hoặc lỗi kết nối
       setError(
-        err.response?.data?.message || "Lỗi kết nối server hoặc sai thông tin"
+        err.response?.data?.message || "Không thể kết nối đến máy chủ. Hãy kiểm tra Backend!"
       );
     }
   };
 
-  // 3. Lệnh return (giao diện) phải nằm cuối cùng của hàm
   return (
     <div className="login-wrapper">
       <div className="login-card shadow-lg">
@@ -74,7 +84,7 @@ const Login = ({ setUser }) => {
               <input
                 type="email"
                 className="form-control custom-input"
-                placeholder="Nhập email của bạn"
+                placeholder="admin@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
