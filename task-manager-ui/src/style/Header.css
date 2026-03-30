@@ -1,0 +1,49 @@
+/* Tùy chỉnh chung cho Navbar */
+.custom-navbar {
+    background-color: #ffffff !important;
+    padding: 10px 0;
+}
+
+/* Màu chữ cho Logo */
+.logo-text {
+    color: #d63384 !important;
+    font-size: 1.5rem;
+}
+
+/* Tùy chỉnh các link điều hướng */
+.nav-link-custom {
+    color: #333 !important;
+    transition: color 0.3s ease;
+}
+
+.nav-link-custom:hover {
+    color: #d63384 !important;
+}
+
+/* Màu chữ chào người dùng */
+.user-welcome-text {
+    color: #d63384;
+}
+
+/* Nút Đăng nhập màu hồng đặc trưng */
+.btn-login-pink {
+    background-color: #d63384 !important;
+    color: white !important;
+    border: none;
+    transition: opacity 0.3s;
+}
+
+.btn-login-pink:hover {
+    opacity: 0.8;
+}
+
+/* Nút thoát */
+.btn-logout-custom {
+    border-color: #dc3545 !important;
+    color: #dc3545 !important;
+}
+
+.btn-logout-custom:hover {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
