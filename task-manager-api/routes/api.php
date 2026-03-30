@@ -46,12 +46,6 @@ Route::post('/login', function (Request $request) {
         ]);
     }
 
-    /*
-    ============================
-    FIX: phân quyền rõ ràng
-    ============================
-    */
-
     $role = "user";
 
     if ($user->Email === "admin@gmail.com") {
@@ -70,12 +64,9 @@ Route::post('/login', function (Request $request) {
             "role" => $role
         ]
     ]);
-
 });
 
-
 Route::post('/register', [AuthController::class, 'register']);
-
 Route::put('/user/update/{id}', [AuthController::class, 'updateProfile']);
 
 
@@ -88,7 +79,6 @@ Route::put('/user/update/{id}', [AuthController::class, 'updateProfile']);
 Route::prefix('user')->group(function () {
 
     Route::get('/products', [ProductController::class, 'index']);
-
     Route::get('/products/{id}', [ProductController::class, 'show']);
 
 });
@@ -101,11 +91,6 @@ Route::prefix('user')->group(function () {
 */
 
 Route::get('/admin/dashboard', function () {
-
-    /*
-    FIX:
-    React thường dùng camelCase
-    */
 
     return response()->json([
         "totalProducts" => DB::table("sanpham")->count(),
@@ -137,15 +122,7 @@ Route::prefix('admin/categories')->group(function () {
 
     });
 
-
     Route::post('/', function (Request $request) {
-
-        if (!$request->name) {
-            return response()->json([
-                "success" => false,
-                "message" => "Thiếu tên danh mục"
-            ]);
-        }
 
         $id = DB::table("loaisp")->insertGetId([
             "TenLoai" => $request->name
@@ -155,9 +132,7 @@ Route::prefix('admin/categories')->group(function () {
             "success" => true,
             "id" => $id
         ]);
-
     });
-
 
     Route::put('/{id}', function (Request $request, $id) {
 
@@ -170,9 +145,7 @@ Route::prefix('admin/categories')->group(function () {
         return response()->json([
             "success" => true
         ]);
-
     });
-
 
     Route::delete('/{id}', function ($id) {
 
@@ -183,7 +156,6 @@ Route::prefix('admin/categories')->group(function () {
         return response()->json([
             "success" => true
         ]);
-
     });
 
 });
@@ -196,10 +168,6 @@ Route::prefix('admin/categories')->group(function () {
 */
 
 Route::prefix('admin/products')->group(function () {
-
-    /*
-    GET PRODUCT LIST
-    */
 
     Route::get('/', function () {
 
@@ -225,44 +193,21 @@ Route::prefix('admin/products')->group(function () {
 
             ->get();
 
-
-        /*
-        FIX:
-        convert ảnh sang base64
-        */
-
         foreach ($products as $p) {
-
             if ($p->image) {
                 $p->image = base64_encode($p->image);
             }
-
         }
 
         return response()->json($products);
-
     });
 
-
-
-    /*
-    ADD PRODUCT
-    */
 
     Route::post('/', function (Request $request) {
 
         try {
 
             DB::beginTransaction();
-
-            if (!$request->name || !$request->price) {
-
-                return response()->json([
-                    "success" => false,
-                    "message" => "Thiếu tên hoặc giá"
-                ]);
-
-            }
 
             $imageId = null;
 
@@ -273,7 +218,6 @@ Route::prefix('admin/products')->group(function () {
                 $imageId = DB::table("anhsp")->insertGetId([
                     "HinhAnh" => $imageData
                 ]);
-
             }
 
             $sizeId = DB::table("sizesp")->value("IdSize") ?? 1;
@@ -283,18 +227,13 @@ Route::prefix('admin/products')->group(function () {
                 "IdSize" => $sizeId
             ]);
 
-            $categoryId = $request->categoryId
-                ?? DB::table("loaisp")->value("IdLoai");
-
             $productId = DB::table("sanpham")->insertGetId([
-
                 "TenSP" => $request->name,
                 "MoTa" => $request->description ?? "",
                 "NgayTao" => now(),
-                "IdLoai" => $categoryId,
+                "IdLoai" => $request->categoryId,
                 "IdCT" => $detailId,
                 "IdAnh" => $imageId
-
             ]);
 
             DB::commit();
@@ -312,16 +251,9 @@ Route::prefix('admin/products')->group(function () {
                 "success" => false,
                 "error" => $e->getMessage()
             ]);
-
         }
-
     });
 
-
-
-    /*
-    DELETE PRODUCT
-    */
 
     Route::delete('/{id}', function ($id) {
 
@@ -332,7 +264,6 @@ Route::prefix('admin/products')->group(function () {
         return response()->json([
             "success" => true
         ]);
-
     });
 
 });
@@ -340,10 +271,83 @@ Route::prefix('admin/products')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| ORDERS
+| ADMIN ORDERS (PHẦN BẠN ĐANG THIẾU)
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('admin/orders')->group(function () {
+
+    /*
+    GET ORDERS
+    */
+
+    Route::get('/', function () {
+
+        $orders = DB::table("donhang")
+
+            ->join("user", "donhang.IdUser", "=", "user.IdUser")
+
+            ->join("chitietdonhang", "donhang.IdDonHang", "=", "chitietdonhang.IdDonHang")
+
+            ->join("sanpham", "chitietdonhang.IdSP", "=", "sanpham.IdSP")
+
+            ->select(
+                "donhang.IdDonHang as id",
+                "user.Ten as customer",
+                "sanpham.TenSP as product",
+                "donhang.TongTien as total",
+                "donhang.TrangThai as status"
+            )
+
+            ->orderBy("donhang.IdDonHang", "desc")
+
+            ->get();
+
+        return response()->json($orders);
+    });
+
+
+    /*
+    UPDATE STATUS
+    */
+
+    Route::put('/{id}', function (Request $request, $id) {
+
+        DB::table("donhang")
+            ->where("IdDonHang", $id)
+            ->update([
+                "TrangThai" => $request->status
+            ]);
+
+        return response()->json([
+            "success" => true
+        ]);
+    });
+
+
+    /*
+    DELETE ORDER
+    */
+
+    Route::delete('/{id}', function ($id) {
+
+        DB::table("donhang")
+            ->where("IdDonHang", $id)
+            ->delete();
+
+        return response()->json([
+            "success" => true
+        ]);
+    });
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| USER ORDERS
 |--------------------------------------------------------------------------
 */
 
 Route::post('/orders', [OrderController::class, 'store']);
-
 Route::get('/orders/{id}', [OrderController::class, 'getOrdersByUser']);
