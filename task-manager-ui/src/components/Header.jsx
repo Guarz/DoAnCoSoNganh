@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../style/Header.css"; 
+import "../style/Header.css";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ const Header = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light shadow-sm custom-navbar">
+    <nav className="navbar navbar-expand-lg navbar-light shadow-sm custom-navbar sticky-top">
       <div className="container">
         {/* Logo */}
         <Link className="navbar-brand fw-bold logo-text" to="/">

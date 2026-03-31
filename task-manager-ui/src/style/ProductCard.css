@@ -1,0 +1,129 @@
+.product-card-wrapper {
+    margin-bottom: 25px;
+    display: flex; 
+}
+
+.modern-product-card {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    border: 1px solid #e0f7ff; 
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.modern-product-card:hover {
+    transform: translateY(-8px); 
+    box-shadow: 0 12px 25px rgba(197, 240, 255, 0.5), 0 5px 10px rgba(255, 197, 211, 0.3);
+    border-color: #FFC5D3;
+}
+.pd-img-container {
+    position: relative;
+    width: 100%;
+    height: 300px; 
+    overflow: hidden;
+    background-color: #f0faff;
+}
+
+.pd-main-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    transition: transform 0.8s ease; 
+}
+
+.modern-product-card:hover .pd-main-img {
+    transform: scale(1.05); 
+}
+.pd-img-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(197, 240, 255, 0.2); 
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modern-product-card:hover .pd-img-overlay {
+    opacity: 1;
+}
+.pd-details-body {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; 
+    text-align: center;
+}
+
+.pd-category-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #5bbccf; 
+    background-color: #e0f7ff;
+    padding: 2px 10px;
+    border-radius: 50px;
+    display: inline-block;
+    align-self: center;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.pd-name-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    transition: color 0.3s ease;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 42px; 
+}
+
+.modern-product-card:hover .pd-name-title {
+    color: #ff8ca8; 
+}
+
+.pd-price-section {
+    margin-top: auto; 
+    padding-top: 12px;
+    border-top: 1px solid #f0faff;
+}
+
+.pd-current-price {
+    font-size: 19px;
+    font-weight: 800;
+    color: #ff8ca8; 
+}
+.pd-action-footer {
+    padding: 0 18px 18px 18px; 
+}
+
+.btn-view-detail {
+    width: 100%;
+    background-color: #FFC5D3; 
+    color: #fff;
+    border: none;
+    padding: 10px 0;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+}
+
+.btn-view-detail:hover {
+    background-color: #C5F0FF; 
+    color: #4d98af;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(197, 240, 255, 0.6); 
+}
