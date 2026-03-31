@@ -1,154 +1,126 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link, useOutletContext } from 'react-router-dom';
-import axios from 'axios';
-import './ProductDetail.css';
+import React, { useEffect, useState } from "react";
+import { useParams, Link, useOutletContext } from "react-router-dom";
+import axios from "axios";
+import "./ProductDetail.css";
 
 const UserProductDetail = () => {
-    const { id } = useParams();
-    const [product, setProduct] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const { setCart } = useOutletContext();
-    const [quantity, setQuantity] = useState(1);
-    const [showPopup, setShowPopup] = useState(false);
-    
-    useEffect(() => {
-        axios.get(`http://127.0.0.1:8000/api/user/products/${id}`)
-            .then(res => {
-                setProduct(res.data.data || res.data);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("Lỗi API chi tiết:", err);
-                setLoading(false);
-            });
-    }, [id]);
+  const { id } = useParams();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { setCart } = useOutletContext();
+  const [quantity, setQuantity] = useState(1);
+  const [showPopup, setShowPopup] = useState(false);
 
-    const handleAddToCart = () => {
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const existingItemIndex = cart.findIndex(item => item.id === product.id);
+  useEffect(() => {
+    axios
+      .get(`http://127.0.0.1:8000/api/user/products/${id}`)
+      .then((res) => {
+        setProduct(res.data.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Lỗi API chi tiết:", err);
+        setLoading(false);
+      });
+  }, [id]);
 
-        const qtyToAdd = Number(quantity) || 1;
+  const handleAddToCart = () => {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const existingItemIndex = cart.findIndex((item) => item.IdSP === product.IdSP);
+    const qtyToAdd = Number(quantity) || 1;
 
-        if (existingItemIndex !== -1) {
-            
-            cart[existingItemIndex].quantity = qtyToAdd; 
-            
-            console.log("Đã cập nhật số lượng mới là:", qtyToAdd);
-        } else {
-            
-            cart.push({
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                image: product.image,
-                quantity: qtyToAdd
-            });
-        }
+    if (existingItemIndex !== -1) {
+      cart[existingItemIndex].quantity += qtyToAdd;
+    } else {
+      cart.push({
+        IdSP: product.IdSP,
+        TenSP: product.TenSP,
+        Gia: product.Gia,
+        HinhAnh: product.HinhAnh,
+        TenLoai: product.TenLoai,
+        quantity: qtyToAdd,
+      });
+    }
 
-        localStorage.setItem('cart', JSON.stringify(cart));
-        setCart(cart);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    setCart(cart);
+    setShowPopup(true);
+    setTimeout(() => setShowPopup(false), 3000);
+  };
 
-        setShowPopup(true);
-        setTimeout(() => setShowPopup(false), 3000);
-    };
+  if (loading) return <div className="text-center mt-5 text-pink">Đang tải chi tiết...</div>;
+  if (!product) return <div className="text-center mt-5">Sản phẩm không tồn tại.</div>;
 
-    if (loading) return <div className="text-center mt-5 text-pink">Đang tải chi tiết...</div>;
-    if (!product) return <div className="text-center mt-5">Sản phẩm không tồn tại.</div>;
+  const imageSrc = product.HinhAnh
+    ? product.HinhAnh.startsWith("data:image")
+      ? product.HinhAnh
+      : `data:image/jpeg;base64,${product.HinhAnh}`
+    : "https://via.placeholder.com/500";
 
-    const imageSrc = product.image?.startsWith('data:image') 
-        ? product.image 
-        : `data:image/jpeg;base64,${product.image}`;
-
-    return (
-        <div className="container mt-5 pb-5 relative">
-            
-            {/* COMPONENT POP-UP THÔNG BÁO */}
-            {showPopup && (
-                <div 
-                    className="alert alert-success shadow-lg d-flex align-items-center" 
-                    role="alert"
-                    style={{
-                        position: 'fixed',
-                        top: '20px',
-                        right: '20px',
-                        zIndex: 9999,
-                        minWidth: '300px',
-                        animation: 'fadeIn 0.5s'
-                    }}
-                >
-                    <i className="bi bi-check-circle-fill me-2 fs-4"></i>
-                    <div>
-                        <strong>Thành công!</strong> <br/>
-                        Đã thêm <i>{product.name}</i> vào giỏ hàng.
-                    </div>
-                </div>
-            )}
-
-            <Link to="/products" className="btn btn-outline-danger mb-4 rounded-pill">
-                ← Quay lại danh sách
-            </Link>
-
-            <div className="row">
-                <div className="col-md-6 mb-4">
-                    <img 
-                        src={imageSrc} 
-                        className="img-fluid rounded shadow-sm" 
-                        alt={product.name}
-                        style={{ width: '100%', maxHeight: '500px', objectFit: 'cover' }}
-                        onError={(e) => { e.target.src = 'https://via.placeholder.com/500' }}
-                    />
-                </div>
-                <div className="col-md-6">
-                    <h6 className="text-pink text-uppercase">{product.category}</h6>
-                    <h1 className="fw-bold mb-3">{product.name}</h1>
-                    <h3 className="text-danger fw-bold mb-4">
-                        {product.price ? product.price.toLocaleString('vi-VN') : '0'} đ
-                    </h3>
-                    <div className="mb-4">
-                        <h5 className="fw-bold">Mô tả sản phẩm:</h5>
-                        <p className="text-muted" style={{ whiteSpace: 'pre-line' }}>
-                            {product.description || "Đang cập nhật nội dung..."}
-                        </p>
-                        
-                    </div>
-                     <div className="d-flex align-items-center mb-4">
-        <span className="me-3 fw-bold text-muted">Số lượng:</span>
-        <div className="input-group" style={{ width: '140px' }}>
-            <button 
-        className="btn btn-outline-secondary fw-bold" 
-        type="button"
-        onClick={() => setQuantity(prev => (Number(prev) > 1 ? Number(prev) - 1 : 1))}
-    >
-        -
-    </button>
-
-    <input 
-        type="text" 
-        className="form-control text-center fw-bold" 
-        value={quantity} 
-        readOnly 
-    />
-
-    <button 
-        className="btn btn-outline-secondary fw-bold" 
-        type="button" 
-    
-        onClick={() => setQuantity(prev => Number(prev) + 1)}
-    >
-        +
-    </button>
+  return (
+    <div className="container mt-5 pb-5 position-relative">
+      {/* THÔNG BÁO POP-UP (Khớp với class .cart-popup trong CSS) */}
+      {showPopup && (
+        <div className="cart-popup shadow">
+          <i className="bi bi-check-circle-fill me-2"></i>
+          <div>
+            Đã thêm <i>{product.TenSP}</i> vào giỏ hàng.
+          </div>
         </div>
-    </div>
-                    <button 
-                        onClick={handleAddToCart}
-                        className="btn btn-danger btn-lg w-100 rounded-pill py-3 fw-bold"
-                    >
-                        THÊM VÀO GIỎ HÀNG
-                    </button>
-                </div>
+      )}
+
+      {/* NÚT QUAY LẠI (Khớp với class .btn-back-custom) */}
+      <Link to="/products" className="btn btn-back-custom mb-4 px-4 shadow-sm">
+        <i className="bi bi-arrow-left me-2"></i> Tiếp tục mua sắm
+      </Link>
+
+      <div className="row g-5">
+        <div className="col-md-6">
+          <div className="detail-img-wrapper shadow-sm">
+            <img src={imageSrc} className="img-fluid rounded-4" alt={product.TenSP} />
+          </div>
+        </div>
+
+        <div className="col-md-6">
+          {/* NHÃN DANH MỤC */}
+          <span className="badge-category-tag">{product.TenLoai}</span>
+          
+          {/* TÊN SẢN PHẨM */}
+          <h1 className="product-detail-name mt-2 mb-3">{product.TenSP}</h1>
+          
+          {/* GIÁ TIỀN */}
+          <h3 className="product-price-detail mb-4">
+            {Number(product.Gia).toLocaleString("vi-VN")} đ
+          </h3>
+
+          <div className="mb-4">
+            <h5 className="fw-bold">Mô tả sản phẩm:</h5>
+            <p className="text-muted description-text">
+              {product.MoTa || "Sản phẩm chất lượng cao từ cửa hàng."}
+            </p>
+          </div>
+
+          <div className="d-flex align-items-center mb-4 gap-3">
+            <span className="fw-bold text-muted">Số lượng:</span>
+            <div className="quantity-control-wrapper">
+              <button className="btn-qty" type="button" onClick={() => setQuantity((q) => (q > 1 ? q - 1 : 1))}>
+                <i className="bi bi-dash-lg"></i>
+              </button>
+              <input type="number" className="input-qty" value={quantity} readOnly />
+              <button className="btn-qty" type="button" onClick={() => setQuantity((q) => q + 1)}>
+                <i className="bi bi-plus-lg"></i>
+              </button>
             </div>
+          </div>
+
+          {/* NÚT THÊM GIỎ HÀNG (Khớp với class .btn-add-main) */}
+          <button onClick={handleAddToCart} className="btn btn-add-main w-100 py-3">
+            <i className="bi bi-cart-plus me-2"></i> THÊM VÀO GIỎ HÀNG
+          </button>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default UserProductDetail;
