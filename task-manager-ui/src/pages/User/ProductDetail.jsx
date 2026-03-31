@@ -14,7 +14,7 @@ const UserProductDetail = () => {
 
   useEffect(() => {
     axios
-      .get(`http://127.0.0.1:8000/api/user/products/${id}`)
+      .get(`http://127.0.0.1:8000/api/products/${id}`)
       .then((res) => {
         setProduct(res.data.data);
         setLoading(false);
