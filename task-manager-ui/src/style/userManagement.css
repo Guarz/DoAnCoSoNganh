@@ -1,131 +1,245 @@
+/* Container chính với nền xanh cyan cực nhẹ */
 .user-container {
-    padding: 25px;
-    background: #f4f6f9;
+    padding: 30px;
+    background-color: #e0f7f9; /* Màu nền giống ảnh danh mục */
     min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* HEADER */
+/* Header & Tiêu đề */
 .user-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .user-title {
-    font-size: 22px;
+    font-size: 28px;
     font-weight: bold;
-    margin-left: 15px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-/* BUTTON */
+/* Nút Quay lại giống Dashboard */
 .back-btn {
-    background: #6c757d;
-    color: white;
-    border: none;
-    padding: 8px 14px;
+    background: white;
+    color: #4a90e2;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .back-btn:hover {
-    background: #5a6268;
+    background: #f8f9fa;
 }
 
-.reload-btn {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.reload-btn:hover {
-    background: #0056b3;
-}
-
-/* SEARCH */
+/* Form tìm kiếm và Input */
 .search-box {
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    width: 250px;
     outline: none;
-    transition: 0.3s;
 }
 
-.search-box:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0,123,255,0.4);
+/* Card chứa bảng (Trắng, bo góc) */
+.table-card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-/* TABLE */
+/* Table Style */
 .user-table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-top: 10px;
 }
 
-.user-table thead {
-    background: #f1f3f5;
-}
-
+/* Header của bảng màu hồng pastel giống ảnh */
 .user-table th {
-    padding: 14px;
-    text-align: left;
+    background: #fbc2d4; /* Màu hồng pastel */
     color: #555;
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
 }
 
 .user-table td {
-    padding: 14px;
-    border-top: 1px solid #eee;
-}
-
-/* HOVER ROW */
-.table-row:hover {
-    background: #f9fafb;
-    transition: 0.2s;
-}
-
-/* DELETE BUTTON */
-.delete-btn {
-    background: #ff4d4f;
-    color: white;
-    border: none;
-    padding: 6px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.delete-btn:hover {
-    background: #d9363e;
-}
-.edit-box {
-    background: white;
     padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    border-bottom: 1px solid #f0f0f0;
+    color: #444;
 }
 
-.edit-box input {
-    margin-right: 10px;
-    padding: 8px;
+.user-table tr:hover {
+    background-color: #f9f9f9;
 }
 
+/* Button "Sửa" màu xanh cyan nhạt */
 .edit-btn {
-    background: #ffc107;
-    color: black;
-    border: none;
-    padding: 6px 12px;
+    background: #e1f5fe;
+    color: #03a9f4;
+    border: 1px solid #b3e5fc;
+    padding: 6px 15px;
     border-radius: 6px;
-    margin-right: 5px;
+    margin-right: 8px;
     cursor: pointer;
+    transition: 0.3s;
 }
 
 .edit-btn:hover {
-    background: #e0a800;
+    background: #03a9f4;
+    color: white;
+}
+
+/* Button "Xóa" màu đỏ nhạt/hồng */
+.delete-btn {
+    background: #fff1f0;
+    color: #ff4d4f;
+    border: 1px solid #ffa39e;
+    padding: 6px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.delete-btn:hover {
+    background: #ff4d4f;
+    color: white;
+}
+
+/* Nút Reload/Thêm mới màu xanh lá giống "Thêm danh mục" */
+.reload-btn {
+    background: #5cb85c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.reload-btn:hover {
+    background: #4cae4c;
+}
+/* Bảng trắng sạch sẽ, bo góc */
+.user-table {
+    width: 100%;
+    border-collapse: separate; /* Dùng separate để bo góc table được */
+    border-spacing: 0;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Container chứa 2 nút */
+.edit-actions {
+    display: flex;
+    gap: 10px; /* Tạo khoảng cách giữa 2 nút */
+    margin-top: 15px;
+}
+
+/* Style chung cho nút trong form edit */
+.edit-box button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+/* Nút Cập nhật - Màu xanh lá dương */
+.update-confirm-btn {
+    background-color: #4caf50;
+    color: white;
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+}
+
+.update-confirm-btn:hover {
+    background-color: #43a047;
+    transform: translateY(-1px);
+}
+
+/* Nút Huỷ - Màu xám hoặc đỏ nhạt */
+.cancel-btn {
+    background-color: #e0e0e0;
+    color: #444;
+}
+
+.cancel-btn:hover {
+    background-color: #bdbdbd;
+}
+
+/* Container chứa form edit */
+.edit-box {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+}
+
+/* Các ô nhập liệu */
+.edit-box input {
+    padding: 10px;
+    border-collapse: separate;
+    margin-right: 10px;
+    border: 1px solid #eea9dd;
+    border-radius: 4px;
+    width: 200px;
+    transition: border 0.3s;
+}
+
+.edit-box input:focus {
+    border-color: #4caf50;
+    outline: none;
+}
+
+/* Container chứa các nút bấm */
+.edit-actions {
+    display: inline-flex;
+    gap: 10px;
+}
+
+/* Nút Cập nhật */
+.btn-update {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.btn-update:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+/* Nút Huỷ */
+.btn-cancel {
+    background-color: #6c757d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-cancel:hover {
+    background-color: #5a6268;
 }

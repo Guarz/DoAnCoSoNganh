@@ -69,25 +69,28 @@ function UserManagement(){
         setEmail(user.email);
     };
 
-    const updateUser = ()=>{
+   const updateUser = () => {
+    if (!name || !email) {
+        alert("Vui lòng nhập đủ tên và email");
+        return;
+    }
 
-        axios.put(`http://127.0.0.1:8000/api/admin/users/${editingUser}`,{
-            name,
-            email
-        })
-        .then(()=>{
-            alert("Cập nhật thành công");
-            setEditingUser(null);
-            setName("");
-            setEmail("");
-            fetchUsers();
-        })
-        .catch(()=>{
-            alert("Cập nhật thất bại");
-        });
-
-    };
-
+    axios.put(`http://127.0.0.1:8000/api/admin/users/${editingUser}`, {
+        name: name,
+        email: email
+    })
+    .then(() => {
+        alert("Cập nhật thành công");
+        setEditingUser(null);
+        fetchUsers();
+    })
+    .catch((err) => {
+        console.error("Full Error:", err);
+        // Kiểm tra xem có message cụ thể từ backend không, nếu không thì lấy message mặc định
+        const errMsg = err.response?.data?.message || err.message || "Lỗi không xác định";
+        alert("Thất bại: " + errMsg);
+    });
+};
     /*
     ========================
     SEARCH
@@ -142,28 +145,37 @@ function UserManagement(){
                 </div>
             </div>
 
-            {/* 🔥 FORM EDIT */}
-            {editingUser && (
-                <div className="edit-box">
-                    <h3>Sửa user</h3>
+           {/* 🔥 FORM EDIT */}
+{editingUser && (
+    <div className="edit-box">
+        <h3 style={{ marginBottom: "15px", color: "#333" }}>Sửa thông tin người dùng</h3>
 
-                    <input
-                        value={name}
-                        onChange={(e)=>setName(e.target.value)}
-                        placeholder="Tên"
-                    />
+        <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+            <input
+                className="edit-input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Tên"
+            />
 
-                    <input
-                        value={email}
-                        onChange={(e)=>setEmail(e.target.value)}
-                        placeholder="Email"
-                    />
+            <input
+                className="edit-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+            />
 
-                    <button onClick={updateUser}>Cập nhật</button>
-                    <button onClick={()=>setEditingUser(null)}>Huỷ</button>
-                </div>
-            )}
-
+            <div className="edit-actions">
+                <button className="btn-update" onClick={updateUser}>
+                    ✓ Cập nhật
+                </button>
+                <button className="btn-cancel" onClick={() => setEditingUser(null)}>
+                    ✕ Huỷ
+                </button>
+            </div>
+        </div>
+    </div>
+)}
             {/* TABLE */}
             <table className="user-table">
 

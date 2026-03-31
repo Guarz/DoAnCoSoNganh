@@ -4,472 +4,472 @@ import "../../style/product.css";
 
 function ProductManagement() {
 
-    const navigate = useNavigate();
+    const navigate = useNavigate();
 
-    const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
 
-    const [product, setProduct] = useState({
-        name: "",
-        price: "",
-        shortDesc: "",
-        categoryId: "",
-        image: null
-    });
+    const [product, setProduct] = useState({
+        name: "",
+        price: "",
+        shortDesc: "",
+        categoryId: "",
+        image: null
+    });
 
-    const [editingId, setEditingId] = useState(null);
+    const [editingId, setEditingId] = useState(null);
 
-    /*
-    =========================
-    LOAD DATA
-    =========================
-    */
+    /*
+    =========================
+    LOAD DATA
+    =========================
+    */
 
-    const fetchData = async () => {
+    const fetchData = async () => {
 
-        try {
+        try {
 
-            const [resProd, resCat] = await Promise.all([
-                fetch("http://localhost:8000/api/admin/products"),
-                fetch("http://localhost:8000/api/admin/categories")
-            ]);
+            const [resProd, resCat] = await Promise.all([
+                fetch("http://localhost:8000/api/admin/products"),
+                fetch("http://localhost:8000/api/admin/categories")
+            ]);
 
-            const dataProd = await resProd.json();
-            const dataCat = await resCat.json();
+            const dataProd = await resProd.json();
+            const dataCat = await resCat.json();
 
-            setProducts(dataProd);
-            setCategories(dataCat);
+            setProducts(dataProd);
+            setCategories(dataCat);
 
-            if (dataCat.length > 0 && !editingId) {
+            if (dataCat.length > 0 && !editingId) {
 
-                setProduct(prev => ({
-                    ...prev,
-                    categoryId: dataCat[0].id
-                }));
+                setProduct(prev => ({
+                    ...prev,
+                    categoryId: dataCat[0].id
+                }));
 
-            }
+            }
 
-        } catch (err) {
+        } catch (err) {
 
-            console.log("Lỗi load dữ liệu:", err);
+            console.log("Lỗi load dữ liệu:", err);
 
-        }
+        }
 
-    };
+    };
 
-    useEffect(() => {
+    useEffect(() => {
 
-        fetchData();
+        fetchData();
 
-    }, []);
+    }, []);
 
-    /*
-    =========================
-    HANDLERS
-    =========================
-    */
+    /*
+    =========================
+    HANDLERS
+    =========================
+    */
 
-    const handleChange = (e) => {
+    const handleChange = (e) => {
 
-        setProduct({
-            ...product,
-            [e.target.name]: e.target.value
-        });
+        setProduct({
+            ...product,
+            [e.target.name]: e.target.value
+        });
 
-    };
+    };
 
-    const handleImage = (e) => {
+    const handleImage = (e) => {
 
-        const file = e.target.files[0];
+        const file = e.target.files[0];
 
-        if (file) {
+        if (file) {
 
-            setProduct({
-                ...product,
-                image: file
-            });
+            setProduct({
+                ...product,
+                image: file
+            });
 
-        }
+        }
 
-    };
+    };
 
-    const resetForm = () => {
+    const resetForm = () => {
 
-        setProduct({
-            name: "",
-            price: "",
-            shortDesc: "",
-            categoryId: categories[0]?.id || "",
-            image: null
-        });
+        setProduct({
+            name: "",
+            price: "",
+            shortDesc: "",
+            categoryId: categories[0]?.id || "",
+            image: null
+        });
 
-        setEditingId(null);
+        setEditingId(null);
 
-        const fileInput = document.querySelector('input[type="file"]');
+        const fileInput = document.querySelector('input[type="file"]');
 
-        if (fileInput) fileInput.value = "";
+        if (fileInput) fileInput.value = "";
 
-    };
+    };
 
-    /*
-    =========================
-    ADD PRODUCT
-    =========================
-    */
+    /*
+    =========================
+    ADD PRODUCT
+    =========================
+    */
 
-    const handleAddProduct = async () => {
+    const handleAddProduct = async () => {
 
-        if (!product.name || !product.price) {
+        if (!product.name || !product.price) {
 
-            alert("Vui lòng nhập tên và giá sản phẩm!");
-            return;
+            alert("Vui lòng nhập tên và giá sản phẩm!");
+            return;
 
-        }
+        }
 
-        const formData = new FormData();
+        const formData = new FormData();
 
-        formData.append("name", product.name);
-        formData.append("price", product.price);
-        formData.append("description", product.shortDesc);
-        formData.append("categoryId", product.categoryId);
+        formData.append("name", product.name);
+        formData.append("price", product.price);
+        formData.append("description", product.shortDesc);
+        formData.append("categoryId", product.categoryId);
 
-        if (product.image) {
+        if (product.image) {
 
-            formData.append("image", product.image);
+            formData.append("image", product.image);
 
-        }
+        }
 
-        try {
+        try {
 
-            const res = await fetch(
-                "http://localhost:8000/api/admin/products",
-                {
-                    method: "POST",
-                    body: formData
-                }
-            );
+            const res = await fetch(
+                "http://localhost:8000/api/admin/products",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
 
-            const data = await res.json();
+            const data = await res.json();
 
-            if (data.success) {
+            if (data.success) {
 
-                alert("Thêm sản phẩm thành công 🎉");
+                alert("Thêm sản phẩm thành công 🎉");
 
-                fetchData();
-                resetForm();
+                fetchData();
+                resetForm();
 
-            }
+            }
 
-        } catch (err) {
+        } catch (err) {
 
-            console.log("Lỗi thêm:", err);
+            console.log("Lỗi thêm:", err);
 
-        }
+        }
 
-    };
+    };
 
-    /*
-    =========================
-    UPDATE PRODUCT
-    =========================
-    */
+    /*
+    =========================
+    UPDATE PRODUCT
+    =========================
+    */
 
-    const handleUpdateProduct = async () => {
+    const handleUpdateProduct = async () => {
 
-        const formData = new FormData();
+        const formData = new FormData();
 
-        formData.append("name", product.name);
-        formData.append("price", product.price);
-        formData.append("description", product.shortDesc);
-        formData.append("categoryId", product.categoryId);
+        formData.append("name", product.name);
+        formData.append("price", product.price);
+        formData.append("description", product.shortDesc);
+        formData.append("categoryId", product.categoryId);
 
-        formData.append("_method", "PUT");
+        formData.append("_method", "PUT");
 
-        if (product.image) {
+        if (product.image) {
 
-            formData.append("image", product.image);
+            formData.append("image", product.image);
 
-        }
+        }
 
-        try {
+        try {
 
-            const res = await fetch(
-                `http://localhost:8000/api/admin/products/${editingId}`,
-                {
-                    method: "POST",
-                    body: formData
-                }
-            );
+            const res = await fetch(
+                `http://localhost:8000/api/admin/products/${editingId}`,
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
 
-            const data = await res.json();
+            const data = await res.json();
 
-            if (data.success) {
+            if (data.success) {
 
-                alert("Cập nhật thành công ✨");
+                alert("Cập nhật thành công ✨");
 
-                fetchData();
-                resetForm();
+                fetchData();
+                resetForm();
 
-            }
+            }
 
-        } catch (err) {
+        } catch (err) {
 
-            console.log("Lỗi cập nhật:", err);
+            console.log("Lỗi cập nhật:", err);
 
-        }
+        }
 
-    };
+    };
 
-    /*
-    =========================
-    EDIT
-    =========================
-    */
+    /*
+    =========================
+    EDIT
+    =========================
+    */
 
-    const handleEdit = (p) => {
+    const handleEdit = (p) => {
 
-        setEditingId(p.id);
+        setEditingId(p.id);
 
-        setProduct({
-            name: p.name,
-            price: p.price,
-            shortDesc: p.description || "",
-            categoryId: p.categoryId || "",
-            image: null
-        });
+        setProduct({
+            name: p.name,
+            price: p.price,
+            shortDesc: p.description || "",
+            categoryId: p.categoryId || "",
+            image: null
+        });
 
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
 
-    };
+    };
 
-    /*
-    =========================
-    DELETE
-    =========================
-    */
+    /*
+    =========================
+    DELETE
+    =========================
+    */
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (id) => {
 
-        if (!window.confirm("Bạn có chắc muốn xóa?")) return;
+        if (!window.confirm("Bạn có chắc muốn xóa?")) return;
 
-        try {
+        try {
 
-            const res = await fetch(
-                `http://localhost:8000/api/admin/products/${id}`,
-                {
-                    method: "DELETE"
-                }
-            );
+            const res = await fetch(
+                `http://localhost:8000/api/admin/products/${id}`,
+                {
+                    method: "DELETE"
+                }
+            );
 
-            const data = await res.json();
+            const data = await res.json();
 
-            if (data.success) {
+            if (data.success) {
 
-                alert("Đã xóa sản phẩm");
+                alert("Đã xóa sản phẩm");
 
-                fetchData();
+                fetchData();
 
-            }
+            }
 
-        } catch (err) {
+        } catch (err) {
 
-            console.log("Lỗi delete:", err);
+            console.log("Lỗi delete:", err);
 
-        }
+        }
 
-    };
+    };
 
-    return (
+    return (
 
-        <div className="product-page">
+        <div className="product-page">
 
-            {/* BACK BUTTON */}
+            {/* BACK BUTTON */}
 
-            <button
-                className="back-btn"
-                onClick={() => navigate("/admin/dashboard")}
-            >
-                ⬅ Quay lại Dashboard
-            </button>
+            <button
+                className="back-btn"
+                onClick={() => navigate("/admin/dashboard")}
+            >
+                ⬅ Quay lại Dashboard
+            </button>
 
-            <h2 className="title">🌸 Quản lý sản phẩm</h2>
+            <h2 className="title">🌸 Quản lý sản phẩm</h2>
 
-            {/* FORM */}
+            {/* FORM */}
 
-            <div className="product-card">
+            <div className="product-card">
 
-                <div className="form-grid">
+                <div className="form-grid">
 
-                    <input
-                        name="name"
-                        placeholder="Tên sản phẩm"
-                        value={product.name}
-                        onChange={handleChange}
-                    />
+                    <input
+                        name="name"
+                        placeholder="Tên sản phẩm"
+                        value={product.name}
+                        onChange={handleChange}
+                    />
 
-                    <input
-                        name="price"
-                        type="number"
-                        placeholder="Giá"
-                        value={product.price}
-                        onChange={handleChange}
-                    />
+                    <input
+                        name="price"
+                        type="number"
+                        placeholder="Giá"
+                        value={product.price}
+                        onChange={handleChange}
+                    />
 
-                    <select
-                        name="categoryId"
-                        value={product.categoryId}
-                        onChange={handleChange}
-                        className="form-select"
-                    >
+                    <select
+                        name="categoryId"
+                        value={product.categoryId}
+                        onChange={handleChange}
+                        className="form-select"
+                    >
 
-                        {categories.map(cat => (
+                        {categories.map(cat => (
 
-                            <option key={cat.id} value={cat.id}>
-                                {cat.name}
-                            </option>
+                            <option key={cat.id} value={cat.id}>
+                                {cat.name}
+                            </option>
 
-                        ))}
+                        ))}
 
-                    </select>
+                    </select>
 
-                    <input
-                        name="shortDesc"
-                        placeholder="Mô tả"
-                        value={product.shortDesc}
-                        onChange={handleChange}
-                    />
+                    <input
+                        name="shortDesc"
+                        placeholder="Mô tả"
+                        value={product.shortDesc}
+                        onChange={handleChange}
+                    />
 
-                    <input
-                        type="file"
-                        onChange={handleImage}
-                    />
+                    <input
+                        type="file"
+                        onChange={handleImage}
+                    />
 
-                </div>
+                </div>
 
-                <div className="form-actions">
+                <div className="form-actions">
 
-                    <button
-                        className="add-btn"
-                        onClick={
-                            editingId
-                                ? handleUpdateProduct
-                                : handleAddProduct
-                        }
-                    >
+                    <button
+                        className="add-btn"
+                        onClick={
+                            editingId
+                                ? handleUpdateProduct
+                                : handleAddProduct
+                        }
+                    >
 
-                        {editingId
-                            ? "Cập nhật sản phẩm"
-                            : "Thêm sản phẩm"}
+                        {editingId
+                            ? "Cập nhật sản phẩm"
+                            : "Thêm sản phẩm"}
 
-                    </button>
+                    </button>
 
-                    {editingId && (
+                    {editingId && (
 
-                        <button
-                            className="cancel-btn"
-                            onClick={resetForm}
-                        >
-                            Hủy bỏ
-                        </button>
+                        <button
+                            className="cancel-btn"
+                            onClick={resetForm}
+                        >
+                            Hủy bỏ
+                        </button>
 
-                    )}
+                    )}
 
-                </div>
+                </div>
 
-            </div>
+            </div>
 
-            {/* PRODUCT LIST */}
+            {/* PRODUCT LIST */}
 
-            <div className="product-list">
+            <div className="product-list">
 
-                <h3>📋 Danh sách sản phẩm</h3>
+                <h3>📋 Danh sách sản phẩm</h3>
 
-                <table>
+                <table>
 
-                    <thead>
+                    <thead>
 
-                        <tr>
-                            <th>Ảnh</th>
-                            <th>Tên</th>
-                            <th>Loại</th>
-                            <th>Giá</th>
-                            <th>Hành động</th>
-                        </tr>
+                        <tr>
+                            <th>Ảnh</th>
+                            <th>Tên</th>
+                            <th>Loại</th>
+                            <th>Giá</th>
+                            <th>Hành động</th>
+                        </tr>
 
-                    </thead>
+                    </thead>
 
-                    <tbody>
+                    <tbody>
 
-                        {products.map((p) => (
+                        {products.map((p) => (
 
-                            <tr key={p.id}>
+                            <tr key={p.id}>
 
-                                <td>
+                                <td>
 
-                                    {p.image ? (
+                                    {p.image ? (
 
-                                        <img
-                                            src={`data:image/jpeg;base64,${p.image}`}
-                                            width="60"
-                                            height="60"
-                                            style={{
-                                                objectFit: "cover",
-                                                borderRadius: "6px"
-                                            }}
-                                        />
+                                        <img
+                                            src={`data:image/jpeg;base64,${p.image}`}
+                                            width="60"
+                                            height="60"
+                                            style={{
+                                                objectFit: "cover",
+                                                borderRadius: "6px"
+                                            }}
+                                        />
 
-                                    ) : (
-                                        <span>Không ảnh</span>
-                                    )}
+                                    ) : (
+                                        <span>Không ảnh</span>
+                                    )}
 
-                                </td>
+                                </td>
 
-                                <td>{p.name}</td>
+                                <td>{p.name}</td>
 
-                                <td>
-                                    <span className="badge-cat">
-                                        {p.category_name}
-                                    </span>
-                                </td>
+                                <td>
+                                    <span className="badge-cat">
+                                        {p.category_name}
+                                    </span>
+                                </td>
 
-                                <td>
-                                    {Number(p.price).toLocaleString()} VNĐ
-                                </td>
+                                <td>
+                                    {Number(p.price).toLocaleString()} VNĐ
+                                </td>
 
-                                <td>
+                                <td>
 
-                                    <button
-                                        className="edit-btn"
-                                        onClick={() => handleEdit(p)}
-                                    >
-                                        Sửa
-                                    </button>
+                                    <button
+                                        className="edit-btn"
+                                        onClick={() => handleEdit(p)}
+                                    >
+                                        Sửa
+                                    </button>
 
-                                    <button
-                                        className="delete-btn"
-                                        onClick={() => handleDelete(p.id)}
-                                    >
-                                        Xóa
-                                    </button>
+                                    <button
+                                        className="delete-btn"
+                                        onClick={() => handleDelete(p.id)}
+                                    >
+                                        Xóa
+                                    </button>
 
-                                </td>
+                                </td>
 
-                            </tr>
+                            </tr>
 
-                        ))}
+                        ))}
 
-                    </tbody>
+                    </tbody>
 
-                </table>
+                </table>
 
-            </div>
+            </div>
 
-        </div>
+        </div>
 
-    );
+    );
 
 }
 

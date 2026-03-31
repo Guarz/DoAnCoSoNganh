@@ -228,7 +228,6 @@ Route::prefix('admin/orders')->group(function () {
     });
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | ADMIN USERS
@@ -238,23 +237,40 @@ Route::prefix('admin/orders')->group(function () {
 Route::prefix('admin/users')->group(function () {
 
     Route::get('/', function () {
-
         return DB::table("user")
-
             ->select(
                 "IdUser as id",
                 "Ten as name",
                 "Email as email",
                 "NgayTao as created_at"
             )
-
             ->orderBy("IdUser", "desc")
-
             ->get();
     });
 
-    Route::delete('/{id}', function ($id) {
+    // --- THÊM ĐOẠN NÀY VÀO ---
+    Route::put('/{id}', function (Request $request, $id) {
+        // Kiểm tra dữ liệu gửi lên (optional nhưng nên có)
+        if (!$request->name || !$request->email) {
+            return response()->json(["success" => false, "message" => "Thiếu thông tin"], 400);
+        }
 
+        DB::table("user")
+            ->where("IdUser", $id)
+            ->update([
+                "Ten" => $request->name,
+                "Email" => $request->email
+                // Nếu DB của bạn dùng tên cột khác thì hãy sửa lại cho đúng nhé
+            ]);
+
+        return response()->json([
+            "success" => true,
+            "message" => "Cập nhật thành công"
+        ]);
+    });
+    // ------------------------
+
+    Route::delete('/{id}', function ($id) {
         DB::table("user")
             ->where("IdUser", $id)
             ->delete();
@@ -264,8 +280,6 @@ Route::prefix('admin/users')->group(function () {
         ]);
     });
 });
-
-
 // USER ROUTES Đm thằng nào Admin mà làm chỗ này t đánh chết >:( 
 
 Route::get('/products', [ProductController::class, 'index']);

@@ -149,3 +149,82 @@ td img {
 .delete-btn:hover {
     background: #d32f2f;
 }
+/* Container chứa các nút bấm */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Nút chính (Thêm/Cập nhật) */
+.add-btn {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(110, 142, 251, 0.3);
+}
+
+.add-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(110, 142, 251, 0.4);
+}
+/* Badge loại sản phẩm trong bảng */
+.badge-cat {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+/* Container chứa các nút bấm */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Áp dụng chung cho cả nút Thêm/Cập nhật và nút Hủy để chúng bằng nhau */
+.add-btn, .cancel-btn {
+    min-width: 180px;       /* Độ rộng cố định để 2 nút bằng nhau */
+    height: 45px;          /* Chiều cao bằng nhau */
+    display: flex;         /* Căn giữa chữ trong nút */
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    border: none;          /* Bỏ viền mặc định */
+}
+
+/* Nút chính (Thêm/Cập nhật) */
+.add-btn {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    color: white;
+    box-shadow: 0 4px 15px rgba(110, 142, 251, 0.3);
+    margin-top: 0;         /* Ghi đè lại margin-top nếu có */
+}
+
+.add-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(110, 142, 251, 0.4);
+}
+
+/* Nút Hủy bỏ */
+.cancel-btn {
+    background-color: #f58f8f;
+    color: #e05555;
+    border: 1px solid #ddd; /* Nút hủy nên có viền nhẹ để phân biệt */
+}
+
+.cancel-btn:hover {
+    background-color: #e5e5e5;
+    transform: translateY(-2px);
+}
