@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+
 import {
     BarChart,
     Bar,
@@ -18,8 +19,6 @@ function AdminDashboard() {
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
-    const [isAuthorized, setIsAuthorized] = useState(false);
-
     const [data, setData] = useState({
         total_products: 0,
         total_categories: 0,
@@ -27,23 +26,37 @@ function AdminDashboard() {
         total_users: 0
     });
 
+    /*
+    ==========================
+    CHECK LOGIN + LOAD DATA
+    ==========================
+    */
+
     useEffect(() => {
 
         const storedUser = localStorage.getItem("user");
 
         if (!storedUser) {
-            window.location.href = "/admin/login";
+            navigate("/admin/login");
             return;
         }
 
-        const user = JSON.parse(storedUser);
+        try {
 
-        if (user.role !== "admin") {
-            window.location.href = "/admin/login";
+            const user = JSON.parse(storedUser);
+
+            if (!user || user.role !== "admin") {
+                navigate("/admin/login");
+                return;
+            }
+
+        } catch (error) {
+
+            localStorage.removeItem("user");
+            navigate("/admin/login");
             return;
-        }
 
-        setIsAuthorized(true);
+        }
 
         /*
         ==========================
@@ -67,12 +80,13 @@ function AdminDashboard() {
             })
             .catch((err) => {
 
-                console.error(err);
+                console.error("Dashboard error:", err);
                 setLoading(false);
 
             });
 
-    }, []);
+    }, [navigate]);
+
 
     /*
     ==========================
@@ -86,15 +100,16 @@ function AdminDashboard() {
 
             localStorage.removeItem("user");
 
-            window.location.href = "/admin/login";
+            navigate("/admin/login");
 
         }
 
     };
 
+
     /*
     ==========================
-    DATA CHO BIỂU ĐỒ
+    CHART DATA
     ==========================
     */
 
@@ -107,18 +122,20 @@ function AdminDashboard() {
         { name: "T6", orders: 70 }
     ];
 
-    if (!isAuthorized || loading) {
+
+    if (loading) {
 
         return (
             <div className="dashboard-loading">
                 <div className="spinner"></div>
-                <h3 style={{ marginTop: '20px', color: '#666' }}>
+                <h3 style={{ marginTop: 20, color: "#666" }}>
                     Đang tải dữ liệu...
                 </h3>
             </div>
         );
 
     }
+
 
     return (
 
@@ -135,14 +152,17 @@ function AdminDashboard() {
                     </p>
                 </div>
 
-                <button className="logout-btn" onClick={handleLogout}>
+                <button
+                    className="logout-btn"
+                    onClick={handleLogout}
+                >
                     Đăng xuất
                 </button>
 
             </header>
 
 
-            {/* THỐNG KÊ */}
+            {/* STATISTICS */}
 
             <div className="dashboard-grid">
 
@@ -181,7 +201,7 @@ function AdminDashboard() {
             </div>
 
 
-            {/* BIỂU ĐỒ */}
+            {/* CHART */}
 
             <div className="chart-box">
 
@@ -208,24 +228,14 @@ function AdminDashboard() {
                                 dataKey="name"
                                 axisLine={false}
                                 tickLine={false}
-                                tick={{ fill: '#a3aed0', fontSize: 12 }}
-                                dy={10}
                             />
 
                             <YAxis
                                 axisLine={false}
                                 tickLine={false}
-                                tick={{ fill: '#a3aed0', fontSize: 12 }}
                             />
 
-                            <Tooltip
-                                cursor={{ fill: '#f4f7fe' }}
-                                contentStyle={{
-                                    borderRadius: '15px',
-                                    border: 'none',
-                                    boxShadow: '0 10px 15px rgba(0,0,0,0.1)'
-                                }}
-                            />
+                            <Tooltip />
 
                             <Bar
                                 dataKey="orders"
@@ -267,16 +277,23 @@ function StatBox({ icon, label, value, onClick, color }) {
 
             <div
                 className="stat-icon"
-                style={{ backgroundColor: `${color}15`, color: color }}
+                style={{
+                    backgroundColor: `${color}20`,
+                    color: color
+                }}
             >
                 {icon}
             </div>
 
             <div className="stat-info">
 
-                <span className="stat-label">{label}</span>
+                <span className="stat-label">
+                    {label}
+                </span>
 
-                <span className="stat-value">{value}</span>
+                <span className="stat-value">
+                    {value}
+                </span>
 
             </div>
 
