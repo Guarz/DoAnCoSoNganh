@@ -60,4 +60,29 @@ class CartController extends Controller
 
         return response()->json(['success' => false, 'message' => 'Sản phẩm không tồn tại trong giỏ'], 404);
     }
+    public function addToCart(Request $request)
+    {
+        // 1. Tìm hoặc tạo Giỏ hàng gốc cho User
+        $gioHang = GioHang::firstOrCreate(['IdUser' => $request->IdUser]);
+
+        // 2. Kiểm tra sản phẩm đã tồn tại trong Chi tiết giỏ hàng chưa
+        $chiTiet = ChiTietGioHang::where('IdGH', $gioHang->IdGH)
+            ->where('IdSP', $request->IdSP)
+            ->first();
+
+        if ($chiTiet) {
+            // Nếu đã có, cộng dồn số lượng mới vào số lượng cũ
+            $chiTiet->SoLuong += $request->SoLuong;
+            $chiTiet->save();
+        } else {
+            // Nếu chưa có, tạo dòng mới
+            $newEntry = new ChiTietGioHang();
+            $newEntry->IdGH = $gioHang->IdGH;
+            $newEntry->IdSP = $request->IdSP;
+            $newEntry->SoLuong = $request->SoLuong;
+            $newEntry->save();
+        }
+
+        return response()->json(['success' => true, 'message' => 'Cập nhật Database thành công']);
+    }
 }

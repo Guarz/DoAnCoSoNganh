@@ -8,11 +8,7 @@ use App\Http\Controllers\Api\User\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Api\CartController;
 
-/*
-|--------------------------------------------------------------------------
-| AUTHENTICATION
-|--------------------------------------------------------------------------
-*/
+
 
 Route::post('/login', function (Request $request) {
 
@@ -42,7 +38,6 @@ Route::post('/login', function (Request $request) {
             "role" => "user"
         ]
     ]);
-
 });
 
 
@@ -63,7 +58,6 @@ Route::post('/admin-login', function (Request $request) {
             "success" => false,
             "message" => "Tài khoản quản trị không chính xác"
         ], 401);
-
     }
 
     return response()->json([
@@ -76,7 +70,6 @@ Route::post('/admin-login', function (Request $request) {
             "role" => "admin"
         ]
     ]);
-
 });
 
 
@@ -98,7 +91,6 @@ Route::get('/admin/dashboard', function () {
         "totalOrders" => DB::table("donhang")->count(),
         "totalUsers" => DB::table("user")->count()
     ]);
-
 });
 
 
@@ -116,7 +108,6 @@ Route::prefix('admin/categories')->group(function () {
             ->select("IdLoai as id", "TenLoai as name")
             ->orderBy("IdLoai", "desc")
             ->get();
-
     });
 
     Route::post('/', function (Request $request) {
@@ -129,7 +120,6 @@ Route::prefix('admin/categories')->group(function () {
             "success" => true,
             "id" => $id
         ]);
-
     });
 
     Route::put('/{id}', function (Request $request, $id) {
@@ -141,7 +131,6 @@ Route::prefix('admin/categories')->group(function () {
             ]);
 
         return response()->json(["success" => true]);
-
     });
 
     Route::delete('/{id}', function ($id) {
@@ -151,9 +140,7 @@ Route::prefix('admin/categories')->group(function () {
             ->delete();
 
         return response()->json(["success" => true]);
-
     });
-
 });
 
 
@@ -194,13 +181,10 @@ Route::prefix('admin/products')->group(function () {
             if ($p->image) {
                 $p->image = base64_encode($p->image);
             }
-
         }
 
         return response()->json($products);
-
     });
-
 });
 
 
@@ -242,9 +226,7 @@ Route::prefix('admin/orders')->group(function () {
             ->orderBy("donhang.IdDonHang", "desc")
 
             ->get();
-
     });
-
 });
 
 
@@ -270,7 +252,6 @@ Route::prefix('admin/users')->group(function () {
             ->orderBy("IdUser", "desc")
 
             ->get();
-
     });
 
     Route::delete('/{id}', function ($id) {
@@ -282,30 +263,22 @@ Route::prefix('admin/users')->group(function () {
         return response()->json([
             "success" => true
         ]);
-
     });
-
 });
 
 
-/*
-|--------------------------------------------------------------------------
-| USER API
-|--------------------------------------------------------------------------
-*/
+// USER ROUTES Đm thằng nào Admin mà làm chỗ này t đánh chết >:( 
 
-Route::prefix('user')->group(function () {
-
-    Route::get('/products', [ProductController::class, 'index']);
-
-    Route::get('/products/{id}', [ProductController::class, 'show']);
-
-});
-
-
-Route::post('/orders', [OrderController::class, 'store']);
-
-Route::get('/orders/{id}', [OrderController::class, 'getOrdersByUser']);
-
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{id}', [ProductController::class, 'show']);
 
 Route::get('/user/cart/{idUser}', [CartController::class, 'getCartByUserId']);
+
+Route::post('/cart/add', [CartController::class, 'addToCart']);
+
+Route::post('/cart/update', [CartController::class, 'updateQty']);
+
+Route::post('/cart/remove', [CartController::class, 'removeItem']);
+
+Route::post('/orders', [OrderController::class, 'store']);
+Route::get('/orders/{id}', [OrderController::class, 'getOrdersByUser']);

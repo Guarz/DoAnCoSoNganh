@@ -1,39 +1,38 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link, useOutletContext } from "react-router-dom";
-import "../../style/CartPage.css"; 
+import "../../style/CartPage.css"; // Nhớ import file CSS
 
 const CartPage = () => {
   const navigate = useNavigate();
   const { cart, setCart } = useOutletContext();
   const [selectedIds, setSelectedIds] = useState([]);
   
-  // Dùng toán tử ?. và || {} để tránh lỗi khi chưa đăng nhập
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    // Nếu chưa đăng nhập, đá ra trang login
-    if (!user || !token) {
+    if (!token) {
       navigate("/login");
       return;
     }
 
-    axios.get(`http://127.0.0.1:8000/api/user/cart/${user.IdUser}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    .then(res => {
-      if (res.data.success) {
-        setCart(res.data.items);
-        localStorage.setItem("cart", JSON.stringify(res.data.items));
-      }
-    })
-    .catch(err => console.error("Lỗi lấy giỏ hàng:", err));
+    if (user?.IdUser) {
+      axios.get(`http://127.0.0.1:8000/api/user/cart/${user.IdUser}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(res => {
+        if (res.data.success) {
+          setCart(res.data.items || []);
+          localStorage.setItem("cart", JSON.stringify(res.data.items || []));
+        }
+      })
+      .catch(err => console.error("Lỗi lấy giỏ hàng:", err));
+    }
   }, []);
 
   const handleUpdateQty = async (idSP, newQty) => {
     if (newQty < 1) return;
-
     const updatedCart = cart.map((item) =>
       item.IdSP === idSP ? { ...item, quantity: newQty } : item
     );
@@ -44,34 +43,23 @@ const CartPage = () => {
         IdUser: user.IdUser,
         IdSP: idSP,
         SoLuong: newQty,
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-    } catch (error) {
-      console.error("Lỗi cập nhật số lượng:", error);
-    }
+      }, { headers: { Authorization: `Bearer ${token}` } });
+    } catch (error) { console.error(error); }
   };
 
   const removeItem = async (idSP) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+    if (window.confirm("Xác nhận xóa sản phẩm này khỏi giỏ hàng?")) {
       try {
-        const response = await axios.post("http://127.0.0.1:8000/api/cart/remove", {
+        await axios.post("http://127.0.0.1:8000/api/cart/remove", {
           IdUser: user.IdUser,
           IdSP: idSP
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        }, { headers: { Authorization: `Bearer ${token}` } });
 
-        if (response.data.success) {
-          const updatedCart = cart.filter((item) => item.IdSP !== idSP);
-          setCart(updatedCart);
-          localStorage.setItem("cart", JSON.stringify(updatedCart));
-          setSelectedIds(prev => prev.filter(id => id !== idSP));
-          // alert("Xóa thành công!"); // Có thể tắt alert để trải nghiệm mượt hơn
-        }
-      } catch (error) {
-        console.error("Lỗi khi xóa sản phẩm:", error);
-      }
+        const updatedCart = cart.filter((item) => item.IdSP !== idSP);
+        setCart(updatedCart);
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        setSelectedIds(prev => prev.filter(id => id !== idSP));
+      } catch (error) { console.error(error); }
     }
   };
 
@@ -92,15 +80,6 @@ const CartPage = () => {
   const selectedTotal = cart
     .filter((item) => selectedIds.includes(item.IdSP))
     .reduce((sum, item) => sum + (Number(item.Gia) * item.quantity), 0);
-
-  const handleCheckout = () => {
-    if (selectedIds.length === 0) {
-      alert("Vui lòng chọn ít nhất một sản phẩm!");
-      return;
-    }
-    // Chuyển sang trang thanh toán kèm theo danh sách ID đã chọn
-    navigate("/checkout", { state: { selectedIds, total: selectedTotal } });
-  };
 
   if (!cart) return <div className="text-center mt-5">Đang tải...</div>;
 
@@ -149,12 +128,7 @@ const CartPage = () => {
                   <div style={{ width: "15%", display: "flex", justifyContent: "center" }}>
                     <div className="cart-qty-wrapper">
                       <button className="cart-qty-btn" onClick={() => handleUpdateQty(item.IdSP, item.quantity - 1)}>-</button>
-                      <input 
-                        type="text" 
-                        className="cart-qty-input"
-                        value={item.quantity} 
-                        readOnly
-                      />
+                      <input type="text" className="cart-qty-input" value={item.quantity} readOnly />
                       <button className="cart-qty-btn" onClick={() => handleUpdateQty(item.IdSP, item.quantity + 1)}>+</button>
                     </div>
                   </div>
@@ -170,22 +144,17 @@ const CartPage = () => {
 
             <div className="cart-footer-bar">
                <div style={{display: 'flex', alignItems: 'center'}}>
-                 <input 
-                    type="checkbox" 
-                    className="cart-checkbox"
+                 <input type="checkbox" className="cart-checkbox"
                     checked={cart.length > 0 && selectedIds.length === cart.length} 
                     onChange={toggleSelectAll} 
                  />
                  <span style={{marginLeft: 10}}>Chọn tất cả ({cart.length})</span>
                </div>
                <div className="cart-total-display">
-                 <div style={{marginRight: 20}}>
-                    Tổng thanh toán ({selectedIds.length} sản phẩm): 
-                    <span className="cart-total-price">
-                        {selectedTotal.toLocaleString()}₫
-                    </span>
+                 <div>Tổng thanh toán ({selectedIds.length} món): 
+                    <span className="cart-total-price">{selectedTotal.toLocaleString()}₫</span>
                  </div>
-                 <button onClick={handleCheckout} className="btn-checkout-main">MUA HÀNG</button>
+                 <button onClick={() => navigate("/checkout", { state: { selectedIds, total: selectedTotal } })} className="btn-checkout-main">MUA HÀNG</button>
                </div>
             </div>
           </>
