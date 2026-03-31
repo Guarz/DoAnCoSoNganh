@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ChiTietGioHang extends Model
 {
     protected $table = 'ChiTietGioHang';
+    protected $fillable = ['IdGH', 'IdSP', 'SoLuong'];
     public function GioHang()
     {
         // Một sản phẩm có nhiều chi tiết 

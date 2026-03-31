@@ -9,6 +9,7 @@ class GioHang extends Model
     protected $table = 'GioHang';
     protected $primaryKey = 'IdGH';
     public $timestamps = false;
+    protected $fillable = ['IdUser'];
     public function ChiTietGioHang()
     {
         return $this->hasMany(ChiTietGioHang::class, 'IdGH', 'IdGH');

@@ -11,35 +11,25 @@ const Login = ({ setUser }) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
-
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/login", {
-        email: email,
-        password: password,
-      });
+        const res = await axios.post("http://127.0.0.1:8000/api/login", {
+            email: email,
+            password: password
+        });
 
-      if (response.data.success) {
-        const userData = response.data.user;
+        if (res.data.success) {
+            // --- QUAN TRỌNG NHẤT: LƯU VÀO LOCAL STORAGE ---
+            localStorage.setItem("token", res.data.token); 
+            localStorage.setItem("user", JSON.stringify(res.data.user)); 
+            // Lưu ý: res.data.user phải chứa IdUser
 
-        // 🔥 BƯỚC CHẶN QUAN TRỌNG: Kiểm tra nếu là Admin
-        if (userData.role === "admin") {
-          setError("Tài khoản này thuộc quyền quản trị. Vui lòng đăng nhập tại trang Admin.");
-          return; // Dừng xử lý, không lưu vào localStorage và không setUser
+            alert("Đăng nhập thành công!");
+            navigate("/"); // Chuyển về trang chủ
         }
-
-        // Nếu là User bình thường thì mới tiếp tục
-        localStorage.setItem("user", JSON.stringify(userData));
-        setUser(userData);
-        navigate("/"); // Luôn về trang chủ user
-      }
-    } catch (err) {
-      console.error(err);
-      setError(
-        err.response?.data?.message || "Không thể kết nối đến máy chủ"
-      );
+    } catch (error) {
+        console.error("Lỗi đăng nhập:", error);
     }
-  };
+};
 
   return (
     <div className="login-wrapper">
