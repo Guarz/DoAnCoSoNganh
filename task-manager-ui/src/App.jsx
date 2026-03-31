@@ -18,7 +18,7 @@ import AdminLogin from "./pages/Admin/AdminLogin";
 
 // USER PAGES
 import HomePage from "./pages/User/HomePage";
-import CartPage from "./pages/CartPage";
+import CartPage from "./pages/User/CartPage";
 import UserOrders from "./pages/User/UserOrders";
 import UserProductDetail from "./pages/User/ProductDetail";
 import ProductList from "./pages/User/ProductList";

@@ -11,7 +11,7 @@ class GioHang extends Model
     public $timestamps = false;
     public function ChiTietGioHang()
     {
-        return $this->hasOne(ChiTietGioHang::class, 'IdGH', 'IdGH');
+        return $this->hasMany(ChiTietGioHang::class, 'IdGH', 'IdGH');
     }
     public function user()
     {

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\User\ProductController;
 use App\Http\Controllers\OrderController;
-
+use App\Http\Controllers\Api\CartController;
 /*
 |--------------------------------------------------------------------------
 | 1. AUTHENTICATION (ĐĂNG NHẬP & ĐĂNG KÝ)
@@ -355,4 +355,11 @@ Route::prefix('user')->group(function () {
 });
 
 Route::post('/orders', [OrderController::class, 'store']);
+<<<<<<< Updated upstream
 Route::get('/orders/user/{id}', [OrderController::class, 'getOrdersByUser']);
+=======
+Route::get('/orders/{id}', [OrderController::class, 'getOrdersByUser']);
+
+
+Route::get('/user/cart/{idUser}', [CartController::class, 'getCartByUserId']);
+>>>>>>> Stashed changes
