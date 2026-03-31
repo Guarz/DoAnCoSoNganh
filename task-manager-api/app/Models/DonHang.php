@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 <?php
 
 namespace App\Models;
@@ -43,22 +42,3 @@ class DonHang extends Model
         return $this->hasMany(ChiTietDonHang::class, 'IdDH', 'IdDH');
     }
 }
-=======
-class DonHang extends Model
-{
-    protected $table = 'donhang';
-    protected $primaryKey = 'IdDH';
-
-    public function user() {
-        return $this->belongsTo(User::class, 'IdUser');
-    }
-
-    public function trangThai() {
-        return $this->belongsTo(TrangThai::class, 'IdTT');
-    }
-
-    public function chiTiet() {
-        return $this->hasMany(ChiTietDonHang::class, 'IdDH');
-    }
-}
->>>>>>> Stashed changes
