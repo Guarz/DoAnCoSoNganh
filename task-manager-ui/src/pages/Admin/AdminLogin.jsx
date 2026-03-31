@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../../style/adminLogin.css";
 
-function AdminLogin() {
+function AdminLogin({ setUser }) {
+
     const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
@@ -13,160 +14,218 @@ function AdminLogin() {
 
     /*
     =========================
-    KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP
+    CHECK ADMIN LOGIN
     =========================
     */
+
     useEffect(() => {
+
         const savedUser = localStorage.getItem("user");
-        if (savedUser) {
-            try {
-                const user = JSON.parse(savedUser);
-                // Kiểm tra nếu role là admin thì điều hướng ngay
-                if (user && user.role === "admin") {
-                    navigate("/admin/dashboard", { replace: true });
-                }
-            } catch (error) {
-                console.error("Lỗi dữ liệu đăng nhập cũ:", error);
-                localStorage.removeItem("user");
+
+        if (!savedUser) return;
+
+        try {
+
+            const user = JSON.parse(savedUser);
+
+            if (user && user.role === "admin") {
+                navigate("/admin/dashboard", { replace: true });
             }
+
+        } catch (error) {
+
+            console.error("Parse user error:", error);
+            localStorage.removeItem("user");
+
         }
-    }, []); // ĐỂ MẢNG RỖNG: Chỉ chạy 1 lần duy nhất khi load trang để tránh loop
+
+    }, [navigate]);
+
+
 
     /*
     =========================
-    XỬ LÝ ĐĂNG NHẬP
+    HANDLE LOGIN
     =========================
     */
+
     const handleLogin = async (e) => {
+
         e.preventDefault();
 
         if (!email || !password) {
-            alert("Vui lòng điền đầy đủ Email và Mật khẩu!");
+            alert("Vui lòng nhập đầy đủ Email và mật khẩu");
             return;
         }
 
         setLoading(true);
 
         try {
+
             const res = await axios.post(
                 "http://127.0.0.1:8000/api/admin-login",
                 {
                     email: email,
                     password: password
-                },
-                {
-                    headers: { "Content-Type": "application/json" }
                 }
             );
 
             if (res.data.success) {
+
                 const adminData = {
                     id: res.data.user.id,
                     name: res.data.user.name,
                     email: res.data.user.email,
-                    role: "admin",
-                    token: res.data.token || null
+                    role: "admin"
                 };
 
-                // Lưu vào localStorage
+                // lưu local
                 localStorage.setItem("user", JSON.stringify(adminData));
 
-                // Điều hướng ngay lập tức
+                // cập nhật state App.jsx
+                setUser(adminData);
+
                 navigate("/admin/dashboard", { replace: true });
-            } else {
-                alert(res.data.message || "Tài khoản hoặc mật khẩu không chính xác!");
+
+                return;
             }
 
+            alert(res.data.message || "Sai tài khoản hoặc mật khẩu");
+
         } catch (error) {
-            console.error("Lỗi kết nối Login:", error);
-            const errorMsg = error.response?.data?.message || "Máy chủ không phản hồi, vui lòng thử lại sau!";
-            alert(errorMsg);
-        } finally {
-            // Chỉ tắt loading nếu KHÔNG chuyển trang (để tránh lỗi update state trên component đã unmount)
-            setLoading(false);
+
+            console.error("Login error:", error);
+
+            const message =
+                error.response?.data?.message ||
+                "Không thể kết nối server";
+
+            alert(message);
+
         }
+
+        setLoading(false);
+
     };
 
+
+
     return (
+
         <div className="admin-login-container">
+
             <div className="admin-login-card">
 
-                {/* PHẦN BÊN TRÁI - BRANDING */}
+                {/* LEFT */}
+
                 <div className="admin-login-left">
+
                     <div className="brand-content">
+
                         <img
                             src="https://cdn-icons-png.flaticon.com/512/4042/4042356.png"
-                            alt="Shop Icon"
+                            alt="shop"
                             className="brand-icon"
                         />
+
                         <h1>SHOP QUẦN ÁO A</h1>
-                        <p>Hệ thống quản lý nội bộ chuyên nghiệp</p>
+
+                        <p>Hệ thống quản trị cửa hàng</p>
+
                     </div>
+
                 </div>
 
-                {/* PHẦN BÊN PHẢI - FORM */}
+
+                {/* RIGHT */}
+
                 <div className="admin-login-right">
+
                     <div className="form-header">
+
                         <h2>Admin Login</h2>
-                        <p>Đăng nhập để quản lý cửa hàng của bạn</p>
+
+                        <p>Đăng nhập để quản lý hệ thống</p>
+
                     </div>
 
-                    <form onSubmit={handleLogin} className="admin-form">
+
+                    <form
+                        onSubmit={handleLogin}
+                        className="admin-form"
+                    >
 
                         {/* EMAIL */}
+
                         <div className="input-group">
-                            <label>Email Admin</label>
+
+                            <label>Email</label>
+
                             <input
                                 type="email"
-                                placeholder="Nhập email quản trị..."
+                                placeholder="admin@gmail.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                autoComplete="username"
                                 required
                             />
+
                         </div>
 
-                        {/* MẬT KHẨU */}
+
+                        {/* PASSWORD */}
+
                         <div className="input-group">
+
                             <label>Mật khẩu</label>
+
                             <div className="password-wrapper">
+
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     placeholder="••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    autoComplete="current-password"
                                     required
                                 />
+
                                 <span
                                     className="toggle-password"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    title={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                                    style={{ cursor: "pointer" }}
                                 >
                                     {showPassword ? "🙈" : "👁️"}
                                 </span>
+
                             </div>
+
                         </div>
 
-                        {/* NÚT ĐĂNG NHẬP */}
+
+                        {/* BUTTON */}
+
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`btn-admin-submit ${loading ? "loading" : ""}`}
+                            className="btn-admin-submit"
                         >
-                            {loading ? "Đang xác thực..." : "Đăng nhập hệ thống"}
+                            {loading ? "Đang đăng nhập..." : "Đăng nhập hệ thống"}
                         </button>
 
                     </form>
 
+
                     <div className="form-footer">
-                        <p>© 2026 Shop Quần Áo A - IT Department</p>
+                        <p>© 2026 Shop Quần Áo A</p>
                     </div>
+
                 </div>
 
             </div>
+
         </div>
+
     );
+
 }
 
 export default AdminLogin;

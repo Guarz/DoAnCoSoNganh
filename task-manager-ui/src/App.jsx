@@ -2,8 +2,9 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
+  Navigate
 } from "react-router-dom";
+
 import { useState, useEffect } from "react";
 
 // Layout
@@ -50,18 +51,46 @@ function App() {
     const savedUser = localStorage.getItem("user");
 
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+
+      try {
+
+        const parsedUser = JSON.parse(savedUser);
+
+        setUser(parsedUser);
+
+      } catch (error) {
+
+        console.error("Parse user error:", error);
+        localStorage.removeItem("user");
+
+      }
+
     }
 
     setLoading(false);
 
   }, []);
 
+
+  /*
+  ========================
+  LOADING SCREEN
+  ========================
+  */
+
   if (loading) {
-    return <h3 style={{ textAlign: "center", marginTop: 50 }}>Loading...</h3>;
+
+    return (
+      <h3 style={{ textAlign: "center", marginTop: 50 }}>
+        Loading...
+      </h3>
+    );
+
   }
 
+
   const isAdmin = user?.role === "admin";
+
 
   return (
 
@@ -74,15 +103,19 @@ function App() {
         <Route element={<UserLayout user={user} setUser={setUser} />}>
 
           <Route path="/" element={<HomePage />} />
+
           <Route path="/home" element={<HomePage />} />
 
           <Route path="/products" element={<ProductList />} />
+
           <Route path="/product/:id" element={<UserProductDetail />} />
 
           <Route path="/cart" element={<CartPage />} />
+
           <Route path="/checkout" element={<Checkout />} />
 
           <Route path="/login" element={<Login setUser={setUser} />} />
+
           <Route path="/register" element={<Register />} />
 
           <Route
@@ -98,7 +131,7 @@ function App() {
         </Route>
 
 
-        {/* ================= ADMIN LOGIN ================= */}
+        {/* ================= ADMIN ================= */}
 
         <Route
           path="/admin/login"
@@ -110,8 +143,6 @@ function App() {
         />
 
 
-        {/* ================= ADMIN DASHBOARD ================= */}
-
         <Route
           path="/admin/dashboard"
           element={
@@ -121,8 +152,6 @@ function App() {
           }
         />
 
-
-        {/* ================= ADMIN HOME ================= */}
 
         <Route
           path="/admin/home"
@@ -134,8 +163,6 @@ function App() {
         />
 
 
-        {/* ================= PRODUCT MANAGEMENT ================= */}
-
         <Route
           path="/admin/products"
           element={
@@ -144,6 +171,7 @@ function App() {
               : <Navigate to="/admin/login" />
           }
         />
+
 
         <Route
           path="/admin/product/:id"
@@ -155,8 +183,6 @@ function App() {
         />
 
 
-        {/* ================= ORDERS ================= */}
-
         <Route
           path="/admin/orders"
           element={
@@ -167,8 +193,6 @@ function App() {
         />
 
 
-        {/* ================= CATEGORIES ================= */}
-
         <Route
           path="/admin/categories"
           element={
@@ -178,8 +202,6 @@ function App() {
           }
         />
 
-
-        {/* ================= USERS ================= */}
 
         <Route
           path="/admin/users"

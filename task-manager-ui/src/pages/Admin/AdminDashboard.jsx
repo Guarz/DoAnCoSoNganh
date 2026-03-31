@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react"; // Thêm useCallback
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -15,8 +15,11 @@ import {
 import "../../style/dashboard.css";
 
 function AdminDashboard() {
+
     const navigate = useNavigate();
+
     const [loading, setLoading] = useState(true);
+
     const [data, setData] = useState({
         total_products: 0,
         total_categories: 0,
@@ -26,12 +29,14 @@ function AdminDashboard() {
 
     /*
     ==========================
-    LOAD DASHBOARD DATA 
-    (Dùng useCallback để hàm không bị tạo lại gây lỗi loop)
+    LOAD DASHBOARD DATA
     ==========================
     */
-    const loadDashboard = useCallback(async () => {
+
+    const loadDashboard = async () => {
+
         try {
+
             const res = await axios.get(
                 "http://127.0.0.1:8000/api/admin/dashboard"
             );
@@ -42,44 +47,62 @@ function AdminDashboard() {
                 total_orders: res.data.totalOrders || 0,
                 total_users: res.data.totalUsers || 0
             });
+
         } catch (error) {
+
             console.error("Dashboard API error:", error);
+
         } finally {
-            // Đảm bảo tắt loading dù API thành công hay thất bại
+
             setLoading(false);
+
         }
-    }, []);
+
+    };
+
 
     /*
     ==========================
-    CHECK LOGIN + LOAD DATA
+    CHECK LOGIN
     ==========================
     */
+
     useEffect(() => {
+
         const storedUser = localStorage.getItem("user");
 
         if (!storedUser) {
-            navigate("/admin/login", { replace: true });
+
+            window.location.href = "/admin/login";
             return;
+
         }
+
+        let user;
 
         try {
-            const user = JSON.parse(storedUser);
-            if (!user || user.role !== "admin") {
-                localStorage.removeItem("user");
-                navigate("/admin/login", { replace: true });
-                return;
-            }
 
-            // Nếu kiểm tra OK, gọi hàm load data ngay tại đây
-            loadDashboard();
+            user = JSON.parse(storedUser);
 
         } catch (error) {
-            console.error("Lỗi parse user:", error);
+
             localStorage.removeItem("user");
-            navigate("/admin/login", { replace: true });
+            window.location.href = "/admin/login";
+            return;
+
         }
-    }, [navigate, loadDashboard]); // Thêm các dependencies cần thiết
+
+        if (!user || user.role !== "admin") {
+
+            localStorage.removeItem("user");
+            window.location.href = "/admin/login";
+            return;
+
+        }
+
+        loadDashboard();
+
+    }, []);
 
 
     /*
@@ -87,18 +110,28 @@ function AdminDashboard() {
     LOGOUT
     ==========================
     */
+
     const handleLogout = () => {
-        if (window.confirm("Bạn có chắc chắn muốn đăng xuất không?")) {
-            localStorage.removeItem("user");
-            navigate("/admin/login", { replace: true });
+
+        if (!window.confirm("Bạn có chắc chắn muốn đăng xuất không?")) {
+            return;
         }
+
+        // xoá session
+        localStorage.removeItem("user");
+
+        // reload app để tránh loop React Router
+        window.location.href = "/admin/login";
+
     };
+
 
     /*
     ==========================
-    CHART DATA (DEMO)
+    DEMO CHART DATA
     ==========================
     */
+
     const chartData = [
         { name: "T1", orders: 40 },
         { name: "T2", orders: 65 },
@@ -108,39 +141,55 @@ function AdminDashboard() {
         { name: "T6", orders: 70 }
     ];
 
+
     if (loading) {
+
         return (
             <div className="dashboard-loading">
                 <div className="spinner"></div>
                 <h3 style={{ marginTop: 20 }}>
-                    Đang xác thực và tải dữ liệu...
+                    Đang tải dữ liệu...
                 </h3>
             </div>
         );
+
     }
 
+
     return (
+
         <div className="admin-dashboard">
+
             {/* HEADER */}
+
             <header className="dashboard-header">
+
                 <div>
+
                     <h2 className="dashboard-title">
                         📊 HỆ THỐNG QUẢN TRỊ
                     </h2>
+
                     <p className="dashboard-subtitle">
                         Chào mừng Quản trị viên quay trở lại
                     </p>
+
                 </div>
+
                 <button
                     className="logout-btn"
                     onClick={handleLogout}
                 >
                     Đăng xuất
                 </button>
+
             </header>
 
+
             {/* STATISTICS */}
+
             <div className="dashboard-grid">
+
                 <StatBox
                     icon="📦"
                     label="Sản phẩm"
@@ -148,6 +197,7 @@ function AdminDashboard() {
                     color="#4318FF"
                     onClick={() => navigate("/admin/products")}
                 />
+
                 <StatBox
                     icon="📂"
                     label="Danh mục"
@@ -155,6 +205,7 @@ function AdminDashboard() {
                     color="#6AD2FF"
                     onClick={() => navigate("/admin/categories")}
                 />
+
                 <StatBox
                     icon="🧾"
                     label="Đơn hàng"
@@ -162,6 +213,7 @@ function AdminDashboard() {
                     color="#FF4081"
                     onClick={() => navigate("/admin/orders")}
                 />
+
                 <StatBox
                     icon="👤"
                     label="Người dùng"
@@ -169,49 +221,73 @@ function AdminDashboard() {
                     color="#422AFB"
                     onClick={() => navigate("/admin/users")}
                 />
+
             </div>
 
+
             {/* CHART */}
+
             <div className="chart-box">
+
                 <h3 className="chart-title">
                     📈 Biểu đồ tăng trưởng đơn hàng
                 </h3>
+
                 <div style={{ width: "100%", height: 350 }}>
+
                     <ResponsiveContainer width="100%" height="100%">
+
                         <BarChart data={chartData}>
+
                             <CartesianGrid
                                 strokeDasharray="3 3"
                                 vertical={false}
                             />
+
                             <XAxis dataKey="name" />
+
                             <YAxis />
+
                             <Tooltip />
+
                             <Bar
                                 dataKey="orders"
                                 fill="#ff4081"
                                 radius={[8, 8, 0, 0]}
                                 barSize={40}
                             />
+
                         </BarChart>
+
                     </ResponsiveContainer>
+
                 </div>
+
             </div>
+
         </div>
+
     );
+
 }
+
 
 /*
 ==========================
 STAT BOX
 ==========================
 */
+
 function StatBox({ icon, label, value, onClick, color }) {
+
     return (
+
         <div
             className="stat-box"
             onClick={onClick}
             style={{ cursor: onClick ? "pointer" : "default" }}
         >
+
             <div
                 className="stat-icon"
                 style={{
@@ -221,16 +297,23 @@ function StatBox({ icon, label, value, onClick, color }) {
             >
                 {icon}
             </div>
+
             <div className="stat-info">
+
                 <span className="stat-label">
                     {label}
                 </span>
+
                 <span className="stat-value">
                     {Number(value).toLocaleString()}
                 </span>
+
             </div>
+
         </div>
+
     );
+
 }
 
 export default AdminDashboard;

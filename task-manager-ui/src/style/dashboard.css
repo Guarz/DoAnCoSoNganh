@@ -5,7 +5,7 @@
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* HEADER CĂN CHỈNH */
+/* HEADER */
 .dashboard-header {
     display: flex;
     justify-content: space-between;
@@ -26,7 +26,8 @@
     font-size: 14px;
 }
 
-/* NÚT ĐĂNG XUẤT ĐẸP */
+/* LOGOUT BUTTON */
+
 .logout-btn {
     background: white;
     color: #ff4081;
@@ -46,13 +47,16 @@
     transform: translateY(-2px);
 }
 
-/* GRID & STAT BOX */
+/* GRID */
+
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 25px;
     margin-bottom: 40px;
 }
+
+/* STAT BOX */
 
 .stat-box {
     display: flex;
@@ -92,11 +96,16 @@
 }
 
 /* CHART BOX */
+
 .chart-box {
     background: white;
     padding: 30px;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+
+    /* QUAN TRỌNG */
+    width: 100%;
+    min-height: 420px;
 }
 
 .chart-title {
@@ -106,7 +115,15 @@
     margin-bottom: 25px;
 }
 
-/* LOADING SPINNER */
+/* CHART CONTAINER */
+
+.chart-container {
+    width: 100%;
+    height: 350px;
+}
+
+/* LOADING */
+
 .spinner {
     width: 45px;
     height: 45px;
@@ -115,6 +132,14 @@
     border-radius: 50%;
     margin: 0 auto;
     animation: spin 1s linear infinite;
+}
+
+.dashboard-loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 60vh;
 }
 
 @keyframes spin {
