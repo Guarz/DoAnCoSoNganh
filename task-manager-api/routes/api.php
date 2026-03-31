@@ -181,32 +181,149 @@ Route::prefix('admin/products')->group(function () {
     });
 });
 
+<<<<<<< HEAD
 // Quản lý Đơn hàng
 Route::prefix('admin/orders')->group(function () {
+=======
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN ORDERS (FULL CHUẨN)
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('admin/orders')->group(function () {
+
+    /*
+    🧾 LẤY DANH SÁCH ĐƠN HÀNG
+    */
+>>>>>>> f6be6630efb1f4d73cc14d36f9610585c2ba86c3
     Route::get('/', function () {
         return DB::table("donhang")
             ->join("user", "donhang.IdUser", "=", "user.IdUser")
+<<<<<<< HEAD
             ->select(
                 "donhang.IdDonHang as id",
                 "user.Ten as customer",
                 "donhang.TongTien as total",
                 "donhang.TrangThai as status",
                 "donhang.NgayDat as date"
+=======
+
+            ->leftJoin("chitietdonhang", "donhang.IdDonHang", "=", "chitietdonhang.IdDonHang")
+
+            ->leftJoin("sanpham", "chitietdonhang.IdSP", "=", "sanpham.IdSP")
+
+            ->select(
+                "donhang.IdDonHang as id",
+                "user.Ten as customer",
+                DB::raw("GROUP_CONCAT(sanpham.TenSP SEPARATOR ', ') as products"),
+                "donhang.TongTien as total",
+                "donhang.TrangThai as status",
+                "donhang.NgayTao as created_at"
+            )
+
+            ->groupBy(
+                "donhang.IdDonHang",
+                "user.Ten",
+                "donhang.TongTien",
+                "donhang.TrangThai",
+                "donhang.NgayTao"
+>>>>>>> f6be6630efb1f4d73cc14d36f9610585c2ba86c3
             )
             ->orderBy("donhang.IdDonHang", "desc")
             ->get();
     });
 
+<<<<<<< HEAD
+=======
+
+    /*
+    🔍 CHI TIẾT 1 ĐƠN HÀNG
+    */
+    Route::get('/{id}', function ($id) {
+
+        $order = DB::table("donhang")
+            ->join("user", "donhang.IdUser", "=", "user.IdUser")
+            ->where("donhang.IdDonHang", $id)
+            ->select(
+                "donhang.IdDonHang as id",
+                "user.Ten as customer",
+                "user.Email as email",
+                "user.DienThoai as phone",
+                "donhang.TongTien as total",
+                "donhang.TrangThai as status",
+                "donhang.NgayTao as created_at"
+            )
+            ->first();
+
+        $items = DB::table("chitietdonhang")
+            ->leftJoin("sanpham", "chitietdonhang.IdSP", "=", "sanpham.IdSP")
+            ->where("chitietdonhang.IdDonHang", $id)
+            ->select(
+                "sanpham.TenSP as product",
+                "chitietdonhang.SoLuong as quantity"
+            )
+            ->get();
+
+        return response()->json([
+            "order" => $order,
+            "items" => $items
+        ]);
+    });
+
+
+    /*
+    ✏️ CẬP NHẬT TRẠNG THÁI
+    */
+>>>>>>> f6be6630efb1f4d73cc14d36f9610585c2ba86c3
     Route::put('/{id}', function (Request $request, $id) {
         DB::table("donhang")->where("IdDonHang", $id)->update(["TrangThai" => $request->status]);
         return response()->json(["success" => true]);
     });
 
+<<<<<<< HEAD
     Route::delete('/{id}', function ($id) {
         DB::table("donhang")->where("IdDonHang", $id)->delete();
         return response()->json(["success" => true]);
+=======
+
+    /*
+    ❌ XOÁ ĐƠN HÀNG
+    */
+    Route::delete('/{id}', function ($id) {
+
+        DB::beginTransaction();
+
+        try {
+
+            DB::table("chitietdonhang")
+                ->where("IdDonHang", $id)
+                ->delete();
+
+            DB::table("donhang")
+                ->where("IdDonHang", $id)
+                ->delete();
+
+            DB::commit();
+
+            return response()->json([
+                "success" => true
+            ]);
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return response()->json([
+                "success" => false,
+                "error" => $e->getMessage()
+            ]);
+        }
+>>>>>>> f6be6630efb1f4d73cc14d36f9610585c2ba86c3
     });
 });
+<<<<<<< HEAD
 
 // Quản lý Người dùng
 Route::prefix('admin/users')->group(function () {
@@ -223,6 +340,9 @@ Route::prefix('admin/users')->group(function () {
     });
 });
 
+=======
+    
+>>>>>>> f6be6630efb1f4d73cc14d36f9610585c2ba86c3
 /*
 |--------------------------------------------------------------------------
 | 3. USER & PUBLIC API (CHO APP/WEB KHÁCH HÀNG)

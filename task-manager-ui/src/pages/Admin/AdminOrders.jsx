@@ -8,274 +8,207 @@ function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  /*
-  =========================
-  LOAD ORDERS FROM API
-  =========================
-  */
-
+  // ================= LOAD DATA =================
   const fetchOrders = async () => {
-
     try {
-
-      setLoading(true);
-
       const res = await fetch("http://localhost:8000/api/admin/orders");
-
-      if (!res.ok) {
-        throw new Error("API lỗi");
-      }
-
       const data = await res.json();
-
       setOrders(Array.isArray(data) ? data : []);
-
     } catch (err) {
-
-      console.log("Lỗi load đơn hàng:", err);
+      console.log(err);
       setOrders([]);
-
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
   useEffect(() => {
-
     fetchOrders();
-
   }, []);
 
-  /*
-  =========================
-  UPDATE STATUS
-  =========================
-  */
+  // ================= UPDATE STATUS =================
+  const changeStatus = async (id, status) => {
+    await fetch(`http://localhost:8000/api/admin/orders/${id}/status`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ IdTT: status })
+    });
 
-  const changeStatus = async (id, newStatus) => {
-
-    try {
-
-      const res = await fetch(
-        `http://localhost:8000/api/admin/orders/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            status: newStatus
-          })
-        }
-      );
-
-      const data = await res.json();
-
-      if (data.success) {
-
-        fetchOrders();
-
-      } else {
-
-        alert("Cập nhật trạng thái thất bại");
-
-      }
-
-    } catch (err) {
-
-      console.log("Lỗi update:", err);
-
-    }
-
+    fetchOrders();
   };
 
-  /*
-  =========================
-  DELETE ORDER
-  =========================
-  */
-
+  // ================= DELETE =================
   const deleteOrder = async (id) => {
+    if (!window.confirm("Bạn có chắc muốn xóa?")) return;
 
-    if (!window.confirm("Bạn có chắc muốn xóa đơn hàng?")) return;
+    await fetch(`http://localhost:8000/api/admin/orders/${id}`, {
+      method: "DELETE"
+    });
 
-    try {
-
-      const res = await fetch(
-        `http://localhost:8000/api/admin/orders/${id}`,
-        {
-          method: "DELETE"
-        }
-      );
-
-      const data = await res.json();
-
-      if (data.success) {
-
-        alert("Đã xóa đơn hàng");
-
-        fetchOrders();
-
-      }
-
-    } catch (err) {
-
-      console.log("Lỗi xóa:", err);
-
-    }
-
+    fetchOrders();
   };
 
-  /*
-  =========================
-  FORMAT MONEY
-  =========================
-  */
+  const formatMoney = (money) =>
+    Number(money || 0).toLocaleString() + " đ";
 
-  const formatMoney = (money) => {
-
-    if (!money) return "0 đ";
-
-    return Number(money).toLocaleString() + " đ";
-
-  };
-
-  /*
-  =========================
-  RENDER
-  =========================
-  */
-
+  // ================= UI =================
   return (
+    <div style={styles.page}>
 
-    <div style={{ padding: 30 }}>
-
-      {/* BACK BUTTON */}
-
-      <button
-        onClick={() => navigate("/admin/dashboard")}
-        style={{
-          marginBottom: 20,
-          padding: "8px 15px",
-          border: "none",
-          background: "#555",
-          color: "#fff",
-          cursor: "pointer"
-        }}
-      >
+      {/* BACK */}
+      <button style={styles.backBtn} onClick={() => navigate("/admin/dashboard")}>
         ⬅ Quay lại Dashboard
       </button>
 
-      <h2>📦 Quản lý đơn hàng</h2>
+      {/* TITLE */}
+      <h1 style={styles.title}>📦 Quản lý đơn hàng</h1>
 
-      {loading ? (
+      {/* CARD */}
+      <div style={styles.card}>
 
-        <p>⏳ Đang tải dữ liệu...</p>
+        <h2 style={styles.subTitle}>📋 Danh sách đơn hàng</h2>
 
-      ) : orders.length === 0 ? (
+        {loading ? (
+          <p>Đang tải...</p>
+        ) : orders.length === 0 ? (
+          <p>Không có đơn hàng</p>
+        ) : (
 
-        <p>Không có đơn hàng</p>
+          <table style={styles.table}>
 
-      ) : (
-
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            marginTop: 20
-          }}
-        >
-
-          <thead>
-
-            <tr style={{ background: "#abd0f5" }}>
-              <th>ID</th>
-              <th>Khách hàng</th>
-              <th>Sản phẩm</th>
-              <th>Tổng tiền</th>
-              <th>Trạng thái</th>
-              <th>Hành động</th>
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            {orders.map((order) => (
-
-              <tr key={order.id} style={{ textAlign: "center" }}>
-
-                <td>{order.id}</td>
-
-                <td>{order.customer || "Không rõ"}</td>
-
-                <td>{order.product || "Chưa có sản phẩm"}</td>
-
-                <td>{formatMoney(order.total)}</td>
-
-                <td>
-
-                  <select
-                    value={order.status || "Chờ xử lý"}
-                    onChange={(e) =>
-                      changeStatus(order.id, e.target.value)
-                    }
-                  >
-
-                    <option value="Chờ xử lý">
-                      Chờ xử lý
-                    </option>
-
-                    <option value="Đang giao">
-                      Đang giao
-                    </option>
-
-                    <option value="Hoàn thành">
-                      Hoàn thành
-                    </option>
-
-                    <option value="Hủy">
-                      Hủy
-                    </option>
-
-                  </select>
-
-                </td>
-
-                <td>
-
-                  <button
-                    onClick={() => deleteOrder(order.id)}
-                    style={{
-                      background: "red",
-                      color: "#fff",
-                      border: "none",
-                      padding: "6px 12px",
-                      cursor: "pointer"
-                    }}
-                  >
-                    Xóa
-                  </button>
-
-                </td>
-
+            <thead>
+              <tr style={styles.thead}>
+                <th>ID</th>
+                <th>Khách hàng</th>
+                <th>Sản phẩm</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
               </tr>
+            </thead>
 
-            ))}
+            <tbody>
 
-          </tbody>
+              {orders.map((order) => (
 
-        </table>
+                <tr key={order.IdDH} style={styles.row}>
 
-      )}
+                  <td>{order.IdDH}</td>
 
+                  <td>{order.user?.name}</td>
+
+                  <td>
+                    {order.chi_tiet?.map((item) => (
+                      <div key={item.IdCTDH}>
+                        {item.san_pham?.TenSP} x{item.SoLuong}
+                      </div>
+                    ))}
+                  </td>
+
+                  <td style={{ color: "red", fontWeight: "bold" }}>
+                    {formatMoney(order.TongTien)}
+                  </td>
+
+                  <td>
+                    <select
+                      value={order.IdTT}
+                      onChange={(e) =>
+                        changeStatus(order.IdDH, e.target.value)
+                      }
+                      style={styles.select}
+                    >
+                      <option value={1}>Chờ xử lý</option>
+                      <option value={2}>Đang giao</option>
+                      <option value={3}>Hoàn thành</option>
+                      <option value={4}>Hủy</option>
+                    </select>
+                  </td>
+
+                  <td>
+                    <button style={styles.deleteBtn} onClick={() => deleteOrder(order.IdDH)}>
+                      Xóa
+                    </button>
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        )}
+
+      </div>
     </div>
-
   );
-
 }
 
 export default AdminOrders;
+
+
+// ================= STYLE =================
+const styles = {
+
+  page: {
+    background: "#cfe8ef",
+    minHeight: "100vh",
+    padding: 30
+  },
+
+  backBtn: {
+    background: "#ff3b6c",
+    color: "#fff",
+    border: "none",
+    padding: "10px 15px",
+    borderRadius: 8,
+    cursor: "pointer",
+    marginBottom: 20
+  },
+
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    marginBottom: 20
+  },
+
+  card: {
+    background: "#fff",
+    padding: 20,
+    borderRadius: 15,
+    boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
+  },
+
+  subTitle: {
+    marginBottom: 15
+  },
+
+  table: {
+    width: "100%",
+    borderCollapse: "collapse"
+  },
+
+  thead: {
+    background: "#f7b2c4"
+  },
+
+  row: {
+    textAlign: "center",
+    borderBottom: "1px solid #ddd"
+  },
+
+  select: {
+    padding: 5,
+    borderRadius: 5
+  },
+
+  deleteBtn: {
+    background: "red",
+    color: "#fff",
+    border: "none",
+    padding: "6px 12px",
+    borderRadius: 5,
+    cursor: "pointer"
+  }
+};
