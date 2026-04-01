@@ -8,38 +8,30 @@ const Login = ({ setUser }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(""); // Reset lỗi cũ trước khi login mới
-
+    setError("");
     try {
       const res = await axios.post("http://127.0.0.1:8000/api/login", {
         email: email,
         password: password,
       });
-
       if (res.data.success) {
         if (res.data.token) {
           localStorage.setItem("token", res.data.token);
         }
         localStorage.setItem("user", JSON.stringify(res.data.user));
         setUser(res.data.user);
-
         alert("Đăng nhập thành công!");
-
-        // 3. Chuyển hướng
         navigate("/");
       }
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
-      // Hiển thị thông báo lỗi lên giao diện thay vì chỉ console.log
       setError(
         error.response?.data?.message || "Email hoặc mật khẩu không đúng!"
       );
     }
   };
-
   return (
     <div className="login-wrapper">
       <div className="login-card shadow-lg">

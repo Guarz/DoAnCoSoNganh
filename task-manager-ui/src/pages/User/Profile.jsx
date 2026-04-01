@@ -6,22 +6,17 @@ const Profile = () => {
   const { user, setUser } = useOutletContext();
   const navigate = useNavigate();
   const [msg, setMsg] = useState("");
-  
-  // Khởi tạo state rỗng
   const [formData, setFormData] = useState({
     ten: "",
     diachi: "",
     dienthoai: "",
   });
 
-  // 1. Theo dõi user: Nếu mất user thì về login, nếu có user thì điền vào form
   useEffect(() => {
     if (user === null) {
-      // Chỉ navigate khi chắc chắn user đã bị null (sau khi app đã kiểm tra localStorage)
       const storedUser = localStorage.getItem("user");
       if (!storedUser) navigate("/login");
     } else {
-      // Đổ dữ liệu vào form khi user đã load xong
       setFormData({
         ten: user.name || "",
         diachi: user.address || "",
@@ -45,14 +40,10 @@ const Profile = () => {
         }
       );
 
-      // Sửa lại đúng với key "success" từ Laravel trả về
       if (response.data.success) {
         const updatedData = response.data.user;
-
-        // Ghi đè vào LocalStorage
         localStorage.setItem("user", JSON.stringify(updatedData));
 
-        // Cập nhật State toàn cục để Header/Sidebar nhận tên mới
         setUser(updatedData);
 
         setMsg("Thông tin đã được cập nhật thành công!");
@@ -63,7 +54,6 @@ const Profile = () => {
     }
   };
 
-  // Nếu chưa có user thì hiển thị loading để tránh bị nhảy sang trang login quá nhanh
   if (!user) return <div className="text-center mt-5">Đang tải dữ liệu...</div>;
 
   return (

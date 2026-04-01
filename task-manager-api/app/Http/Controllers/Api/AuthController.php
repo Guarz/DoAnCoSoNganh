@@ -11,24 +11,17 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-
         $request->validate([
             'email' => 'required|email',
             'password' => 'required'
         ]);
-
-        // tìm user theo email
         $user = User::where('Email', $request->email)->first();
-
         if (!$user) {
-
             return response()->json([
                 "success" => false,
                 "message" => "Email không tồn tại"
             ], 404);
         }
-
-        // kiểm tra mật khẩu
         if ($request->password !== $user->Password) {
 
             return response()->json([
@@ -50,20 +43,17 @@ class AuthController extends Controller
     }
     public function register(Request $request)
     {
-
         $request->validate([
             'ten' => 'required|string|max:255',
             'email' => 'required|email|unique:user,Email',
             'password' => 'required'
         ]);
-
         $user = User::create([
             "Ten" => $request->ten,
             "Email" => $request->email,
             "Password" => $request->password,
             "NgayTao" => now()
         ]);
-
         return response()->json([
             "success" => true,
             "message" => "Đăng ký thành công",
@@ -92,7 +82,6 @@ class AuthController extends Controller
             'diachi' => 'nullable|string|max:255',
             'dienthoai' => 'nullable|string|max:15'
         ]);
-
         try {
             $user->update([
                 'Ten' => $request->ten,
