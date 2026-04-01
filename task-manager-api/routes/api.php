@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\User\ProductController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\OrderController;
 
 
 
@@ -284,7 +285,7 @@ Route::prefix('admin/users')->group(function () {
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
-
+Route::post('/orders', [OrderController::class, 'store']);
 Route::get('/cart/{idUser}', [CartController::class, 'getCartByUserId']);
 Route::post('/cart/add', [CartController::class, 'addToCart']);
 Route::post('/cart/update', [CartController::class, 'updateQty']);

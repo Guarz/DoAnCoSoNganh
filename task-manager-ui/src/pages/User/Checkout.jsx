@@ -18,7 +18,11 @@ const Checkout = () => {
         setCartItems(selectedItems);
     }, []);
 
-    const totalAmount = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const totalAmount = cartItems.reduce((total, item) => {
+    const itemPrice = Number(item.price || item.Gia || item.gia || 0);
+    const itemQty = Number(item.quantity || item.SoLuong || item.so_luong || 1);
+    return total + (itemPrice * itemQty);
+}, 0);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -174,16 +178,33 @@ const Checkout = () => {
                         <div className="order-items mb-3">
                             {cartItems.length > 0 ? (
                                 cartItems.map((item, index) => {
-                                    const imageSrc = item.image?.startsWith('data:image') ? item.image : `data:image/jpeg;base64,${item.image}`;
+                                    const itemName = item.name || item.TenSP || item.ten_sp || "Sản phẩm";
+                                    const itemPrice = Number(item.price || item.Gia || item.gia || 0);
+                                    const itemQty = Number(item.quantity || item.SoLuong || item.so_luong || 1);
+                                    const itemImg = item.image || item.HinhAnh || item.hinh_anh || "";
+                                    let imageSrc = 'https://placehold.co/60x60'; 
+                                    if (itemImg) {
+                                        imageSrc = itemImg.startsWith('data:image') || itemImg.startsWith('http') 
+                                            ? itemImg 
+                                            : `data:image/jpeg;base64,${itemImg}`;
+                                    }
                                     return (
                                         <div key={index} className="d-flex align-items-center mb-3 pb-3 border-bottom">
-                                            <img src={imageSrc} alt={item.name} className="rounded" style={{ width: '60px', height: '60px', objectFit: 'cover' }} onError={(e) => { e.target.src = 'https://via.placeholder.com/60' }} />
+                                            <img 
+                                                src={imageSrc} 
+                                                alt={itemName} 
+                                                className="rounded" 
+                                                style={{ width: '60px', height: '60px', objectFit: 'cover' }} 
+                                                onError={(e) => { e.target.src = 'https://placehold.co/60x60' }} 
+                                            />
                                             <div className="ms-3 flex-grow-1">
-                                                <h6 className="mb-1 fw-bold text-truncate" style={{ maxWidth: '200px' }}>{item.name}</h6>
-                                                <small className="text-muted">SL: {item.quantity}</small>
+                                                <h6 className="mb-1 fw-bold text-truncate" style={{ maxWidth: '200px' }}>
+                                                    {itemName}
+                                                </h6>
+                                                <small className="text-muted">SL: {itemQty}</small>
                                             </div>
                                             <div className="fw-bold" style={{ color: '#d81b60' }}>
-                                                {(item.price * item.quantity).toLocaleString('vi-VN')} đ
+                                                {(itemPrice * itemQty).toLocaleString('vi-VN')} đ
                                             </div>
                                         </div>
                                     )
