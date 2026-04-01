@@ -152,6 +152,9 @@ Route::prefix('admin/categories')->group(function () {
 
 Route::prefix('admin/products')->group(function () {
 
+    // =========================
+    // GET PRODUCTS
+    // =========================
     Route::get('/', function () {
 
         $products = DB::table("sanpham")
@@ -177,7 +180,6 @@ Route::prefix('admin/products')->group(function () {
             ->get();
 
         foreach ($products as $p) {
-
             if ($p->image) {
                 $p->image = base64_encode($p->image);
             }
@@ -185,8 +187,85 @@ Route::prefix('admin/products')->group(function () {
 
         return response()->json($products);
     });
-});
 
+
+    // =========================
+    // ADD PRODUCT
+    // =========================
+    Route::post('/', function (Request $request) {
+
+        try {
+
+            DB::beginTransaction();
+
+            if (!$request->name || !$request->price) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "Thiếu tên hoặc giá"
+                ]);
+            }
+
+            $imageId = null;
+
+            if ($request->hasFile("image")) {
+
+                $imageData = file_get_contents($request->file("image"));
+
+                $imageId = DB::table("anhsp")->insertGetId([
+                    "HinhAnh" => $imageData
+                ]);
+            }
+
+            $sizeId = DB::table("sizesp")->value("IdSize") ?? 1;
+
+            $detailId = DB::table("chitietsanpham")->insertGetId([
+                "Gia" => $request->price,
+                "IdSize" => $sizeId
+            ]);
+
+            $productId = DB::table("sanpham")->insertGetId([
+                "TenSP" => $request->name,
+                "MoTa" => $request->description ?? "",
+                "NgayTao" => now(),
+                "IdLoai" => $request->categoryId,
+                "IdCT" => $detailId,
+                "IdAnh" => $imageId
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                "success" => true,
+                "id" => $productId
+            ]);
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return response()->json([
+                "success" => false,
+                "error" => $e->getMessage()
+            ]);
+        }
+    });
+
+
+    // =========================
+    // DELETE PRODUCT
+    // =========================
+    Route::delete('/{id}', function ($id) {
+
+        DB::table("sanpham")
+            ->where("IdSP", $id)
+            ->delete();
+
+        return response()->json([
+            "success" => true
+        ]);
+    });
+
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -202,31 +281,30 @@ Route::prefix('admin/orders')->group(function () {
 
             ->join("user", "donhang.IdUser", "=", "user.IdUser")
 
-            ->leftJoin("chitietdonhang", "donhang.IdDonHang", "=", "chitietdonhang.IdDonHang")
+            ->leftJoin("chitietdonhang", "donhang.IdDH", "=", "chitietdonhang.IdDH")
 
             ->leftJoin("sanpham", "chitietdonhang.IdSP", "=", "sanpham.IdSP")
 
             ->select(
-                "donhang.IdDonHang as id",
+                "donhang.IdDH as id",
                 "user.Ten as customer",
                 DB::raw("GROUP_CONCAT(sanpham.TenSP SEPARATOR ', ') as products"),
-                "donhang.TongTien as total",
-                "donhang.TrangThai as status",
-                "donhang.NgayTao as created_at"
+                "donhang.NgayDat as created_at",
+                "donhang.IdTT as status"
             )
 
             ->groupBy(
-                "donhang.IdDonHang",
+                "donhang.IdDH",
                 "user.Ten",
-                "donhang.TongTien",
-                "donhang.TrangThai",
-                "donhang.NgayTao"
+                "donhang.NgayDat",
+                "donhang.IdTT"
             )
 
-            ->orderBy("donhang.IdDonHang", "desc")
+            ->orderBy("donhang.IdDH", "desc")
 
             ->get();
     });
+
 });
 
 /*
