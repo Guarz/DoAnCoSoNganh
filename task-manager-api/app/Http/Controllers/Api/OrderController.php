@@ -35,46 +35,57 @@ class OrderController extends Controller
     }
 /** TẠO ĐƠN HÀNG MỚI */
     public function store(Request $request)
-        {
-            try {
-                DB::beginTransaction();
-                $idDonHang = DB::table('donhang')->insertGetId([
-                    'IdUser'     => $request->IdUser,
-                    'DiaChiDat'  => $request->DiaChiDat,
-                    'IdTT'       => 0, 
-                    'NgayDat'    => now()->toDateString(), 
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-                $chiTiet = $request->ChiTietDonHang; 
-                if (!empty($chiTiet)) {
-                    foreach ($chiTiet as $item) {
-                        $tonTai = DB::table('sanpham')->where('IdSP', $item['IdSP'])->exists();
-                        
-                        if (!$tonTai) {
-                            throw new \Exception("Sản phẩm ID " . $item['IdSP'] . " không còn tồn tại!");
-                        }
-                        DB::table('chitietdonhang')->insert([
-                            'IdDH'      => $idDonHang,
-                            'IdSP'      => $item['IdSP'],
-                            'SoLuong'   => $item['SoLuong'],
-                            'TongTien'  => (int)DB::table('sanpham')
-                                            ->join('chitietsanpham', 'sanpham.IdCT', '=', 'chitietsanpham.IdCT')
-                                            ->where('sanpham.IdSP', $item['IdSP'])
-                                            ->value('chitietsanpham.Gia') * $item['SoLuong'],
-                        ]);
-                    }
+{
+    try {
+        DB::beginTransaction();
+
+        // 1. Tạo đơn hàng chính
+        $idDonHang = DB::table('donhang')->insertGetId([
+            'IdUser'     => $request->IdUser,
+            'DiaChiDat'  => $request->DiaChiDat,
+            'IdTT'       => 0, 
+            'NgayDat'    => now()->toDateString(), 
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $chiTiet = $request->ChiTietDonHang; 
+        if (!empty($chiTiet)) {
+            foreach ($chiTiet as $item) {
+                $product = DB::table('sanpham')
+                    ->join('chitietsanpham', 'sanpham.IdCT', '=', 'chitietsanpham.IdCT')
+                    ->where('sanpham.IdSP', $item['IdSP'])
+                    ->first();
+                
+                if (!$product) {
+                    throw new \Exception("Sản phẩm ID " . $item['IdSP'] . " không còn tồn tại trong hệ thống!");
                 }
-                DB::commit();
-                return response()->json(['success' => true, 'message' => 'Đặt hàng thành công!'], 200);
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return response()->json([
-                    'success' => false, 
-                    'message' => 'Lỗi hệ thống: ' . $e->getMessage()
-                ], 500);
+
+                DB::table('chitietdonhang')->insert([
+                    'IdDH'      => $idDonHang,
+                    'IdSP'      => $item['IdSP'],
+                    'SoLuong'   => $item['SoLuong'],
+                    'TongTien'  => (int)$product->Gia * $item['SoLuong'],
+                ]);
+
+                DB::table('chitietgiohang')
+                    ->join('giohang', 'chitietgiohang.IdGH', '=', 'giohang.IdGH')
+                    ->where('giohang.IdUser', $request->IdUser)
+                    ->where('chitietgiohang.IdSP', $item['IdSP'])
+                    ->delete();
             }
         }
+
+        DB::commit();
+        return response()->json(['success' => true, 'message' => 'Đặt hàng thành công!'], 200);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'success' => false, 
+            'message' => 'Lỗi hệ thống: ' . $e->getMessage()
+        ], 500);
+    }
+}
     /**
      * Cập nhật trạng thái đơn hàng
      */

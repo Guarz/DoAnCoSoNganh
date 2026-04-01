@@ -76,7 +76,11 @@ const CartPage = () => {
   };
 
   const removeItem = async (idSP) => {
-    if (window.confirm("Xác nhận xóa sản phẩm này khỏi giỏ hàng?")) {
+    if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+      const updatedCart = cart.filter((item) => item.IdSP !== idSP);
+      setCart(updatedCart);
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      setSelectedIds((prev) => prev.filter((id) => id !== idSP));
       try {
         const res = await axios.post(
           "http://127.0.0.1:8000/api/cart/remove",
@@ -84,17 +88,20 @@ const CartPage = () => {
             IdUser: user.IdUser,
             IdSP: idSP,
           },
-          { headers: { Authorization: `Bearer ${token}` } }
+          { 
+            headers: { Authorization: `Bearer ${token}` } 
+          }
         );
 
         if (res.data.success) {
-          const updatedCart = cart.filter((item) => item.IdSP !== idSP);
-          setCart(updatedCart);
-          localStorage.setItem("cart", JSON.stringify(updatedCart));
-          setSelectedIds((prev) => prev.filter((id) => id !== idSP));
+          alert("Đã xóa sản phẩm thành công!");
         }
       } catch (error) {
-        console.error(error);
+        if (error.response && error.response.status === 404) {
+          console.log("Sản phẩm chưa có trong DB, dọn dẹp UI thành công.");
+        } else {
+          console.error("Lỗi server khi xóa sản phẩm:", error);
+        }
       }
     }
   };

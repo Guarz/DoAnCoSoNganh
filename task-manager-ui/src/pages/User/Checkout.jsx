@@ -47,13 +47,13 @@ const Checkout = () => {
     const completeOrder = async () => {
         const user = JSON.parse(localStorage.getItem('user'));
         
-        if (!user || !user.id) {
+        if (!user || !user.IdUser) {
             alert("Lỗi: Bạn chưa đăng nhập!");
             return;
         }
 
         const orderPayload = {
-            IdUser: user.id,
+            IdUser: user.IdUser,
             DiaChiDat: formData.address,
             TongTien: totalAmount, 
             IdPT: paymentMethod === 'COD' ? 1 : 2,
@@ -62,7 +62,7 @@ const Checkout = () => {
             note: formData.note || "",
             ChiTietDonHang: cartItems.map(item => ({
                 IdSP: item.IdSP || item.id,
-                SoLuong: item.quantity,
+                SoLuong: item.quantity || item.SoLuong || item.so_luong || 1,
                 Gia: item.price // Đã thêm trường Giá để gửi sang Backend
             }))
         };

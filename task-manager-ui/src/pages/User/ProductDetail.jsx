@@ -25,36 +25,54 @@ const UserProductDetail = () => {
       });
   }, [id]);
 
-  const handleAddToCart = () => {
-    const user = localStorage.getItem("user");
+  const handleAddToCart = async () => {
+    const userStr = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
 
-    if (!user) {
+    if (!userStr || !token) {
       alert("Vui lòng đăng nhập để thực hiện chức năng này!");
       navigate("/login"); 
       return; 
     }
 
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const existingItemIndex = cart.findIndex((item) => item.IdSP === product.IdSP);
+    const userObj = JSON.parse(userStr);
     const qtyToAdd = Number(quantity) || 1;
 
-    if (existingItemIndex !== -1) {
-      cart[existingItemIndex].quantity += qtyToAdd;
-    } else {
-      cart.push({
-        IdSP: product.IdSP,
-        TenSP: product.TenSP,
-        Gia: product.Gia,
-        HinhAnh: product.HinhAnh,
-        TenLoai: product.TenLoai,
-        quantity: qtyToAdd,
-      });
-    }
+    try {
+      await axios.post(
+        "http://127.0.0.1:8000/api/cart/add",
+        {
+          IdUser: userObj.IdUser, 
+          IdSP: product.IdSP,     
+          SoLuong: qtyToAdd       
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` } 
+        }
+      );
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const existingItemIndex = cart.findIndex((item) => item.IdSP === product.IdSP);
+      if (existingItemIndex !== -1) {
+        cart[existingItemIndex].quantity += qtyToAdd;
+      } else {
+        cart.push({
+          IdSP: product.IdSP,
+          TenSP: product.TenSP,
+          Gia: product.Gia,
+          HinhAnh: product.HinhAnh,
+          TenLoai: product.TenLoai,
+          quantity: qtyToAdd,
+        });
+      }
+      localStorage.setItem("cart", JSON.stringify(cart));
+      setCart(cart);
+      setShowPopup(true);
+      setTimeout(() => setShowPopup(false), 3000);
 
-    localStorage.setItem("cart", JSON.stringify(cart));
-    setCart(cart);
-    setShowPopup(true);
-    setTimeout(() => setShowPopup(false), 3000);
+    } catch (error) {
+      console.error("Lỗi khi thêm vào giỏ hàng DB:", error);
+      alert("Đã xảy ra lỗi khi lưu vào cơ sở dữ liệu. Vui lòng thử lại!");
+    }
   };
 
   if (loading) return <div className="text-center mt-5 text-pink">Đang tải chi tiết...</div>;
