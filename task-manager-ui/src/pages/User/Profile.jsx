@@ -1,28 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useOutletContext } from "react-router-dom";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 
 const Profile = () => {
-  // Lấy user và setUser từ OutletContext (giống như cách làm với giỏ hàng)
   const { user, setUser } = useOutletContext();
   const navigate = useNavigate();
+  const [msg, setMsg] = useState("");
+  
+  // Khởi tạo state rỗng
+  const [formData, setFormData] = useState({
+    ten: "",
+    diachi: "",
+    dienthoai: "",
+  });
 
+  // 1. Theo dõi user: Nếu mất user thì về login, nếu có user thì điền vào form
   useEffect(() => {
-    // Nếu không có user (chưa đăng nhập), đá về trang login ngay
-    if (!user) {
-      navigate("/login");
+    if (user === null) {
+      // Chỉ navigate khi chắc chắn user đã bị null (sau khi app đã kiểm tra localStorage)
+      const storedUser = localStorage.getItem("user");
+      if (!storedUser) navigate("/login");
+    } else {
+      // Đổ dữ liệu vào form khi user đã load xong
+      setFormData({
+        ten: user.name || "",
+        diachi: user.address || "",
+        dienthoai: user.phone || "",
+      });
     }
   }, [user, navigate]);
-
-  if (!user) return null;
-  const [formData, setFormData] = useState({
-    ten: user?.name || "",
-    diachi: user?.address || "",
-    dienthoai: user?.phone || "",
-  });
-  const [msg, setMsg] = useState("");
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -33,28 +39,32 @@ const Profile = () => {
         `http://127.0.0.1:8000/api/user/update/${user.id}`,
         {
           ten: formData.ten,
-          email: user.email, // Giữ nguyên email hoặc lấy từ form nếu cho sửa
+          email: user.email,
           diachi: formData.diachi,
           dienthoai: formData.dienthoai,
         }
       );
 
-      if (response.data.status === "success") {
+      // Sửa lại đúng với key "success" từ Laravel trả về
+      if (response.data.success) {
         const updatedData = response.data.user;
 
-        // GHI ĐÈ LÊN LOCALSTORAGE (Rất quan trọng)
+        // Ghi đè vào LocalStorage
         localStorage.setItem("user", JSON.stringify(updatedData));
 
-        // CẬP NHẬT STATE TOÀN CỤC (Để Header đổi tên ngay)
+        // Cập nhật State toàn cục để Header/Sidebar nhận tên mới
         setUser(updatedData);
 
-        setMsg("Thông tin đã được ghi đè thành công!");
+        setMsg("Thông tin đã được cập nhật thành công!");
       }
     } catch (err) {
       console.error(err);
-      setMsg(err.response?.data?.message || "Lỗi ghi dữ liệu vào Database");
+      setMsg(err.response?.data?.message || "Lỗi cập nhật dữ liệu");
     }
   };
+
+  // Nếu chưa có user thì hiển thị loading để tránh bị nhảy sang trang login quá nhanh
+  if (!user) return <div className="text-center mt-5">Đang tải dữ liệu...</div>;
 
   return (
     <div className="container mt-5">
@@ -64,7 +74,11 @@ const Profile = () => {
             Hồ Sơ Của Tôi
           </h3>
 
-          {msg && <div className="alert alert-info">{msg}</div>}
+          {msg && (
+            <div className={`alert ${msg.includes("thành công") ? "alert-success" : "alert-danger"}`}>
+              {msg}
+            </div>
+          )}
 
           <form onSubmit={handleUpdate}>
             <div className="mb-3">
@@ -73,20 +87,17 @@ const Profile = () => {
                 type="text"
                 className="form-control"
                 value={formData.ten}
-                onChange={(e) =>
-                  setFormData({ ...formData, ten: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, ten: e.target.value })}
+                required
               />
             </div>
 
             <div className="mb-3">
-              <label className="form-label fw-bold">
-                Email (Không thể đổi)
-              </label>
+              <label className="form-label fw-bold">Email (Không thể đổi)</label>
               <input
                 type="text"
                 className="form-control bg-light"
-                value={user?.email}
+                value={user.email}
                 disabled
               />
             </div>
@@ -97,9 +108,7 @@ const Profile = () => {
                 type="text"
                 className="form-control"
                 value={formData.dienthoai}
-                onChange={(e) =>
-                  setFormData({ ...formData, dienthoai: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, dienthoai: e.target.value })}
               />
             </div>
 
@@ -109,9 +118,7 @@ const Profile = () => {
                 className="form-control"
                 rows="3"
                 value={formData.diachi}
-                onChange={(e) =>
-                  setFormData({ ...formData, diachi: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, diachi: e.target.value })}
               ></textarea>
             </div>
 
