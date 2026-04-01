@@ -29,6 +29,7 @@ const CartPage = () => {
           if (res.data.success) {
             // Controller trả về key 'products', hãy dùng đúng tên này
             const data = res.data.products || [];
+            console.log("Dữ liệu từ DB:", data);
             setCart(data);
             localStorage.setItem("cart", JSON.stringify(data));
           }
@@ -39,8 +40,16 @@ const CartPage = () => {
           if (err.response?.status === 401) navigate("/login");
         });
     }
-  }, [navigate, token]); // Thêm dependencies để React quản lý tốt hơn
-
+  }, [navigate, token]); 
+  const handleGoToCheckout = () => {
+  const itemsToPay = cart.filter((item) => selectedIds.includes(item.IdSP));
+  if (itemsToPay.length === 0) {
+    alert("Vui lòng tích chọn sản phẩm bạn muốn mua!");
+    return;
+  }
+  localStorage.setItem("checkout_items", JSON.stringify(itemsToPay));
+  navigate("/checkout");
+};
   const handleUpdateQty = async (idSP, newQty) => {
     if (newQty < 1) return;
 
@@ -99,14 +108,18 @@ const CartPage = () => {
   };
 
   const toggleSelect = (id) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
+  setSelectedIds((prev) =>
+    prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+  );
+};
 
   const selectedTotal = (cart || [])
-    .filter((item) => selectedIds.includes(item.IdSP))
-    .reduce((sum, item) => sum + Number(item.Gia) * item.quantity, 0);
+  .filter((item) => selectedIds.includes(item.IdSP))
+  .reduce((sum, item) => {
+    const price = Number(item.Gia || 0);
+    const qty = Number(item.quantity || item.SoLuong || 0);
+    return sum + (price * qty);
+  }, 0);
 
   // Nếu chưa có token thì không render gì cả (để useEffect navigate đi)
   if (!token) return null;
@@ -153,7 +166,7 @@ const CartPage = () => {
                     <input
                       type="checkbox"
                       className="cart-checkbox"
-                      checked={selectedIds.includes(item.IdSP)}
+                      checked={selectedIds.includes(item.IdSP)} 
                       onChange={() => toggleSelect(item.IdSP)}
                     />
                     <img
@@ -242,11 +255,7 @@ const CartPage = () => {
                   </span>
                 </div>
                 <button
-                  onClick={() =>
-                    navigate("/checkout", {
-                      state: { selectedIds, total: selectedTotal },
-                    })
-                  }
+                  onClick={handleGoToCheckout} // Gọi hàm vừa tạo ở trên
                   className="btn-checkout-main"
                 >
                   MUA HÀNG

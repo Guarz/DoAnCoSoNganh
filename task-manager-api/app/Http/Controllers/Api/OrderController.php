@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\DonHang;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 class OrderController extends Controller
 {
     /**
@@ -33,7 +33,48 @@ class OrderController extends Controller
 
         return response()->json($order);
     }
-
+/** TẠO ĐƠN HÀNG MỚI */
+    public function store(Request $request)
+        {
+            try {
+                DB::beginTransaction();
+                $idDonHang = DB::table('donhang')->insertGetId([
+                    'IdUser'     => $request->IdUser,
+                    'DiaChiDat'  => $request->DiaChiDat,
+                    'IdTT'       => 0, 
+                    'NgayDat'    => now()->toDateString(), 
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $chiTiet = $request->ChiTietDonHang; 
+                if (!empty($chiTiet)) {
+                    foreach ($chiTiet as $item) {
+                        $tonTai = DB::table('sanpham')->where('IdSP', $item['IdSP'])->exists();
+                        
+                        if (!$tonTai) {
+                            throw new \Exception("Sản phẩm ID " . $item['IdSP'] . " không còn tồn tại!");
+                        }
+                        DB::table('chitietdonhang')->insert([
+                            'IdDH'      => $idDonHang,
+                            'IdSP'      => $item['IdSP'],
+                            'SoLuong'   => $item['SoLuong'],
+                            'TongTien'  => (int)DB::table('sanpham')
+                                            ->join('chitietsanpham', 'sanpham.IdCT', '=', 'chitietsanpham.IdCT')
+                                            ->where('sanpham.IdSP', $item['IdSP'])
+                                            ->value('chitietsanpham.Gia') * $item['SoLuong'],
+                        ]);
+                    }
+                }
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Đặt hàng thành công!'], 200);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Lỗi hệ thống: ' . $e->getMessage()
+                ], 500);
+            }
+        }
     /**
      * Cập nhật trạng thái đơn hàng
      */
