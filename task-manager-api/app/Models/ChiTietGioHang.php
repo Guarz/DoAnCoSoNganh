@@ -10,11 +10,12 @@ class ChiTietGioHang extends Model
     protected $fillable = ['IdGH', 'IdSP', 'SoLuong'];
     public function GioHang()
     {
-        // Một sản phẩm có nhiều chi tiết 
+        // Một chi tiết thuộc 1 giỏ hàng 
         return $this->belongsTo(GioHang::class, 'IdGH', 'IdGH');
     }
     public function SanPham()
     {
+        // Một sản phẩm có nhiều chi tiết 
         return $this->belongsTo(SanPham::class, 'IdSP', 'IdSP');
     }
 }

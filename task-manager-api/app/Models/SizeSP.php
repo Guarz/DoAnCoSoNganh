@@ -10,7 +10,7 @@ class SizeSP extends Model
     protected $primaryKey = 'IdSize';
     public function ChiTietSP()
     {
-        // Một sản phẩm có nhiều chi tiết 
+        // Một sản phẩm có 1 chi tiết 
         return $this->hasOne(ChiTietSanPham::class, 'IdSize', 'IdSize');
     }
 }

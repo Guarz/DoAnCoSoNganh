@@ -33,15 +33,13 @@ class SanPham extends Model
     {
         return $this->belongsTo(LoaiSP::class, 'IdLoai', 'IdLoai');
     }
-
-    public function AnhSP()
-    {
-        return $this->belongsTo(AnhSP::class, 'IdAnh', 'IdAnh');
-    }
-
     public function ChiTietSanPham()
     {
         return $this->belongsTo(ChiTietSanPham::class, 'IdCT', 'IdCT');
+    }
+    public function AnhSP()
+    {
+        return $this->hasMany(AnhSP::class, 'IdAnh', 'IdAnh');
     }
 
     public function ChiTietGioHang()

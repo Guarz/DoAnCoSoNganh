@@ -10,7 +10,7 @@ class LoaiSP extends Model
     protected $primaryKey = 'IdLoai'; // Khóa chính
     public function SanPham()
     {
-        // Một sản phẩm có nhiều chi tiết 
+        // Một loại có nhiều sản phẩm, liên kết qua IdLoai
         return $this->hasMany(SanPham::class, 'IdLoai', 'IdLoai');
     }
 }

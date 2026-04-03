@@ -17,9 +17,9 @@ class AnhSP extends Model
         'HinhAnh'
     ];
 
-    // Một ảnh có thể thuộc nhiều sản phẩm
+    // Một sản phẩm có thể có nhiều ảnh
     public function sanpham()
     {
-        return $this->hasMany(SanPham::class, 'IdAnh', 'IdAnh');
+        return $this->belongsTo(SanPham::class, 'IdAnh', 'IdAnh');
     }
 }
