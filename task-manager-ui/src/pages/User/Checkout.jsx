@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import axios from 'axios';
-import './Checkout.css';
+import '../../style/Checkout.css';
+
 
 const Checkout = () => {
     const navigate = useNavigate();

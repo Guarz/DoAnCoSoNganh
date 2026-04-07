@@ -66,8 +66,8 @@ Route::prefix('admin')->group(function () {
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
-Route::post('/orders', [OrderController::class, 'store']);
 Route::get('/cart/{idUser}', [CartController::class, 'getCartByUserId']);
 Route::post('/cart/add', [CartController::class, 'addToCart']);
 Route::post('/cart/update', [CartController::class, 'updateQty']);
 Route::post('/cart/remove', [CartController::class, 'removeItem']);
+Route::post('/orders', [OrderController::class, 'store']);

@@ -20,7 +20,7 @@ import AdminLogin from "./pages/Admin/AdminLogin";
 // USER PAGES
 import HomePage from "./pages/User/HomePage";
 import CartPage from "./pages/User/CartPage";
-import UserOrders from "./pages/User/UserOrders";
+import OrderPage from "./pages/User/OrderPage";
 import UserProductDetail from "./pages/User/ProductDetail";
 import ProductList from "./pages/User/ProductList";
 import Checkout from "./pages/User/Checkout";
@@ -40,12 +40,6 @@ function App() {
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  /*
-  ========================
-  LOAD USER FROM LOCAL
-  ========================
-  */
 
   useEffect(() => {
 
@@ -71,13 +65,6 @@ function App() {
     setLoading(false);
 
   }, []);
-
-
-  /*
-  ========================
-  LOADING SCREEN
-  ========================
-  */
 
   if (loading) {
 
@@ -126,7 +113,7 @@ function App() {
 
           <Route
             path="/orders"
-            element={user ? <UserOrders /> : <Navigate to="/login" />}
+            element={user ? <OrderPage /> : <Navigate to="/login" />}
           />
 
         </Route>

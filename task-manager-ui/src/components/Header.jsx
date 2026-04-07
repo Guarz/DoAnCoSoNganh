@@ -9,19 +9,21 @@ const Header = () => {
   const handleLogout = () => {
     if (window.confirm("Bạn có chắc chắn muốn đăng xuất?")) {
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
       navigate("/login");
       window.location.reload();
     }
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light shadow-sm custom-navbar sticky-top">
+    <nav className="navbar navbar-expand-lg navbar-light shadow-sm custom-navbar sticky-top bg-white">
       <div className="container">
         {/* Logo */}
         <Link className="navbar-brand fw-bold logo-text" to="/">
           SHOP QUẦN ÁO A
         </Link>
 
+        {/* Nút bấm Menu cho Mobile */}
         <button
           className="navbar-toggler"
           type="button"
@@ -32,6 +34,7 @@ const Header = () => {
         </button>
 
         <div className="collapse navbar-collapse" id="navbarNav">
+          {/* Menu bên trái - Rút gọn */}
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
               <Link className="nav-link fw-semibold nav-link-custom" to="/">
@@ -39,69 +42,52 @@ const Header = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link
-                className="nav-link fw-semibold nav-link-custom"
-                to="/products"
-              >
+              <Link className="nav-link fw-semibold nav-link-custom" to="/products">
                 Sản Phẩm
               </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link fw-semibold nav-link-custom" to="/cart">
-                Giỏ hàng
-              </Link>
-            </li>
-            {user && (
-              <>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link fw-semibold nav-link-custom"
-                    to="/orders"
-                  >
-                    Lịch sử
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link fw-semibold nav-link-custom"
-                    to="/profile"
-                  >
-                    Thông tin
-                  </Link>
-                </li>
-              </>
-            )}
           </ul>
 
-          <div className="d-flex align-items-center gap-3">
+          {/* Cụm icon và nút bên phải */}
+          <div className="d-flex align-items-center gap-4">
+            {/* Luôn hiện Giỏ hàng */}
+            <Link to="/cart" className="nav-icon-link position-relative text-dark">
+              <i className="bi bi-cart3 fs-4"></i>
+            </Link>
+
             {user ? (
               <>
-                <span className="text-muted small">
-                  Chào,{" "}
-                  <b className="user-welcome-text">{user.name || user.email}</b>
-                </span>
-                <button
-                  onClick={handleLogout}
-                  className="btn btn-sm fw-bold px-3 rounded-pill btn-logout-custom"
-                >
-                  Thoát
-                </button>
+                {/* Icon Lịch sử đơn hàng */}
+                <Link to="/orders" className="nav-icon-link text-dark" title="Lịch sử đơn hàng">
+                  <i className="bi bi-receipt fs-4"></i>
+                </Link>
+
+                {/* Thông tin User & Logout */}
+                <div className="d-flex align-items-center gap-2 border-start ps-3">
+                  <Link to="/profile" className="text-decoration-none d-flex align-items-center gap-2 text-dark">
+                    <i className="bi bi-person-circle fs-4 text-pink"></i>
+                    <span className="fw-semibold d-none d-md-inline small">
+                      {user.name || "User"}
+                    </span>
+                  </Link>
+                  
+                  <button
+                    onClick={handleLogout}
+                    className="btn btn-link text-danger p-0 ms-2"
+                    title="Đăng xuất"
+                  >
+                    <i className="bi bi-box-arrow-right fs-4"></i>
+                  </button>
+                </div>
               </>
             ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="btn btn-sm fw-bold px-4 rounded-pill btn-login-pink"
-                >
-                  Đăng Nhập
-                </Link>
-                <Link
-                  to="/register"
-                  className="btn btn-outline-secondary btn-sm fw-bold px-4 rounded-pill"
-                >
-                  Đăng Ký
-                </Link>
-              </>
+              /* Nút Đăng nhập bằng Icon User khi chưa có tài khoản */
+              <Link to="/login" className="btn-login-icon text-dark" title="Đăng nhập">
+                <div className="d-flex align-items-center gap-2 border px-3 py-1 rounded-pill hover-shadow">
+                  <i className="bi bi-person fs-4"></i>
+                  <span className="fw-bold small">Đăng nhập</span>
+                </div>
+              </Link>
             )}
           </div>
         </div>

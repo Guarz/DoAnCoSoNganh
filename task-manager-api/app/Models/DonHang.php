@@ -11,11 +11,8 @@ class DonHang extends Model
 
     public $timestamps = false;
 
-    protected $fillable = [
-        'IdUser',
-        'IdTT',
-        'TongTien'
-    ];
+    // App\Models\DonHang.php
+    protected $fillable = ['IdUser', 'DiaChiDat', 'IdTT', 'NgayDat'];
 
     public function user()
     {

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useOutletContext, useNavigate } from "react-router-dom"; // Thêm useNavigate
 import axios from "axios";
-import "./ProductDetail.css";
+import '../../style/productDetail.css';
+
 
 const UserProductDetail = () => {
   const { id } = useParams();

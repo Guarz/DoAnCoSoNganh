@@ -1,0 +1,98 @@
+/* 1. Container chính - Reset để không gây lệch */
+.user-orders-page {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0;
+}
+
+/* 2. Tiêu đề trang */
+.page-title {
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* 3. Style cho Box trống - Căn giữa tuyệt đối */
+.border-dashed {
+    border: 2px dashed #dee2e6 !important;
+    background-color: #f8f9fa;
+    border-radius: 1rem;
+    /* Đảm bảo box này luôn chiếm hết chiều rộng của cột cha (col-lg-9) */
+    width: 100%; 
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 4. Card đơn hàng */
+.order-item-card {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-left: 4px solid transparent !important;
+    background-color: #fff;
+}
+
+.order-item-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+    border-left-color: #d63384 !important; /* Đổi sang màu hồng thương hiệu của bạn */
+}
+
+/* 5. Hiệu ứng xoay icon mũi tên */
+.transition-icon {
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+.rotate-180 {
+    transform: rotate(180deg);
+}
+
+/* 6. Chi tiết sản phẩm bên trong đơn hàng */
+.border-bottom-dashed {
+    border-bottom: 1px dashed #eee;
+}
+
+.border-bottom-dashed:last-child {
+    border-bottom: none;
+}
+
+/* 7. Các thành phần nhỏ */
+.loading-text {
+    text-align: center;
+    width: 100%;
+    padding: 100px 0;
+    color: #d63384;
+    font-weight: bold;
+}
+
+.status-text {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* 8. Responsive cho Mobile */
+@media (max-width: 768px) {
+    .order-summary-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+    
+    .order-status-group {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .p-5 {
+        padding: 2rem !important;
+    }
+
+    .display-1 {
+        font-size: 3.5rem !important;
+    }
+}

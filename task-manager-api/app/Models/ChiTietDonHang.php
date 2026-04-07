@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class ChiTietDonHang extends Model
 {
     protected $table = 'ChiTietDonHang';
+    protected $fillable = [
+        'IdDH', 
+        'IdSP', 
+        'SoLuong', 
+        'TongTien'
+    ];
     public function DonHang()
     {
-        // Một sản phẩm có nhiều chi tiết 
         return $this->belongsTo(DonHang::class, 'IdDH', 'IdDH');
     }
     public function SanPham()
