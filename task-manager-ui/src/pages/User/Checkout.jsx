@@ -48,13 +48,13 @@ const Checkout = () => {
     const completeOrder = async () => {
         const user = JSON.parse(localStorage.getItem('user'));
         
-        if (!user || !user.IdUser) {
+        if (!user || !user.id) {
             alert("Lỗi: Bạn chưa đăng nhập!");
             return;
         }
 
         const orderPayload = {
-            IdUser: user.IdUser,
+            IdUser: user.id,
             DiaChiDat: formData.address,
             TongTien: totalAmount, 
             IdPT: paymentMethod === 'COD' ? 1 : 2,

@@ -30,7 +30,7 @@ const UserProductDetail = () => {
     const userStr = localStorage.getItem("user");
     const token = localStorage.getItem("token");
 
-    if (!userStr || !token) {
+    if (!userStr ) {
       alert("Vui lòng đăng nhập để thực hiện chức năng này!");
       navigate("/login"); 
       return; 
@@ -43,7 +43,7 @@ const UserProductDetail = () => {
       await axios.post(
         "http://127.0.0.1:8000/api/cart/add",
         {
-          IdUser: userObj.IdUser, 
+          IdUser: userObj.id, 
           IdSP: product.IdSP,     
           SoLuong: qtyToAdd       
         },
@@ -79,11 +79,14 @@ const UserProductDetail = () => {
   if (loading) return <div className="text-center mt-5 text-pink">Đang tải chi tiết...</div>;
   if (!product) return <div className="text-center mt-5">Sản phẩm không tồn tại.</div>;
 
-  const imageSrc = product.HinhAnh
-    ? product.HinhAnh.startsWith("data:image")
+  let imageSrc = "https://via.placeholder.com/500";
+  if (product.HinhAnh && typeof product.HinhAnh === "string") {
+    imageSrc = product.HinhAnh.startsWith("data:image")
       ? product.HinhAnh
-      : `data:image/jpeg;base64,${product.HinhAnh}`
-    : "https://via.placeholder.com/500";
+      : `data:image/jpeg;base64,${product.HinhAnh}`;
+  } else if (product.HinhAnh) {
+    console.warn("Dữ liệu HinhAnh không phải là chuỗi:", product.HinhAnh);
+  }
 
   return (
     <div className="container mt-5 pb-5 position-relative">

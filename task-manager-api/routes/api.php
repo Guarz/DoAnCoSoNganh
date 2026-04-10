@@ -4,8 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\User\ProductController;
-use App\Http\Controllers\Api\CartController;
-use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\User\CartController;
+use App\Http\Controllers\Api\User\OrderController;
 
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\CategoryController;
@@ -66,8 +66,8 @@ Route::prefix('admin')->group(function () {
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
-Route::get('/cart/{idUser}', [CartController::class, 'getCartByUserId']);
 Route::post('/cart/add', [CartController::class, 'addToCart']);
 Route::post('/cart/update', [CartController::class, 'updateQty']);
 Route::post('/cart/remove', [CartController::class, 'removeItem']);
+Route::get('/cart/{idUser}', [CartController::class, 'getCartByUserId']);
 Route::post('/orders', [OrderController::class, 'store']);

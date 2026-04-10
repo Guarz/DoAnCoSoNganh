@@ -19,7 +19,10 @@ const CartPage = () => {
     const userStr = localStorage.getItem("user");
     const userData = userStr ? JSON.parse(userStr) : null;
 
-    if (!token || !userData?.IdUser) {
+    console.log("Token hiện tại:", token);
+    console.log("User Data hiện tại:", userData);
+    
+    if (!userData || !userData.id) {
       setIsLogged(false);
       setLoading(false);
       return;
@@ -28,7 +31,7 @@ const CartPage = () => {
     setIsLogged(true);
     
     axios
-      .get(`http://127.0.0.1:8000/api/cart/${userData.IdUser}`, {
+      .get(`http://127.0.0.1:8000/api/cart/${userData.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -60,7 +63,7 @@ const CartPage = () => {
     try {
       await axios.post(
         "http://127.0.0.1:8000/api/cart/update",
-        { IdUser: user.IdUser, IdSP: idSP, SoLuong: newQty },
+        { IdUser: user.id, IdSP: idSP, SoLuong: newQty },
         { headers: { Authorization: `Bearer ${token}` } }
       );
     } catch (error) {
@@ -80,7 +83,7 @@ const CartPage = () => {
       try {
         await axios.post(
           "http://127.0.0.1:8000/api/cart/remove",
-          { IdUser: user.IdUser, IdSP: idSP },
+          { IdUser: user.id, IdSP: idSP },
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } catch (error) {

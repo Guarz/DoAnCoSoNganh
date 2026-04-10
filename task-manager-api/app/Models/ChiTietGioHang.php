@@ -16,4 +16,7 @@ class ChiTietGioHang extends Model
     {
         return $this->belongsTo(SanPham::class, 'IdSP', 'IdSP');
     }
+    protected $primaryKey = null;
+    public $incrementing = false;
+    public $timestamps = false;
 }
