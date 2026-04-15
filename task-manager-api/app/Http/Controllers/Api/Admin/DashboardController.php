@@ -19,7 +19,7 @@ class DashboardController extends Controller
             "totalProducts" => DB::table("sanpham")->count(),
             "totalCategories" => DB::table("loaisp")->count(),
             "totalOrders" => DB::table("donhang")->count(),
-            "totalUsers" => DB::table("users")->count(),
+            "totalUser" => DB::table("user")->count(),
             "totalRevenue" => $revenue ?? 0
         ]);
     }
