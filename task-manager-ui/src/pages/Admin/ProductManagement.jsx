@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../style/product.css";
 import "../../style/table.css";
+
 function ProductManagement() {
 
     const navigate = useNavigate();
@@ -19,16 +20,9 @@ function ProductManagement() {
 
     const [editingId, setEditingId] = useState(null);
 
-    /*
-    =========================
-    LOAD DATA
-    =========================
-    */
-
+    // ================= LOAD DATA =================
     const fetchData = async () => {
-
         try {
-
             const [resProd, resCat] = await Promise.all([
                 fetch("http://localhost:8000/api/admin/products"),
                 fetch("http://localhost:8000/api/admin/categories")
@@ -41,60 +35,41 @@ function ProductManagement() {
             setCategories(dataCat);
 
             if (dataCat.length > 0 && !editingId) {
-
                 setProduct(prev => ({
                     ...prev,
-                    categoryId: dataCat[0].id
+                    categoryId: dataCat[0].id || ""
                 }));
-
             }
 
         } catch (err) {
-
-            console.log("Lỗi load dữ liệu:", err);
-
+            console.log("Lỗi load:", err);
         }
-
     };
 
     useEffect(() => {
-
         fetchData();
-
     }, []);
 
-    /*
-    =========================
-    HANDLERS
-    =========================
-    */
-
+    // ================= HANDLE CHANGE =================
     const handleChange = (e) => {
-
         setProduct({
             ...product,
-            [e.target.name]: e.target.value
+            [e.target.name]: e.target.value || ""
         });
-
     };
 
     const handleImage = (e) => {
-
         const file = e.target.files[0];
-
         if (file) {
-
             setProduct({
                 ...product,
                 image: file
             });
-
         }
-
     };
 
+    // ================= RESET =================
     const resetForm = () => {
-
         setProduct({
             name: "",
             price: "",
@@ -106,37 +81,26 @@ function ProductManagement() {
         setEditingId(null);
 
         const fileInput = document.querySelector('input[type="file"]');
-
         if (fileInput) fileInput.value = "";
-
     };
 
-    /*
-    =========================
-    ADD PRODUCT
-    =========================
-    */
-
+    // ================= ADD =================
     const handleAddProduct = async () => {
 
         if (!product.name || !product.price) {
-
-            alert("Vui lòng nhập tên và giá sản phẩm!");
+            alert("Vui lòng nhập tên và giá!");
             return;
-
         }
 
         const formData = new FormData();
 
-        formData.append("name", product.name);
-        formData.append("price", product.price);
-        formData.append("description", product.shortDesc);
-        formData.append("categoryId", product.categoryId);
+        formData.append("name", product.name || "");
+        formData.append("price", product.price || "");
+        formData.append("description", product.shortDesc || "");
+        formData.append("categoryId", product.categoryId || "");
 
         if (product.image) {
-
             formData.append("image", product.image);
-
         }
 
         try {
@@ -152,43 +116,34 @@ function ProductManagement() {
             const data = await res.json();
 
             if (data.success) {
-
-                alert("Thêm sản phẩm thành công 🎉");
-
-                fetchData();
+                alert("Thêm thành công 🎉");
+                await fetchData();
                 resetForm();
-
             }
 
         } catch (err) {
-
-            console.log("Lỗi thêm:", err);
-
+            console.log(err);
         }
-
     };
 
-    /*
-    =========================
-    UPDATE PRODUCT
-    =========================
-    */
-
+    // ================= UPDATE =================
     const handleUpdateProduct = async () => {
+
+        if (!product.name || !product.price) {
+            alert("Vui lòng nhập tên và giá!");
+            return;
+        }
 
         const formData = new FormData();
 
+        formData.append("_method", "PUT"); 
         formData.append("name", product.name);
         formData.append("price", product.price);
-        formData.append("description", product.shortDesc);
-        formData.append("categoryId", product.categoryId);
-
-        formData.append("_method", "PUT");
+        formData.append("description", product.shortDesc || "");
+        formData.append("categoryId", product.categoryId || "");
 
         if (product.image) {
-
             formData.append("image", product.image);
-
         }
 
         try {
@@ -196,45 +151,40 @@ function ProductManagement() {
             const res = await fetch(
                 `http://localhost:8000/api/admin/products/${editingId}`,
                 {
-                    method: "POST",
+                    method: "POST", 
                     body: formData
                 }
             );
 
             const data = await res.json();
 
+            if (!res.ok) {
+                console.log("Lỗi:", data);
+                alert(data.message || "Update thất bại");
+                return;
+            }
+
             if (data.success) {
-
                 alert("Cập nhật thành công ✨");
-
-                fetchData();
+                await fetchData();
                 resetForm();
-
             }
 
         } catch (err) {
-
-            console.log("Lỗi cập nhật:", err);
-
+            console.log("Lỗi update:", err);
         }
-
     };
 
-    /*
-    =========================
-    EDIT
-    =========================
-    */
-
+    // ================= EDIT =================
     const handleEdit = (p) => {
 
         setEditingId(p.id);
 
         setProduct({
-            name: p.name,
-            price: p.price,
+            name: p.name || "",
+            price: p.price || "",
             shortDesc: p.description || "",
-            categoryId: p.categoryId || "",
+            categoryId: p.categoryId || categories[0]?.id || "",
             image: null
         });
 
@@ -242,18 +192,12 @@ function ProductManagement() {
             top: 0,
             behavior: "smooth"
         });
-
     };
 
-    /*
-    =========================
-    DELETE
-    =========================
-    */
-
+    // ================= DELETE =================
     const handleDelete = async (id) => {
 
-        if (!window.confirm("Bạn có chắc muốn xóa?")) return;
+        if (!window.confirm("Bạn chắc chắn xoá?")) return;
 
         try {
 
@@ -267,38 +211,29 @@ function ProductManagement() {
             const data = await res.json();
 
             if (data.success) {
-
-                alert("Đã xóa sản phẩm");
-
-                fetchData();
-
+                alert("Đã xoá");
+                await fetchData();
             }
 
         } catch (err) {
-
-            console.log("Lỗi delete:", err);
-
+            console.log(err);
         }
-
     };
 
     return (
 
         <div className="product-page">
 
-            {/* BACK BUTTON */}
-
             <button
                 className="back-btn"
                 onClick={() => navigate("/admin/dashboard")}
             >
-                ⬅ Quay lại Dashboard
+                ⬅ Quay lại
             </button>
 
             <h2 className="title">🌸 Quản lý sản phẩm</h2>
 
             {/* FORM */}
-
             <div className="product-card">
 
                 <div className="form-grid">
@@ -306,7 +241,7 @@ function ProductManagement() {
                     <input
                         name="name"
                         placeholder="Tên sản phẩm"
-                        value={product.name}
+                        value={product.name || ""}
                         onChange={handleChange}
                     />
 
@@ -314,38 +249,30 @@ function ProductManagement() {
                         name="price"
                         type="number"
                         placeholder="Giá"
-                        value={product.price}
+                        value={product.price || ""}
                         onChange={handleChange}
                     />
 
                     <select
                         name="categoryId"
-                        value={product.categoryId}
+                        value={product.categoryId || ""}
                         onChange={handleChange}
-                        className="form-select"
                     >
-
                         {categories.map(cat => (
-
                             <option key={cat.id} value={cat.id}>
                                 {cat.name}
                             </option>
-
                         ))}
-
                     </select>
 
                     <input
                         name="shortDesc"
                         placeholder="Mô tả"
-                        value={product.shortDesc}
+                        value={product.shortDesc || ""}
                         onChange={handleChange}
                     />
 
-                    <input
-                        type="file"
-                        onChange={handleImage}
-                    />
+                    <input type="file" onChange={handleImage} />
 
                 </div>
 
@@ -353,44 +280,32 @@ function ProductManagement() {
 
                     <button
                         className="add-btn"
-                        onClick={
-                            editingId
-                                ? handleUpdateProduct
-                                : handleAddProduct
-                        }
+                        onClick={editingId ? handleUpdateProduct : handleAddProduct}
                     >
-
-                        {editingId
-                            ? "Cập nhật sản phẩm"
-                            : "Thêm sản phẩm"}
-
+                        {editingId ? "Cập nhật" : "Thêm"}
                     </button>
 
                     {editingId && (
-
                         <button
                             className="cancel-btn"
                             onClick={resetForm}
                         >
-                            Hủy bỏ
+                            Huỷ
                         </button>
-
                     )}
 
                 </div>
 
             </div>
 
-            {/* PRODUCT LIST */}
-
+            {/* LIST */}
             <div className="product-list">
 
-                <h3>📋 Danh sách sản phẩm</h3>
+                <h3>📋 Danh sách</h3>
 
                 <table>
 
                     <thead>
-
                         <tr>
                             <th>Ảnh</th>
                             <th>Tên</th>
@@ -398,7 +313,6 @@ function ProductManagement() {
                             <th>Giá</th>
                             <th>Hành động</th>
                         </tr>
-
                     </thead>
 
                     <tbody>
@@ -408,56 +322,31 @@ function ProductManagement() {
                             <tr key={p.id}>
 
                                 <td>
-
                                     {p.image ? (
-
                                         <img
-                                            src={
-                                                p.image?.startsWith("data:")
-                                                    ? p.image
-                                                    : p.image?.startsWith("/9j") // base64 jpeg thường bắt đầu vậy
-                                                        ? `data:image/jpeg;base64,${p.image}`
-                                                        : `http://localhost:8000/${p.image}` // nếu là đường dẫn file
-                                            }
+                                            src={p.image}
                                             width="60"
                                             height="60"
-                                            style={{
-                                                objectFit: "cover",
-                                                borderRadius: "6px"
-                                            }}
+                                            style={{ objectFit: "cover" }}
                                         />
-
-                                    ) : (
-                                        <span>Không ảnh</span>
-                                    )}
-
+                                    ) : "Không ảnh"}
                                 </td>
 
                                 <td>{p.name}</td>
 
-                                <td>
-                                    <span className="badge-cat">
-                                        {p.category_name}
-                                    </span>
-                                </td>
+                                <td>{p.category_name}</td>
 
                                 <td>
-                                    {Number(p.price).toLocaleString()} VNĐ
+                                    {Number(p.price || 0).toLocaleString()} VNĐ
                                 </td>
 
                                 <td>
 
-                                    <button
-                                        className="edit-btn"
-                                        onClick={() => handleEdit(p)}
-                                    >
+                                    <button onClick={() => handleEdit(p)}>
                                         Sửa
                                     </button>
 
-                                    <button
-                                        className="delete-btn"
-                                        onClick={() => handleDelete(p.id)}
-                                    >
+                                    <button onClick={() => handleDelete(p.id)}>
                                         Xóa
                                     </button>
 
@@ -474,9 +363,7 @@ function ProductManagement() {
             </div>
 
         </div>
-
     );
-
 }
 
 export default ProductManagement;
