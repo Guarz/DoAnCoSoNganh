@@ -1,67 +1,146 @@
+/* AdminOrders.css */
+
 .page {
-    background: #cfe8ef;
+    background: #f4f7fe;
     min-height: 100vh;
     padding: 30px;
+    font-family: 'Inter', sans-serif;
 }
 
 .backBtn {
-    background: #ff3b6c;
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 8px;
+    background: #ffffff;
+    color: #2b3674;
+    border: 1px solid #e0e5f2;
+    padding: 10px 18px;
+    border-radius: 10px;
     cursor: pointer;
     margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
 }
 
 .title {
-    font-size: 32px;
-    font-weight: bold;
-    margin-bottom: 20px;
+    font-size: 28px;
+    font-weight: 800;
+    color: #2b3674;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.title i {
+    color: #4318ff;
 }
 
 .card {
     background: #fff;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0px 18px 40px rgba(112, 144, 176, 0.12);
 }
 
 .subTitle {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #2b3674;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
+/* BẢNG VÀ CĂN CHỈNH HÀNG */
 .table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.table thead {
-    background: #f7b2c4;
-}
-
 .table th,
 .table td {
-    padding: 10px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #f1f4f9;
+    vertical-align: middle;
+    /* Giữ mọi thứ thẳng hàng theo chiều dọc */
+    line-height: 1.5;
+}
+
+.table th {
+    color: #a3aed0;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.product-cell {
+    color: #2b3674;
+    font-size: 14px;
+    max-width: 250px;
 }
 
 .money {
-    color: red;
-    font-weight: bold;
+    color: #ee5d50;
+    font-weight: 700;
 }
 
-select {
-    padding: 5px;
-    border-radius: 5px;
+/* CĂN CHỈNH SELECT BOX */
+.status-select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #e0e5f2;
+    color: #2b3674;
+    background: #f8f9ff;
+    cursor: pointer;
+    outline: none;
+}
+
+/* NÚT XÓA */
+.action-btns {
+    display: flex;
+    justify-content: center;
 }
 
 .deleteBtn {
-    background: red;
-    color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
     border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
+    background: #feeef3;
+    color: #ee5d50;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+    background: #ee5d50;
+    color: white;
+}
+
+/* LOADING & EMPTY STATE */
+.dashboard-loading,
+.empty-state {
+    text-align: center;
+    padding: 50px 0;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4318ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
