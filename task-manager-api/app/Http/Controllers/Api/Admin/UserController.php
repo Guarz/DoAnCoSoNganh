@@ -14,7 +14,7 @@ class UserController extends Controller
     public function index()
     {
         try {
-            $users = DB::table("user")
+            $user = DB::table("user")
                 ->select(
                     "IdUser as id",
                     "Ten as name",
@@ -23,7 +23,7 @@ class UserController extends Controller
                 ->orderBy("IdUser", "desc")
                 ->get();
 
-            return response()->json($users);
+            return response()->json($user);
 
         } catch (\Exception $e) {
             return response()->json([
