@@ -6,6 +6,8 @@ import {
 } from "react-router-dom";
 
 import { useState, useEffect } from "react";
+// để tự động đưa trang lên đầu mỗi khi đường dẫn (URL) thay đổi.
+import ScrollToTop from "./components/ScrollToTop";
 
 // Layout
 import UserLayout from "./layouts/UserLayout";
@@ -84,7 +86,7 @@ function App() {
   return (
 
     <Router>
-
+      <ScrollToTop />
       <Routes>
 
         {/* ================= USER ================= */}
