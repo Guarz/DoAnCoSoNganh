@@ -114,7 +114,7 @@ const AboutPage = () => {
 
       <section className="py-5 text-center">
         <div className="container">
-          <h3 className="fw-bold mb-4">Bạn Đã Sẵn Sàng F5 Phong Cách?</h3>
+          <h3 className="fw-bold mb-4">Bạn Đã Sẵn Sàng Thay Đổi Phong Cách?</h3>
           <a
             href="/products"
             className="btn btn-outline-dark btn-lg rounded-pill px-5"
