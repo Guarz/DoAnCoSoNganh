@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-
     // =============================
     // LẤY DANH SÁCH USER
     // =============================
@@ -28,11 +27,11 @@ class UserController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
+                "success" => false,
                 "error" => $e->getMessage()
             ], 500);
         }
     }
-
 
     // =============================
     // THÊM USER
@@ -40,15 +39,14 @@ class UserController extends Controller
     public function store(Request $request)
     {
         try {
-
-            // Validate dữ liệu
+            // Validate
             $request->validate([
-                "name" => "required",
+                "name" => "required|string|max:255",
                 "email" => "required|email",
                 "password" => "required|min:6"
             ]);
 
-            // Kiểm tra email trùng
+            // Check email trùng
             $exists = DB::table("user")
                 ->where("Email", $request->email)
                 ->exists();
@@ -60,7 +58,7 @@ class UserController extends Controller
                 ], 400);
             }
 
-            // Thêm user
+            // Insert
             $id = DB::table("user")->insertGetId([
                 "Ten" => $request->name,
                 "Email" => $request->email,
@@ -72,16 +70,17 @@ class UserController extends Controller
 
             return response()->json([
                 "success" => true,
+                "message" => "Thêm user thành công",
                 "id" => $id
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
+                "success" => false,
                 "error" => $e->getMessage()
             ], 500);
         }
     }
-
 
     // =============================
     // CẬP NHẬT USER
@@ -89,12 +88,35 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         try {
-
             $request->validate([
-                "name" => "required",
+                "name" => "required|string|max:255",
                 "email" => "required|email"
             ]);
 
+            // Check tồn tại
+            $user = DB::table("user")->where("IdUser", $id)->first();
+
+            if (!$user) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "User không tồn tại"
+                ], 404);
+            }
+
+            // Check email trùng (trừ chính nó)
+            $exists = DB::table("user")
+                ->where("Email", $request->email)
+                ->where("IdUser", "!=", $id)
+                ->exists();
+
+            if ($exists) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "Email đã tồn tại"
+                ], 400);
+            }
+
+            // Update
             DB::table("user")
                 ->where("IdUser", $id)
                 ->update([
@@ -109,11 +131,11 @@ class UserController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
+                "success" => false,
                 "error" => $e->getMessage()
             ], 500);
         }
     }
-
 
     // =============================
     // XÓA USER
@@ -121,20 +143,38 @@ class UserController extends Controller
     public function destroy($id)
     {
         try {
+            // Check tồn tại
+            $user = DB::table("user")->where("IdUser", $id)->first();
 
+            if (!$user) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "User không tồn tại"
+                ], 404);
+            }
+
+            // Xoá
             DB::table("user")
                 ->where("IdUser", $id)
                 ->delete();
 
             return response()->json([
-                "success" => true
+                "success" => true,
+                "message" => "Xóa thành công"
             ]);
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Lỗi ràng buộc khóa ngoại
+            return response()->json([
+                "success" => false,
+                "message" => "User có dữ liệu liên quan, không thể xóa"
+            ], 400);
 
         } catch (\Exception $e) {
             return response()->json([
+                "success" => false,
                 "error" => $e->getMessage()
             ], 500);
         }
     }
-
 }

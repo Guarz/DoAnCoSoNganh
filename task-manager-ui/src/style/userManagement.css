@@ -1,173 +1,245 @@
-/* Container chính & Nền xanh cyan nhẹ */
+/* ================= CONTAINER ================= */
 .user-container {
-    padding: 30px;
+    padding: 25px;
     background-color: #e0f7f9;
     min-height: 100vh;
-    font-family: 'Segoe UI', sans-serif;
 }
 
-/* Header căn chỉnh 2 bên */
+/* ================= HEADER ================= */
 .user-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
     background: white;
     padding: 15px 25px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.header-left,
-.header-right {
+.header-left {
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-/* Sửa lỗi Search & Nút thêm */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-title {
+    margin: 0;
+    font-size: 22px;
+    color: #2b3674;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ================= BUTTON ================= */
+.back-btn,
+.add-btn-main,
+.reload-btn,
+.btn-update,
+.btn-cancel {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+/* Back */
+.back-btn {
+    background: #f1f4f9;
+    color: #2b3674;
+}
+
+.back-btn:hover {
+    background: #e2e8f0;
+}
+
+/* Add user */
+.add-btn-main {
+    background: #4318ff;
+    color: white;
+}
+
+.add-btn-main:hover {
+    background: #2f0fd6;
+}
+
+/* Reload */
+.reload-btn {
+    background: #f1f4f9;
+}
+
+.reload-btn:hover {
+    background: #e2e8f0;
+}
+
+/* Confirm */
+.btn-update {
+    background: #22c55e;
+    color: white;
+}
+
+.btn-update:hover {
+    background: #16a34a;
+}
+
+/* Cancel */
+.btn-cancel {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #dc2626;
+}
+
+/* ================= SEARCH ================= */
 .search-wrapper {
     position: relative;
 }
 
 .search-wrapper i {
     position: absolute;
-    left: 12px;
+    left: 10px;
     top: 50%;
     transform: translateY(-50%);
     color: #888;
 }
 
 .search-box {
-    padding: 10px 15px 10px 35px !important;
+    padding: 8px 12px 8px 30px;
+    border-radius: 8px;
     border: 1px solid #ddd;
-    border-radius: 8px;
-    width: 250px;
-    transition: 0.3s;
 }
 
-.search-box:focus {
-    border-color: #4318ff;
-    outline: none;
-}
-
-.add-main-btn {
-    background: linear-gradient(135deg, #868CFF 0%, #4318ff 100%);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.reload-btn-icon {
-    background: #f0f2f5;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 18px;
-}
-
-/* Table Style (Header Hồng Pastel) */
-.table-card {
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.table-top {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-}
-
-.user-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-.user-table th {
-    background: #fbc2d4;
-    /* Hồng pastel */
-    color: #555;
-    padding: 15px;
-    text-align: left;
-}
-
-.user-table tr:last-child td:first-child {
-    border-bottom-left-radius: 12px;
-}
-
-.user-table tr:last-child td:last-child {
-    border-bottom-right-radius: 12px;
-}
-
-.action-group {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-}
-
-/* Button trong bảng */
-.edit-btn,
-.delete-btn {
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.edit-btn {
-    background: #e1f5fe;
-    color: #03a9f4;
-}
-
-.delete-btn {
-    background: #fff1f0;
-    color: #ff4d4f;
-}
-
-.edit-btn:hover {
-    background: #03a9f4;
-    color: white;
-}
-
-.delete-btn:hover {
-    background: #ff4d4f;
-    color: white;
-}
-
-/* Edit Box */
+/* ================= FORM ================= */
 .edit-box {
     background: white;
     padding: 20px;
     border-radius: 12px;
     margin-bottom: 25px;
-    border: 1px solid #eea9dd;
 }
 
-.form-inputs {
-    display: flex;
-    gap: 10px;
-    margin: 15px 0;
+.form-grid-user {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    margin-top: 15px;
 }
 
 .edit-input {
-    flex: 1;
     padding: 10px;
-    border-radius: 6px;
+    border-radius: 8px;
     border: 1px solid #ddd;
+}
+
+.edit-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    /* 👉 FIX NÚT ĐẸP */
+}
+
+/* ================= TABLE ================= */
+.table-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+/* Header */
+.admin-table thead th {
+    background: #fbc2d4;
+    padding: 12px;
+    text-align: center;
+}
+
+/* Body */
+.admin-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+/* FIX CỘT KHÔNG LỆCH */
+.admin-table th,
+.admin-table td {
+    box-sizing: border-box;
+}
+
+/* ================= ACTION ================= */
+.action-column {
+    text-align: center;
+}
+
+.action-btns {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ICON BUTTON */
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* Edit */
+.btn-icon.edit {
+    background: #eef2ff;
+    color: #4318ff;
+}
+
+/* Delete */
+.btn-icon.delete {
+    background: #fff5f5;
+    color: #ef4444;
+}
+
+.btn-icon:hover {
+    transform: translateY(-2px);
+}
+
+/* ================= BADGE ================= */
+.total-badge {
+    background: #e1e9ff;
+    color: #4318ff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* ================= LOADING ================= */
+.loading-state {
+    text-align: center;
+    margin-top: 50px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+    .form-grid-user {
+        grid-template-columns: 1fr;
+    }
 }
