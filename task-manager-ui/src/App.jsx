@@ -2,7 +2,7 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate
+  Navigate,
 } from "react-router-dom";
 
 import { useState, useEffect } from "react";
@@ -40,59 +40,39 @@ import UserManagement from "./pages/Admin/UserManagement";
 import RevenueDetail from "./pages/Admin/RevenueDetail";
 
 function App() {
-
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     const savedUser = localStorage.getItem("user");
 
     if (savedUser) {
-
       try {
-
         const parsedUser = JSON.parse(savedUser);
 
         setUser(parsedUser);
-
       } catch (error) {
-
         console.error("Parse user error:", error);
         localStorage.removeItem("user");
-
       }
-
     }
 
     setLoading(false);
-
   }, []);
 
   if (loading) {
-
-    return (
-      <h3 style={{ textAlign: "center", marginTop: 50 }}>
-        Loading...
-      </h3>
-    );
-
+    return <h3 style={{ textAlign: "center", marginTop: 50 }}>Loading...</h3>;
   }
-
 
   const isAdmin = user?.role === "admin";
 
-
   return (
-
     <Router>
       <ScrollToTop />
       <Routes>
-
         {/* ================= USER ================= */}
 
         <Route element={<UserLayout user={user} setUser={setUser} />}>
-
           <Route path="/" element={<HomePage />} />
 
           <Route path="/home" element={<HomePage />} />
@@ -118,99 +98,67 @@ function App() {
             path="/orders"
             element={user ? <OrderPage /> : <Navigate to="/login" />}
           />
-
         </Route>
-
 
         {/* ================= ADMIN ================= */}
 
         <Route
           path="/admin/login"
           element={
-            isAdmin
-              ? <Navigate to="/admin/dashboard" />
-              : <AdminLogin setUser={setUser} />
+            isAdmin ? (
+              <Navigate to="/admin/dashboard" />
+            ) : (
+              <AdminLogin setUser={setUser} />
+            )
           }
         />
-
 
         <Route
           path="/admin/dashboard"
           element={
-            isAdmin
-              ? <AdminDashboard />
-              : <Navigate to="/admin/login" />
+            isAdmin ? <AdminDashboard /> : <Navigate to="/admin/login" />
           }
         />
-
 
         <Route
           path="/admin/home"
-          element={
-            isAdmin
-              ? <AdminHome />
-              : <Navigate to="/admin/login" />
-          }
+          element={isAdmin ? <AdminHome /> : <Navigate to="/admin/login" />}
         />
-
 
         <Route
           path="/admin/products"
           element={
-            isAdmin
-              ? <ProductManagement />
-              : <Navigate to="/admin/login" />
+            isAdmin ? <ProductManagement /> : <Navigate to="/admin/login" />
           }
         />
-
 
         <Route
           path="/admin/product/:id"
-          element={
-            isAdmin
-              ? <ProductDetail />
-              : <Navigate to="/admin/login" />
-          }
+          element={isAdmin ? <ProductDetail /> : <Navigate to="/admin/login" />}
         />
-
 
         <Route
           path="/admin/orders"
-          element={
-            isAdmin
-              ? <AdminOrders />
-              : <Navigate to="/admin/login" />
-          }
+          element={isAdmin ? <AdminOrders /> : <Navigate to="/admin/login" />}
         />
-
 
         <Route
           path="/admin/categories"
           element={
-            isAdmin
-              ? <CategoryManagement />
-              : <Navigate to="/admin/login" />
+            isAdmin ? <CategoryManagement /> : <Navigate to="/admin/login" />
           }
         />
-
 
         <Route
           path="/admin/user"
           element={
-            isAdmin
-              ? <UserManagement />
-              : <Navigate to="/admin/login" />
+            isAdmin ? <UserManagement /> : <Navigate to="/admin/login" />
           }
         />
         <Route
           path="/admin/revenue"
-          element={
-            isAdmin
-              ? <RevenueDetail />
-              : <Navigate to="/admin/login" />
-          }
+          element={isAdmin ? <RevenueDetail /> : <Navigate to="/admin/login" />}
         />
-
 
         {/* ================= 404 ================= */}
 
@@ -222,13 +170,9 @@ function App() {
             </h2>
           }
         />
-
       </Routes>
-
     </Router>
-
   );
-
 }
 
 export default App;

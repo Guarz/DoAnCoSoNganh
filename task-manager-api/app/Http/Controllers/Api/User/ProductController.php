@@ -19,7 +19,7 @@ class ProductController extends Controller
 
             $productsFormatted = $productsRaw->map(function ($p) {
                 $firstImage = $p->AnhSP->first();
-                
+
                 return [
                     'IdSP'    => $p->IdSP,
                     'TenSP'   => $p->TenSP,
@@ -50,7 +50,7 @@ class ProductController extends Controller
                 return response()->json(['success' => false, 'message' => 'Sản phẩm không tồn tại'], 404);
             }
 
-            $images = $p->AnhSP->map(function($img) {
+            $images = $p->AnhSP->map(function ($img) {
                 return 'data:image/jpeg;base64,' . base64_encode($img->HinhAnh);
             });
 

@@ -65,7 +65,11 @@ const Profile = () => {
           </h3>
 
           {msg && (
-            <div className={`alert ${msg.includes("thành công") ? "alert-success" : "alert-danger"}`}>
+            <div
+              className={`alert ${
+                msg.includes("thành công") ? "alert-success" : "alert-danger"
+              }`}
+            >
               {msg}
             </div>
           )}
@@ -77,13 +81,17 @@ const Profile = () => {
                 type="text"
                 className="form-control"
                 value={formData.ten}
-                onChange={(e) => setFormData({ ...formData, ten: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, ten: e.target.value })
+                }
                 required
               />
             </div>
 
             <div className="mb-3">
-              <label className="form-label fw-bold">Email (Không thể đổi)</label>
+              <label className="form-label fw-bold">
+                Email (Không thể đổi)
+              </label>
               <input
                 type="text"
                 className="form-control bg-light"
@@ -98,7 +106,9 @@ const Profile = () => {
                 type="text"
                 className="form-control"
                 value={formData.dienthoai}
-                onChange={(e) => setFormData({ ...formData, dienthoai: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, dienthoai: e.target.value })
+                }
               />
             </div>
 
@@ -108,7 +118,9 @@ const Profile = () => {
                 className="form-control"
                 rows="3"
                 value={formData.diachi}
-                onChange={(e) => setFormData({ ...formData, diachi: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, diachi: e.target.value })
+                }
               ></textarea>
             </div>
 

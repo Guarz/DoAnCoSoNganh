@@ -31,6 +31,38 @@ const OrderCard = () => {
   const handleToggleDetail = (id) => {
     setExpandedOrderId(expandedOrderId === id ? null : id);
   };
+  const getCorrectImageSrc = (base64String) => {
+    if (!base64String)
+      return "https://via.placeholder.com/300x400?text=No+Image";
+    return base64String.startsWith("data:image")
+      ? base64String
+      : `data:image/jpeg;base64,${base64String}`;
+  };
+  const getStatusStyle = (statusName) => {
+    if (!statusName) {
+      return {
+        css: "bg-light text-primary border border-primary",
+        icon: "bi-info-circle",
+      };
+    }
+    const name = statusName.trim().toLowerCase();
+    if (name.includes("chờ xác nhận")) {
+      return {
+        css: "bg-warning text-dark border-0",
+        icon: "bi-hourglass-split",
+      };
+    }
+    if (name.includes("đang giao hàng")) {
+      return { css: "bg-primary text-white border-0", icon: "bi-truck" };
+    }
+    if (name.includes("đã giao hàng")) {
+      return { css: "bg-success text-white border-0", icon: "bi-check-circle" };
+    }
+    return {
+      css: "bg-light text-primary border border-primary",
+      icon: "bi-info-circle",
+    };
+  };
 
   if (loading)
     return (
@@ -79,106 +111,112 @@ const OrderCard = () => {
           </div>
         </div>
       ) : (
-        orders.map((order) => (
-          <div
-            key={order.IdDH}
-            className="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden order-item-card"
-          >
-            {/* Header của Đơn hàng */}
-            <div
-              className="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center"
-              style={{ cursor: "pointer" }}
-              onClick={() => handleToggleDetail(order.IdDH)}
-            >
-              <div className="d-flex flex-column">
-                <span className="fw-bold text-primary">
-                  Mã đơn: #{order.IdDH}
-                </span>
-                <small className="text-muted">
-                  <i className="bi bi-calendar3 me-1"></i>
-                  {order.NgayDat}
-                </small>
-              </div>
-              <div className="d-flex align-items-center">
-                <span className="badge rounded-pill bg-light text-primary border border-primary px-3 py-2 me-3">
-                  <i className="bi bi-info-circle me-1"></i>
-                  {order.trang_thai?.TenTrangThai || "Đang xử lý"}
-                </span>
-                <i
-                  className={`bi bi-chevron-down transition-icon ${
-                    expandedOrderId === order.IdDH ? "rotate-180" : ""
-                  }`}
-                ></i>
-              </div>
-            </div>
+        orders.map((order) => {
+          const statusInfo = getStatusStyle(order.trang_thai?.TenTrangThai);
 
-            {/* Chi tiết sản phẩm - Sử dụng Bootstrap Grid */}
+          return (
             <div
-              className={`collapse ${
-                expandedOrderId === order.IdDH ? "show" : ""
-              }`}
+              key={order.IdDH}
+              className="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden order-item-card"
             >
-              <div className="card-body border-top bg-light-subtle px-4">
-                {order.chi_tiet?.map((detail, index) => {
-                  const sp = detail.san_pham;
-                  const anhBase64 = sp?.anh_s_p?.[0]?.HinhAnh;
+              {/* Header của Đơn hàng */}
+              <div
+                className="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center"
+                style={{ cursor: "pointer" }}
+                onClick={() => handleToggleDetail(order.IdDH)}
+              >
+                <div className="d-flex flex-column">
+                  <span className="fw-bold text-primary">
+                    Mã đơn: #{order.IdDH}
+                  </span>
+                  <small className="text-muted">
+                    <i className="bi bi-calendar3 me-1"></i>
+                    {order.NgayDat}
+                  </small>
+                </div>
+                <div className="d-flex align-items-center">
+                  <span
+                    className={`badge rounded-pill px-3 py-2 me-3 shadow-sm ${statusInfo.css}`}
+                  >
+                    <i className={`bi ${statusInfo.icon} me-1`}></i>
+                    {order.trang_thai?.TenTrangThai || "Đang xử lý"}
+                  </span>
+                  <i
+                    className={`bi bi-chevron-down transition-icon ${
+                      expandedOrderId === order.IdDH ? "rotate-180" : ""
+                    }`}
+                  ></i>
+                </div>
+              </div>
 
-                  return (
-                    <div
-                      key={index}
-                      className="row align-items-center py-3 border-bottom-dashed"
-                    >
-                      <div className="col-auto">
-                        <img
-                          src={
-                            anhBase64
-                              ? `data:image/jpeg;base64,${anhBase64}`
-                              : "https://via.placeholder.com/70"
-                          }
-                          alt={sp?.TenSP}
-                          className="rounded-3 shadow-sm object-fit-cover"
-                          style={{ width: "70px", height: "70px" }}
-                        />
-                      </div>
-                      <div className="col">
-                        <h6 className="mb-0 fw-bold">
-                          {sp?.TenSP || "Sản phẩm đã bị xóa"}
-                        </h6>
-                        <small className="text-muted">
-                          Số lượng:{" "}
-                          <span className="badge bg-secondary-subtle text-dark">
-                            x{detail.SoLuong}
+              {/* Chi tiết sản phẩm - Sử dụng Bootstrap Grid */}
+              <div
+                className={`collapse ${
+                  expandedOrderId === order.IdDH ? "show" : ""
+                }`}
+              >
+                <div className="card-body border-top bg-light-subtle px-4">
+                  {order.chi_tiet?.map((detail, index) => {
+                    const sp = detail.san_pham || detail.SanPham || {};
+                    const tenSP = sp.TenSP || "Sản phẩm đã bị xóa";
+                    const anhBase64 = sp.HinhAnh || sp.Anh;
+                    return (
+                      <div
+                        key={index}
+                        className="row align-items-center py-3 border-bottom-dashed"
+                      >
+                        <div className="col-auto">
+                          <img
+                            src={getCorrectImageSrc(anhBase64)}
+                            alt={tenSP}
+                            className="rounded-3 shadow-sm object-fit-cover"
+                            style={{ width: "70px", height: "70px" }}
+                            onError={(e) => {
+                              e.target.src =
+                                "https://placehold.co/70x70?text=Error";
+                            }}
+                          />
+                        </div>
+                        <div className="col">
+                          <h6 className="mb-0 fw-bold">
+                            {sp?.TenSP || "Sản phẩm đã bị xóa"}
+                          </h6>
+                          <small className="text-muted">
+                            Số lượng:{" "}
+                            <span className="badge bg-secondary-subtle text-dark">
+                              x{detail.SoLuong}
+                            </span>
+                          </small>
+                        </div>
+                        <div className="col-auto text-end">
+                          <span className="fw-bold text-dark">
+                            {Number(detail.TongTien).toLocaleString()} đ
                           </span>
-                        </small>
+                        </div>
                       </div>
-                      <div className="col-auto text-end">
-                        <span className="fw-bold text-dark">
-                          {Number(detail.TongTien).toLocaleString()} đ
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Footer của mỗi Card */}
+              <div className="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                <span className="text-muted small">
+                  <i className="bi bi-tag-fill me-1"></i>Tổng thanh toán
+                </span>
+                <span className="fs-5 fw-bold text-danger">
+                  {Number(
+                    order.chi_tiet?.reduce(
+                      (sum, item) => sum + Number(item.TongTien),
+                      0
+                    )
+                  ).toLocaleString()}{" "}
+                  đ
+                </span>
               </div>
             </div>
-
-            {/* Footer của mỗi Card */}
-            <div className="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-              <span className="text-muted small">
-                <i className="bi bi-tag-fill me-1"></i>Tổng thanh toán
-              </span>
-              <span className="fs-5 fw-bold text-danger">
-                {Number(
-                  order.chi_tiet?.reduce(
-                    (sum, item) => sum + Number(item.TongTien),
-                    0
-                  )
-                ).toLocaleString()}{" "}
-                đ
-              </span>
-            </div>
-          </div>
-        ))
+          );
+        })
       )}
     </div>
   );

@@ -63,7 +63,6 @@ Route::prefix('admin')->group(function () {
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
 });
-// USER ROUTES Đm thằng nào Admin mà làm chỗ này t đánh chết >:( 
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);

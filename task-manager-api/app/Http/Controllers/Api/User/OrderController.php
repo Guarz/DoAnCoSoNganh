@@ -43,12 +43,12 @@ class OrderController extends Controller
                 'NgayDat'   => now()->toDateString(),
             ]);
 
-            $items = $request->ChiTietDonHang; 
-            
+            $items = $request->ChiTietDonHang;
+
             if (!empty($items)) {
                 foreach ($items as $item) {
                     $product = SanPham::find($item['IdSP']);
-                    
+
                     if (!$product) {
                         throw new \Exception("Sản phẩm ID " . $item['IdSP'] . " không tồn tại!");
                     }
@@ -69,15 +69,14 @@ class OrderController extends Controller
 
             DB::commit();
             return response()->json([
-                'success' => true, 
-                'message' => 'Đặt hàng thành công!', 
+                'success' => true,
+                'message' => 'Đặt hàng thành công!',
                 'data'    => $donHang
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Lỗi hệ thống: ' . $e->getMessage()
             ], 500);
         }
@@ -100,12 +99,27 @@ class OrderController extends Controller
     {
         try {
             $orders = DonHang::with([
-                'trangThai',                
-                'chiTiet'   
+                'trangThai',
+                'chiTiet.SanPham.AnhSP'
             ])
-            ->where('IdUser', $userId)
-            ->orderBy('IdDH', 'desc')       
-            ->get();
+                ->where('IdUser', $userId)
+                ->orderBy('IdDH', 'desc')
+                ->get();
+            foreach ($orders as $order) {
+                foreach ($order->chiTiet as $detail) {
+                    $sp = $detail->SanPham;
+
+                    if ($sp) {
+                        $firstImage = $sp->AnhSP->first();
+                        if ($firstImage && $firstImage->HinhAnh) {
+                            $sp->Anh = 'data:image/jpeg;base64,' . base64_encode($firstImage->HinhAnh);
+                        } else {
+                            $sp->Anh = null;
+                        }
+                        unset($sp->AnhSP);
+                    }
+                }
+            }
             return response()->json($orders);
         } catch (\Exception $e) {
             return response()->json([

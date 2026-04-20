@@ -33,7 +33,7 @@ function AdminOrders() {
       await fetch(`http://localhost:8000/api/admin/orders/${id}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: parseInt(status) })
+        body: JSON.stringify({ status: parseInt(status) }),
       });
       fetchOrders(); // Load lại danh sách sau khi cập nhật thành công
     } catch (err) {
@@ -46,7 +46,7 @@ function AdminOrders() {
     if (!window.confirm("Bạn có chắc chắn muốn xóa đơn hàng này?")) return;
     try {
       await fetch(`http://localhost:8000/api/admin/orders/${id}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
       fetchOrders();
     } catch (err) {
@@ -54,8 +54,7 @@ function AdminOrders() {
     }
   };
 
-  const formatMoney = (money) =>
-    Number(money || 0).toLocaleString() + " đ";
+  const formatMoney = (money) => Number(money || 0).toLocaleString() + " đ";
 
   // ================= UI =================
   return (
@@ -81,7 +80,10 @@ function AdminOrders() {
           </div>
         ) : orders.length === 0 ? (
           <div className="empty-state">
-            <i className="bi bi-inbox" style={{ fontSize: "3rem", color: "#a3aed0" }}></i>
+            <i
+              className="bi bi-inbox"
+              style={{ fontSize: "3rem", color: "#a3aed0" }}
+            ></i>
             <p>Hiện chưa có đơn hàng nào.</p>
           </div>
         ) : (
@@ -93,14 +95,18 @@ function AdminOrders() {
                 <th>Sản phẩm</th>
                 <th>Tổng tiền</th>
                 <th>Trạng thái</th>
-                <th style={{ width: "120px", textAlign: "center" }}>HÀNH ĐỘNG</th>
+                <th style={{ width: "120px", textAlign: "center" }}>
+                  HÀNH ĐỘNG
+                </th>
               </tr>
             </thead>
 
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id}>
-                  <td><strong>#{order.id}</strong></td>
+                  <td>
+                    <strong>#{order.id}</strong>
+                  </td>
                   <td>{order.customer}</td>
                   <td className="product-cell">{order.products}</td>
                   <td className="money">{formatMoney(order.total)}</td>
