@@ -81,7 +81,7 @@ function ProductManagement() {
             });
             const data = await res.json();
             if (data.success) {
-                alert("Thêm thành công 🎉");
+                alert("Thêm thành công");
                 fetchData();
                 resetForm();
             }
@@ -104,7 +104,7 @@ function ProductManagement() {
             });
             const data = await res.json();
             if (data.success) {
-                alert("Cập nhật thành công ✨");
+                alert("Cập nhật thành công");
                 fetchData();
                 resetForm();
             }
