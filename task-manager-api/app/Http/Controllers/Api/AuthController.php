@@ -163,7 +163,6 @@ class AuthController extends Controller
                     "phone" => $user->DienThoai,
                 ]
             ], 200);
-
         } catch (\Exception $e) {
 
             return response()->json([
@@ -172,5 +171,4 @@ class AuthController extends Controller
             ], 500);
         }
     }
-
 }

@@ -5,7 +5,6 @@ function Footer() {
     <footer className="bg-white border-top py-4 mt-auto">
       <div className="container">
         <div className="row text-center text-md-start">
-          {/* Cột trái: Chiếm 12 cột trên mobile, 6 cột trên PC */}
           <div className="col-12 col-md-6 mb-3 mb-md-0">
             <p className="mb-1">
               <strong>Địa chỉ:</strong> CS2 - Học Viện Hàng không Việt Nam

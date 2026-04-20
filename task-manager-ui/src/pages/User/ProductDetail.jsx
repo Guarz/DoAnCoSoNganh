@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link, useOutletContext, useNavigate } from "react-router-dom"; // Thêm useNavigate
+import {
+  useParams,
+  Link,
+  useOutletContext,
+  useNavigate,
+} from "react-router-dom"; // Thêm useNavigate
 import axios from "axios";
-import '../../style/productDetail.css';
-
+import "../../style/productDetail.css";
 
 const UserProductDetail = () => {
   const { id } = useParams();
@@ -30,10 +34,10 @@ const UserProductDetail = () => {
     const userStr = localStorage.getItem("user");
     const token = localStorage.getItem("token");
 
-    if (!userStr ) {
+    if (!userStr) {
       alert("Vui lòng đăng nhập để thực hiện chức năng này!");
-      navigate("/login"); 
-      return; 
+      navigate("/login");
+      return;
     }
 
     const userObj = JSON.parse(userStr);
@@ -43,16 +47,18 @@ const UserProductDetail = () => {
       await axios.post(
         "http://127.0.0.1:8000/api/cart/add",
         {
-          IdUser: userObj.id, 
-          IdSP: product.IdSP,     
-          SoLuong: qtyToAdd       
+          IdUser: userObj.id,
+          IdSP: product.IdSP,
+          SoLuong: qtyToAdd,
         },
         {
-          headers: { Authorization: `Bearer ${token}` } 
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       let cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const existingItemIndex = cart.findIndex((item) => item.IdSP === product.IdSP);
+      const existingItemIndex = cart.findIndex(
+        (item) => item.IdSP === product.IdSP
+      );
       if (existingItemIndex !== -1) {
         cart[existingItemIndex].quantity += qtyToAdd;
       } else {
@@ -69,28 +75,31 @@ const UserProductDetail = () => {
       setCart(cart);
       setShowPopup(true);
       setTimeout(() => setShowPopup(false), 3000);
-
     } catch (error) {
       console.error("Lỗi khi thêm vào giỏ hàng DB:", error);
       alert("Đã xảy ra lỗi khi lưu vào cơ sở dữ liệu. Vui lòng thử lại!");
     }
   };
 
-  if (loading) return <div className="text-center mt-5 text-pink">Đang tải chi tiết...</div>;
-  if (!product) return <div className="text-center mt-5">Sản phẩm không tồn tại.</div>;
+  if (loading)
+    return (
+      <div className="text-center mt-5 text-pink">Đang tải chi tiết...</div>
+    );
+  if (!product)
+    return <div className="text-center mt-5">Sản phẩm không tồn tại.</div>;
 
   let imageSrc = "https://via.placeholder.com/500";
-let imgData = product.HinhAnh;
-if (Array.isArray(imgData) && imgData.length > 0) {
-  imgData = imgData[0]; 
-}
-if (imgData && typeof imgData === "string") {
-  imageSrc = imgData.startsWith("data:image")
-    ? imgData
-    : `data:image/jpeg;base64,${imgData}`;
-} else if (imgData) {
-  console.warn("Dữ liệu ảnh không hợp lệ:", imgData);
-}
+  let imgData = product.HinhAnh;
+  if (Array.isArray(imgData) && imgData.length > 0) {
+    imgData = imgData[0];
+  }
+  if (imgData && typeof imgData === "string") {
+    imageSrc = imgData.startsWith("data:image")
+      ? imgData
+      : `data:image/jpeg;base64,${imgData}`;
+  } else if (imgData) {
+    console.warn("Dữ liệu ảnh không hợp lệ:", imgData);
+  }
 
   return (
     <div className="container mt-5 pb-5 position-relative">
@@ -110,7 +119,11 @@ if (imgData && typeof imgData === "string") {
       <div className="row g-5">
         <div className="col-md-6">
           <div className="detail-img-wrapper shadow-sm">
-            <img src={imageSrc} className="img-fluid rounded-4" alt={product.TenSP} />
+            <img
+              src={imageSrc}
+              className="img-fluid rounded-4"
+              alt={product.TenSP}
+            />
           </div>
         </div>
 
@@ -131,17 +144,33 @@ if (imgData && typeof imgData === "string") {
           <div className="d-flex align-items-center mb-4 gap-3">
             <span className="fw-bold text-muted">Số lượng:</span>
             <div className="quantity-control-wrapper">
-              <button className="btn-qty" type="button" onClick={() => setQuantity((q) => (q > 1 ? q - 1 : 1))}>
+              <button
+                className="btn-qty"
+                type="button"
+                onClick={() => setQuantity((q) => (q > 1 ? q - 1 : 1))}
+              >
                 <i className="bi bi-dash-lg"></i>
               </button>
-              <input type="number" className="input-qty" value={quantity} readOnly />
-              <button className="btn-qty" type="button" onClick={() => setQuantity((q) => q + 1)}>
+              <input
+                type="number"
+                className="input-qty"
+                value={quantity}
+                readOnly
+              />
+              <button
+                className="btn-qty"
+                type="button"
+                onClick={() => setQuantity((q) => q + 1)}
+              >
                 <i className="bi bi-plus-lg"></i>
               </button>
             </div>
           </div>
 
-          <button onClick={handleAddToCart} className="btn btn-add-main w-100 py-3">
+          <button
+            onClick={handleAddToCart}
+            className="btn btn-add-main w-100 py-3"
+          >
             <i className="bi bi-cart-plus me-2"></i> THÊM VÀO GIỎ HÀNG
           </button>
         </div>

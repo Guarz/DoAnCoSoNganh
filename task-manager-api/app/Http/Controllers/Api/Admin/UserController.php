@@ -24,7 +24,6 @@ class UserController extends Controller
                 ->get();
 
             return response()->json($user);
-
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,
@@ -73,7 +72,6 @@ class UserController extends Controller
                 "message" => "Thêm user thành công",
                 "id" => $id
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,
@@ -128,7 +126,6 @@ class UserController extends Controller
                 "success" => true,
                 "message" => "Cập nhật thành công"
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,
@@ -162,14 +159,12 @@ class UserController extends Controller
                 "success" => true,
                 "message" => "Xóa thành công"
             ]);
-
         } catch (\Illuminate\Database\QueryException $e) {
             // Lỗi ràng buộc khóa ngoại
             return response()->json([
                 "success" => false,
                 "message" => "User có dữ liệu liên quan, không thể xóa"
             ], 400);
-
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,

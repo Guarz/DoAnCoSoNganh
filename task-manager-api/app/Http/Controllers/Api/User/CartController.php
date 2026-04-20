@@ -16,12 +16,12 @@ class CartController extends Controller
         $gioHang = GioHang::firstOrCreate(['IdUser' => $idUser]);
 
         $listItems = ChiTietGioHang::where('IdGH', $gioHang->IdGH)
-            ->with(['SanPham.AnhSP']) 
+            ->with(['SanPham.AnhSP'])
             ->get();
 
         $items = $listItems->map(function ($ct) {
             $sp = $ct->SanPham;
-            $firstImage = $sp->AnhSP->first(); 
+            $firstImage = $sp->AnhSP->first();
 
             return [
                 'IdSP'    => $sp->IdSP,
@@ -38,30 +38,30 @@ class CartController extends Controller
             'products' => $items
         ]);
     }
-public function updateQty(Request $request)
-{
-    $request->validate([
-        'IdUser' => 'required',
-        'IdSP' => 'required',
-        'SoLuong' => 'required|integer|min:1'
-    ]);
+    public function updateQty(Request $request)
+    {
+        $request->validate([
+            'IdUser' => 'required',
+            'IdSP' => 'required',
+            'SoLuong' => 'required|integer|min:1'
+        ]);
 
-    $gioHang = GioHang::where('IdUser', $request->IdUser)->first();
+        $gioHang = GioHang::where('IdUser', $request->IdUser)->first();
 
-    if (!$gioHang) {
-        return response()->json(['success' => false, 'message' => 'Giỏ hàng không tồn tại'], 404);
+        if (!$gioHang) {
+            return response()->json(['success' => false, 'message' => 'Giỏ hàng không tồn tại'], 404);
+        }
+        $updated = DB::table('ChiTietGioHang')
+            ->where('IdGH', $gioHang->IdGH)
+            ->where('IdSP', $request->IdSP)
+            ->update(['SoLuong' => $request->SoLuong]);
+
+        if ($updated) {
+            return response()->json(['success' => true, 'message' => 'Đã cập nhật số lượng']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Không tìm thấy sản phẩm trong giỏ'], 404);
     }
-    $updated = DB::table('ChiTietGioHang')
-        ->where('IdGH', $gioHang->IdGH)
-        ->where('IdSP', $request->IdSP)
-        ->update(['SoLuong' => $request->SoLuong]);
-
-    if ($updated) {
-        return response()->json(['success' => true, 'message' => 'Đã cập nhật số lượng']);
-    }
-
-    return response()->json(['success' => false, 'message' => 'Không tìm thấy sản phẩm trong giỏ'], 404);
-}
     /** Thêm sản phẩm vào giỏ */
     public function addToCart(Request $request)
     {
@@ -71,7 +71,7 @@ public function updateQty(Request $request)
             'SoLuong' => 'required|integer|min:1'
         ]);
 
-        
+
         $product = SanPham::find($request->IdSP);
         if (!$product) {
             return response()->json(['success' => false, 'message' => 'Sản phẩm không tồn tại!'], 404);
@@ -84,13 +84,13 @@ public function updateQty(Request $request)
             ->first();
 
         if ($chiTiet) {
-            
+
             DB::table('ChiTietGioHang')
                 ->where('IdGH', $gioHang->IdGH)
                 ->where('IdSP', $request->IdSP)
                 ->update(['SoLuong' => $chiTiet->SoLuong + $request->SoLuong]);
         } else {
-            
+
             ChiTietGioHang::create([
                 'IdGH' => $gioHang->IdGH,
                 'IdSP' => $request->IdSP,
@@ -117,7 +117,7 @@ public function updateQty(Request $request)
     {
         $request->validate([
             'IdUser' => 'required',
-            'listIdSP' => 'required|array', 
+            'listIdSP' => 'required|array',
         ]);
         $gioHang = GioHang::where('IdUser', $request->IdUser)->first();
         if (!$gioHang) {

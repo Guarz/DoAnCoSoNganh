@@ -92,7 +92,9 @@ const Register = () => {
                 />
               </div>
               <div className="col-md-6 mb-4">
-                <label className="form-label fw-bold small">Xác nhận mật khẩu</label>
+                <label className="form-label fw-bold small">
+                  Xác nhận mật khẩu
+                </label>
                 <input
                   type="password"
                   padding="10px"
