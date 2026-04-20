@@ -20,6 +20,7 @@
     display: flex;
     align-items: center;
     gap: 15px;
+    height: 40px;
 }
 
 .header-right {
@@ -29,29 +30,23 @@
 }
 
 .user-title {
-    margin: 0 !important; /* Quan trọng: Ép margin về 0 để không lệch với nút */
+    margin: 0 !important;
     font-size: 22px;
     color: #2b3674;
     display: flex;
     align-items: center;
     gap: 8px;
-    line-height: 1; /* Thêm dòng này để căn giữa chữ chuẩn hơn */
-}
-.header-left {
-    display: flex;
-    align-items: center; 
-    gap: 15px;
-    height: 40px; /* Thêm một chiều cao cố định hoặc để fit-content */
+    line-height: 1;
 }
 
 .back-btn {
     background: #f1f4f9;
     color: #2b3674;
-    height: 40px; /* Cho nút cao bằng với vùng chứa chữ */
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0; /* Đảm bảo không có margin bên dưới */
+    margin: 0;
 }
 
 /* ================= BUTTON ================= */
@@ -68,17 +63,11 @@
     transition: 0.25s;
 }
 
-/* Back */
-.back-btn {
-    background: #f1f4f9;
-    color: #2b3674;
-}
-
-.back-btn:hover {
+.back-btn:hover,
+.reload-btn:hover {
     background: #e2e8f0;
 }
 
-/* Add user */
 .add-btn-main {
     background: #4318ff;
     color: white;
@@ -88,16 +77,6 @@
     background: #2f0fd6;
 }
 
-/* Reload */
-.reload-btn {
-    background: #f1f4f9;
-}
-
-.reload-btn:hover {
-    background: #e2e8f0;
-}
-
-/* Confirm */
 .btn-update {
     background: #22c55e;
     color: white;
@@ -107,7 +86,6 @@
     background: #16a34a;
 }
 
-/* Cancel */
 .btn-cancel {
     background: #ef4444;
     color: white;
@@ -162,69 +140,71 @@
     display: flex;
     gap: 10px;
     justify-content: flex-end;
-    /* 👉 FIX NÚT ĐẸP */
 }
 
-/* ================= TABLE ================= */
+/* ================= TABLE (🔥 FIX CHUẨN ADMINORDERS) ================= */
 .table-card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
+    background: #fff;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0px 18px 40px rgba(112, 144, 176, 0.12);
 }
 
 .admin-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed;
 }
 
-/* Header */
-.admin-table thead th {
-    background: #fbc2d4;
-    padding: 12px;
-    text-align: center;
+/* HEADER */
+.admin-table th {
+    color: #000;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #f1f4f9;
 }
 
-/* Body */
+/* BODY */
 .admin-table td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #f1f4f9;
+    color: #2b3674;
+    font-size: 14px;
 }
 
-/* Đảm bảo cột Hành Động đủ rộng để chứa 2 nút ngang nhau */
+/* HOVER */
+.admin-table tbody tr:hover {
+    background-color: #f8f9ff;
+}
+
+/* CỘT ACTION */
 .admin-table th:last-child,
 .admin-table td:last-child {
-    width: 120px; /* Tăng độ rộng lên một chút */
-    min-width: 110px;
-    white-space: nowrap; /* Ngăn chặn tuyệt đối việc rớt dòng */
+    text-align: center;
+    width: 120px;
 }
 
 /* ================= ACTION ================= */
-.action-column {
-    text-align: center;
-}
-
 .action-btns {
     display: flex !important;
-    flex-direction: row !important; /* Ép buộc nằm theo hàng ngang */
     justify-content: center;
     align-items: center;
-    gap: 10px; /* Khoảng cách giữa nút Sửa và Xóa */
-    width: 100%;
+    gap: 10px;
 }
 
 /* ICON BUTTON */
 .btn-icon {
-    width: 32px;  /* Giảm nhẹ kích thước để vừa vặn hơn */
-    height: 32px;
-    flex-shrink: 0; /* Không cho phép nút bị co lại */
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
     border: none;
-    border-radius: 8px;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     transition: 0.2s;
 }
 
@@ -234,14 +214,20 @@
     color: #4318ff;
 }
 
-/* Delete */
-.btn-icon.delete {
-    background: #fff5f5;
-    color: #ef4444;
+.btn-icon.edit:hover {
+    background: #4318ff;
+    color: white;
 }
 
-.btn-icon:hover {
-    transform: translateY(-2px);
+/* Delete */
+.btn-icon.delete {
+    background: #feeef3;
+    color: #ee5d50;
+}
+
+.btn-icon.delete:hover {
+    background: #ee5d50;
+    color: white;
 }
 
 /* ================= BADGE ================= */
