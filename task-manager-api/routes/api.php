@@ -33,12 +33,10 @@ Route::put('/user/update/{id}', [AuthController::class, 'updateProfile']);
 */
 
 Route::prefix('admin')->group(function () {
-    Route::get('/top-products', [DashboardController::class, 'topProducts']);
-
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/revenue-chart', [DashboardController::class, 'revenueChart']);
-
+    Route::get('/top-products', [DashboardController::class, 'topProducts']);
     // Categories
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::post('/categories', [CategoryController::class, 'store']);

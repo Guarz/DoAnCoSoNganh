@@ -151,7 +151,7 @@ function AdminDashboard() {
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" />
 
-              {/* ✅ FIX: chỉ giữ 1 YAxis */}
+              {/* chỉ giữ 1 YAxis */}
               <YAxis
                 tickFormatter={(v) => v.toLocaleString("vi-VN")}
                 width={100}
@@ -165,7 +165,7 @@ function AdminDashboard() {
 
               <Bar
                 dataKey="revenue"
-                fill="#4318FF"   // 🔥 GIỮ NGUYÊN MÀU
+                fill="#4318FF"   
                 radius={[6, 6, 0, 0]}
                 barSize={45}
                 onClick={(data) => handleBarClick(data)}
@@ -186,7 +186,7 @@ function StatBox({ iconClass, label, value, onClick, color }) {
       <div
         className="stat-icon-wrapper"
         style={{
-          backgroundColor: color + "15", // 🔥 giữ màu
+          backgroundColor: color + "15", 
           color: color,
         }}
       >
