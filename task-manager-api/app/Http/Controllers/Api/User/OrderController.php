@@ -101,11 +101,26 @@ class OrderController extends Controller
         try {
             $orders = DonHang::with([
                 'trangThai',                
-                'chiTiet'   
+                'chiTiet.SanPham.AnhSP'   
             ])
             ->where('IdUser', $userId)
             ->orderBy('IdDH', 'desc')       
             ->get();
+            foreach ($orders as $order) {
+                foreach ($order->chiTiet as $detail) {
+                    $sp = $detail->SanPham;
+                    
+                    if ($sp) {
+                        $firstImage = $sp->AnhSP->first();
+                        if ($firstImage && $firstImage->HinhAnh) {
+                            $sp->Anh = 'data:image/jpeg;base64,' . base64_encode($firstImage->HinhAnh);
+                        } else {
+                            $sp->Anh = null;
+                        }
+                        unset($sp->AnhSP);
+                    }
+                }
+            }
             return response()->json($orders);
         } catch (\Exception $e) {
             return response()->json([

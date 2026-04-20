@@ -31,6 +31,28 @@ const OrderCard = () => {
   const handleToggleDetail = (id) => {
     setExpandedOrderId(expandedOrderId === id ? null : id);
   };
+  const getCorrectImageSrc = (base64String) => {
+    if (!base64String) return "https://via.placeholder.com/300x400?text=No+Image";
+    return base64String.startsWith('data:image') 
+      ? base64String 
+      : `data:image/jpeg;base64,${base64String}`;
+  };
+  const getStatusStyle = (statusName) => {
+    if (!statusName) {
+      return { css: "bg-light text-primary border border-primary", icon: "bi-info-circle" };
+    }
+    const name = statusName.trim().toLowerCase();
+    if (name.includes("chờ xác nhận")) {
+      return { css: "bg-warning text-dark border-0", icon: "bi-hourglass-split" }; 
+    }
+    if (name.includes("đang giao hàng")) {
+      return { css: "bg-primary text-white border-0", icon: "bi-truck" }; 
+    }
+    if (name.includes("đã giao hàng")) {
+      return { css: "bg-success text-white border-0", icon: "bi-check-circle" }; 
+    }
+    return { css: "bg-light text-primary border border-primary", icon: "bi-info-circle" };
+  };
 
   if (loading)
     return (
@@ -79,7 +101,10 @@ const OrderCard = () => {
           </div>
         </div>
       ) : (
-        orders.map((order) => (
+        orders.map((order) => {
+          const statusInfo = getStatusStyle(order.trang_thai?.TenTrangThai);
+
+          return (
           <div
             key={order.IdDH}
             className="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden order-item-card"
@@ -100,10 +125,10 @@ const OrderCard = () => {
                 </small>
               </div>
               <div className="d-flex align-items-center">
-                <span className="badge rounded-pill bg-light text-primary border border-primary px-3 py-2 me-3">
-                  <i className="bi bi-info-circle me-1"></i>
-                  {order.trang_thai?.TenTrangThai || "Đang xử lý"}
-                </span>
+                <span className={`badge rounded-pill px-3 py-2 me-3 shadow-sm ${statusInfo.css}`}>
+                    <i className={`bi ${statusInfo.icon} me-1`}></i>
+                    {order.trang_thai?.TenTrangThai || "Đang xử lý"}
+                  </span>
                 <i
                   className={`bi bi-chevron-down transition-icon ${
                     expandedOrderId === order.IdDH ? "rotate-180" : ""
@@ -120,25 +145,22 @@ const OrderCard = () => {
             >
               <div className="card-body border-top bg-light-subtle px-4">
                 {order.chi_tiet?.map((detail, index) => {
-                  const sp = detail.san_pham;
-                  const anhBase64 = sp?.anh_s_p?.[0]?.HinhAnh;
-
+                const sp = detail.san_pham || detail.SanPham || {};
+                const tenSP = sp.TenSP || "Sản phẩm đã bị xóa";
+                const anhBase64 = sp.HinhAnh || sp.Anh;
                   return (
                     <div
                       key={index}
                       className="row align-items-center py-3 border-bottom-dashed"
                     >
                       <div className="col-auto">
-                        <img
-                          src={
-                            anhBase64
-                              ? `data:image/jpeg;base64,${anhBase64}`
-                              : "https://via.placeholder.com/70"
-                          }
-                          alt={sp?.TenSP}
-                          className="rounded-3 shadow-sm object-fit-cover"
-                          style={{ width: "70px", height: "70px" }}
-                        />
+                        <img 
+                              src={getCorrectImageSrc(anhBase64)} 
+                              alt={tenSP}
+                              className="rounded-3 shadow-sm object-fit-cover"
+                              style={{ width: "70px", height: "70px" }}
+                              onError={(e) => { e.target.src = "https://placehold.co/70x70?text=Error"; }}
+                          />
                       </div>
                       <div className="col">
                         <h6 className="mb-0 fw-bold">
@@ -178,7 +200,7 @@ const OrderCard = () => {
               </span>
             </div>
           </div>
-        ))
+        );})
       )}
     </div>
   );
