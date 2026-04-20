@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash; // 🔥 thêm dòng này
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -29,8 +29,6 @@ class AuthController extends Controller
                 "message" => "Email không tồn tại"
             ], 404);
         }
-
-        // 🔥 SỬA Ở ĐÂY
         if (!Hash::check($request->password, $user->Password)) {
             return response()->json([
                 "success" => false,
@@ -73,8 +71,6 @@ class AuthController extends Controller
                 "message" => "Admin không tồn tại"
             ], 404);
         }
-
-        // 🔥 SỬA Ở ĐÂY
         if (!Hash::check($request->password, $admin->Password)) {
             return response()->json([
                 "success" => false,
