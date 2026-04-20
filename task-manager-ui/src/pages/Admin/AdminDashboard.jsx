@@ -106,8 +106,19 @@ function AdminDashboard() {
                         <BarChart data={chartData}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                             <XAxis dataKey="name" />
-                            <YAxis tickFormatter={(v) => v.toLocaleString()} />
-                            <Tooltip formatter={(v) => v.toLocaleString() + " đ"} />
+                            <YAxis 
+    tickFormatter={(v) => v.toLocaleString()} 
+    width={100} // 🔥 Thêm độ rộng để không bị cắt số
+/>{/* Trục Y: Hiển thị kèm chữ đ */}
+<YAxis 
+    tickFormatter={(v) => `${v.toLocaleString()} đ`} 
+    width={100} 
+/>
+
+{/* Tooltip: Hiển thị đẹp hơn khi di chuột vào */}
+<Tooltip 
+    formatter={(v) => [new Intl.NumberFormat('vi-VN').format(v) + " đ", "Doanh thu"]} 
+/>
 
                             {/* 🔥 GẮN CLICK Ở ĐÂY */}
                             <Bar

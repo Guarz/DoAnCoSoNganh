@@ -273,9 +273,8 @@ function UserManagement() {
                                 <td>{user.name}</td>
                                 <td>{user.email}</td>
 
-                                {/* Tìm đến đoạn này trong file của bạn và thay thế */}
 <td className="action-column">
-    {/* PHẢI CÓ THẺ DIV NÀY THÌ CSS .action-btns MỚI CÓ TÁC DỤNG */}
+  
     <div className="action-btns">
         <button
             className="btn-icon edit"
