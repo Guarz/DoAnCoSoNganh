@@ -24,6 +24,7 @@ class UserController extends Controller
                 ->get();
 
             return response()->json($user);
+
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,
@@ -38,14 +39,14 @@ class UserController extends Controller
     public function store(Request $request)
     {
         try {
-            // Validate
+            //  VALIDATE
             $request->validate([
                 "name" => "required|string|max:255",
                 "email" => "required|email",
                 "password" => "required|min:6"
             ]);
 
-            // Check email trùng
+            //  CHECK EMAIL TRÙNG
             $exists = DB::table("user")
                 ->where("Email", $request->email)
                 ->exists();
@@ -57,14 +58,13 @@ class UserController extends Controller
                 ], 400);
             }
 
-            // Insert
+            //  INSERT
             $id = DB::table("user")->insertGetId([
                 "Ten" => $request->name,
                 "Email" => $request->email,
                 "Password" => bcrypt($request->password),
-                "DiaChi" => $request->address ?? "",
-                "DienThoai" => $request->phone ?? "",
-                "TrangThai" => 1
+                "DiaChi" => "",
+                "DienThoai" => ""
             ]);
 
             return response()->json([
@@ -72,6 +72,7 @@ class UserController extends Controller
                 "message" => "Thêm user thành công",
                 "id" => $id
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,
@@ -81,17 +82,18 @@ class UserController extends Controller
     }
 
     // =============================
-    // CẬP NHẬT USER
+    // CẬP NHẬT USER (có password)
     // =============================
     public function update(Request $request, $id)
     {
         try {
+            //  VALIDATE
             $request->validate([
                 "name" => "required|string|max:255",
                 "email" => "required|email"
             ]);
 
-            // Check tồn tại
+            //  CHECK USER TỒN TẠI
             $user = DB::table("user")->where("IdUser", $id)->first();
 
             if (!$user) {
@@ -101,7 +103,7 @@ class UserController extends Controller
                 ], 404);
             }
 
-            // Check email trùng (trừ chính nó)
+            //  CHECK EMAIL TRÙNG (trừ chính nó)
             $exists = DB::table("user")
                 ->where("Email", $request->email)
                 ->where("IdUser", "!=", $id)
@@ -114,18 +116,26 @@ class UserController extends Controller
                 ], 400);
             }
 
-            // Update
+            //  DATA UPDATE
+            $data = [
+                "Ten" => $request->name,
+                "Email" => $request->email
+            ];
+
+            //  NẾU CÓ NHẬP PASSWORD → UPDATE
+            if ($request->password) {
+                $data["Password"] = bcrypt($request->password);
+            }
+
             DB::table("user")
                 ->where("IdUser", $id)
-                ->update([
-                    "Ten" => $request->name,
-                    "Email" => $request->email
-                ]);
+                ->update($data);
 
             return response()->json([
                 "success" => true,
                 "message" => "Cập nhật thành công"
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,
@@ -140,7 +150,6 @@ class UserController extends Controller
     public function destroy($id)
     {
         try {
-            // Check tồn tại
             $user = DB::table("user")->where("IdUser", $id)->first();
 
             if (!$user) {
@@ -150,7 +159,6 @@ class UserController extends Controller
                 ], 404);
             }
 
-            // Xoá
             DB::table("user")
                 ->where("IdUser", $id)
                 ->delete();
@@ -159,12 +167,13 @@ class UserController extends Controller
                 "success" => true,
                 "message" => "Xóa thành công"
             ]);
+
         } catch (\Illuminate\Database\QueryException $e) {
-            // Lỗi ràng buộc khóa ngoại
             return response()->json([
                 "success" => false,
                 "message" => "User có dữ liệu liên quan, không thể xóa"
             ], 400);
+
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,

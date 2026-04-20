@@ -103,8 +103,6 @@ class ProductAdminController extends Controller
                     "message" => "Không tìm thấy"
                 ], 404);
             }
-
-            // 🔥 FIX QUAN TRỌNG
             if (!$request->name || !$request->price || !$request->categoryId) {
                 return response()->json([
                     "success" => false,
@@ -164,7 +162,7 @@ class ProductAdminController extends Controller
                 ], 404);
             }
 
-            // 🔥 FIX FK
+            // FIX FK
             DB::table("anhsp")->where("IdSP", $id)->delete();
 
             DB::table("sanpham")->where("IdSP", $id)->delete();

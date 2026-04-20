@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../../style/userManagement.css";
 
 function UserManagement() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,17 +19,14 @@ function UserManagement() {
   const [editingUser, setEditingUser] = useState(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   // ================= FETCH USERS =================
   const fetchUsers = async () => {
     try {
       setLoading(true);
-
       const res = await axios.get("http://127.0.0.1:8000/api/admin/users");
-
-      // 🔥 FIX: đảm bảo luôn là array
       const data = Array.isArray(res.data) ? res.data : res.data.data;
-
       setUsers(data || []);
     } catch (err) {
       console.log(err);
@@ -40,31 +38,39 @@ function UserManagement() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [location.pathname]);
 
   // ================= ADD USER =================
   const addUser = async () => {
     if (!newName || !newEmail || !newPassword)
       return alert("Vui lòng nhập đủ thông tin");
+    if (newPassword.length < 6) {
+      return alert("Mật khẩu phải từ 6 ký tự trở lên");
+    }
 
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/admin/users", {
+      const res = await axios.post(
+        "http://127.0.0.1:8000/api/admin/users",
+        {
+          name: newName,
+          email: newEmail,
+          password: newPassword,
+        }
+      );
+      const newUser = {
+        id: res.data.id,
         name: newName,
         email: newEmail,
-        password: newPassword,
-      });
+      };
 
-      console.log("ADD RESPONSE:", res.data);
+      setUsers((prev) => [newUser, ...prev]);
 
-      alert("Thêm thành công 🎉");
-
-      await fetchUsers(); // 🔥 reload data
+      alert("Thêm thành công");
 
       setShowAdd(false);
       setNewName("");
       setNewEmail("");
       setNewPassword("");
-      setSearch(""); // 🔥 reset search
     } catch (err) {
       alert(err.response?.data?.message || "Thêm thất bại");
     }
@@ -76,9 +82,7 @@ function UserManagement() {
 
     try {
       await axios.delete(`http://127.0.0.1:8000/api/admin/users/${id}`);
-
       setUsers((prev) => prev.filter((u) => u.id !== id));
-
       alert("Xoá thành công");
     } catch (err) {
       alert("Xoá thất bại");
@@ -90,6 +94,7 @@ function UserManagement() {
     setEditingUser(user.id);
     setName(user.name);
     setEmail(user.email);
+    setPassword(""); //  reset password
     setShowAdd(false);
 
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -98,13 +103,19 @@ function UserManagement() {
   // ================= UPDATE =================
   const updateUser = async () => {
     try {
-      await axios.put(`http://127.0.0.1:8000/api/admin/users/${editingUser}`, {
-        name,
-        email,
-      });
+      await axios.put(
+        `http://127.0.0.1:8000/api/admin/users/${editingUser}`,
+        {
+          name,
+          email,
+          password: password || null, // gửi password nếu có
+        }
+      );
 
       setUsers((prev) =>
-        prev.map((u) => (u.id === editingUser ? { ...u, name, email } : u))
+        prev.map((u) =>
+          u.id === editingUser ? { ...u, name, email } : u
+        )
       );
 
       alert("Cập nhật thành công");
@@ -112,8 +123,9 @@ function UserManagement() {
       setEditingUser(null);
       setName("");
       setEmail("");
+      setPassword("");
     } catch (err) {
-      alert("Lỗi: " + err.message);
+      alert(err.response?.data?.message || "Lỗi update");
     }
   };
 
@@ -216,15 +228,18 @@ function UserManagement() {
               }
             />
 
-            {!editingUser && (
-              <input
-                className="edit-input"
-                type="password"
-                placeholder="Mật khẩu"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-            )}
+            {/* LUÔN HIỆN PASSWORD */}
+            <input
+              className="edit-input"
+              type="password"
+              placeholder="Mật khẩu (để trống nếu không đổi)"
+              value={editingUser ? password : newPassword}
+              onChange={(e) =>
+                editingUser
+                  ? setPassword(e.target.value)
+                  : setNewPassword(e.target.value)
+              }
+            />
           </div>
 
           <div className="edit-actions">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash; // 🔥 thêm dòng này
 use App\Models\User;
 
 class AuthController extends Controller
@@ -29,7 +30,8 @@ class AuthController extends Controller
             ], 404);
         }
 
-        if ($request->password !== $user->Password) {
+        // 🔥 SỬA Ở ĐÂY
+        if (!Hash::check($request->password, $user->Password)) {
             return response()->json([
                 "success" => false,
                 "message" => "Mật khẩu không đúng"
@@ -72,7 +74,8 @@ class AuthController extends Controller
             ], 404);
         }
 
-        if ($request->password !== $admin->Password) {
+        // 🔥 SỬA Ở ĐÂY
+        if (!Hash::check($request->password, $admin->Password)) {
             return response()->json([
                 "success" => false,
                 "message" => "Mật khẩu admin không đúng"
@@ -106,7 +109,7 @@ class AuthController extends Controller
         $user = User::create([
             "Ten" => $request->ten,
             "Email" => $request->email,
-            "Password" => $request->password,
+            "Password" => Hash::make($request->password), // 🔥 SỬA LUÔN
         ]);
 
         return response()->json([

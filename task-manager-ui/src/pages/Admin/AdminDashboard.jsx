@@ -78,12 +78,13 @@ function AdminDashboard() {
     navigate(`/admin/revenue?month=${data.month}`);
   };
 
-  if (loading)
+  if (loading) {
     return (
       <div className="dashboard-loading">
         <div className="spinner"></div>
       </div>
     );
+  }
 
   return (
     <div className="admin-dashboard">
@@ -93,6 +94,7 @@ function AdminDashboard() {
             <i className="bi bi-speedometer2 title-icon"></i> HỆ THỐNG QUẢN TRỊ
           </h2>
         </div>
+
         <button className="logout-btn" onClick={handleLogout}>
           <i className="bi bi-box-arrow-right"></i> <span>Đăng xuất</span>
         </button>
@@ -106,6 +108,7 @@ function AdminDashboard() {
           color="#4318FF"
           onClick={() => navigate("/admin/products")}
         />
+
         <StatBox
           iconClass="bi bi-tags"
           label="Danh mục"
@@ -113,6 +116,7 @@ function AdminDashboard() {
           color="#6AD2FF"
           onClick={() => navigate("/admin/categories")}
         />
+
         <StatBox
           iconClass="bi bi-cart-check"
           label="Đơn hàng"
@@ -120,6 +124,7 @@ function AdminDashboard() {
           color="#FF4081"
           onClick={() => navigate("/admin/orders")}
         />
+
         <StatBox
           iconClass="bi bi-people"
           label="Người dùng"
@@ -127,6 +132,7 @@ function AdminDashboard() {
           color="#1B2559"
           onClick={() => navigate("/admin/user")}
         />
+
         <StatBox
           iconClass="bi bi-cash-stack"
           label="Doanh thu"
@@ -144,24 +150,26 @@ function AdminDashboard() {
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" />
-              <YAxis tickFormatter={(v) => v.toLocaleString()} width={100} />
+
+              {/* ✅ FIX: chỉ giữ 1 YAxis */}
               <YAxis
-                tickFormatter={(v) => `${v.toLocaleString()} đ`}
+                tickFormatter={(v) => v.toLocaleString("vi-VN")}
                 width={100}
               />
+
               <Tooltip
-                formatter={(v) => [
-                  new Intl.NumberFormat("vi-VN").format(v) + " đ",
-                  "Doanh thu",
-                ]}
+                formatter={(v) =>
+                  new Intl.NumberFormat("vi-VN").format(v) + " đ"
+                }
               />
+
               <Bar
                 dataKey="revenue"
-                fill="#4318FF"
+                fill="#4318FF"   // 🔥 GIỮ NGUYÊN MÀU
                 radius={[6, 6, 0, 0]}
                 barSize={45}
                 onClick={(data) => handleBarClick(data)}
-                style={{ cursor: "pointer" }}
+                className="bar-hover"
               />
             </BarChart>
           </ResponsiveContainer>
@@ -171,15 +179,20 @@ function AdminDashboard() {
   );
 }
 
+/* ===== STAT BOX ===== */
 function StatBox({ iconClass, label, value, onClick, color }) {
   return (
     <div className="stat-card" onClick={onClick}>
       <div
         className="stat-icon-wrapper"
-        style={{ backgroundColor: `${color}15`, color: color }}
+        style={{
+          backgroundColor: color + "15", // 🔥 giữ màu
+          color: color,
+        }}
       >
         <i className={iconClass}></i>
       </div>
+
       <div className="stat-content">
         <span className="stat-label">{label}</span>
         <h3 className="stat-value">
