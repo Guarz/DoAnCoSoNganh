@@ -79,7 +79,7 @@ function AdminHome() {
         </div>
       </div>
 
-      {/* KHU VỰC BIỂU ĐỒ - FIX LỖI CHIỀU CAO (image_6157dd.jpg) */}
+    
       <div style={chartContainerStyle}>
         <h3 style={{ marginBottom: "20px", fontSize: "18px" }}>📈 Biểu đồ tăng trưởng đơn hàng</h3>
 
