@@ -273,21 +273,25 @@ function UserManagement() {
                                 <td>{user.name}</td>
                                 <td>{user.email}</td>
 
-                                <td className="action-column">
-                                    <button
-                                        className="btn-icon edit"
-                                        onClick={() => startEdit(user)}
-                                    >
-                                        <i className="bi bi-pencil-square"></i>
-                                    </button>
+                                {/* Tìm đến đoạn này trong file của bạn và thay thế */}
+<td className="action-column">
+    {/* PHẢI CÓ THẺ DIV NÀY THÌ CSS .action-btns MỚI CÓ TÁC DỤNG */}
+    <div className="action-btns">
+        <button
+            className="btn-icon edit"
+            onClick={() => startEdit(user)}
+        >
+            <i className="bi bi-pencil-square"></i>
+        </button>
 
-                                    <button
-                                        className="btn-icon delete"
-                                        onClick={() => deleteUser(user.id)}
-                                    >
-                                        <i className="bi bi-trash3"></i>
-                                    </button>
-                                </td>
+        <button
+            className="btn-icon delete"
+            onClick={() => deleteUser(user.id)}
+        >
+            <i className="bi bi-trash3"></i>
+        </button>
+    </div>
+</td>
                             </tr>
                         ))}
                     </tbody>

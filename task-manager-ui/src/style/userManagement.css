@@ -29,12 +29,29 @@
 }
 
 .user-title {
-    margin: 0;
+    margin: 0 !important; /* Quan trọng: Ép margin về 0 để không lệch với nút */
     font-size: 22px;
     color: #2b3674;
     display: flex;
     align-items: center;
     gap: 8px;
+    line-height: 1; /* Thêm dòng này để căn giữa chữ chuẩn hơn */
+}
+.header-left {
+    display: flex;
+    align-items: center; 
+    gap: 15px;
+    height: 40px; /* Thêm một chiều cao cố định hoặc để fit-content */
+}
+
+.back-btn {
+    background: #f1f4f9;
+    color: #2b3674;
+    height: 40px; /* Cho nút cao bằng với vùng chứa chữ */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0; /* Đảm bảo không có margin bên dưới */
 }
 
 /* ================= BUTTON ================= */
@@ -175,10 +192,12 @@
     border-bottom: 1px solid #eee;
 }
 
-/* FIX CỘT KHÔNG LỆCH */
-.admin-table th,
-.admin-table td {
-    box-sizing: border-box;
+/* Đảm bảo cột Hành Động đủ rộng để chứa 2 nút ngang nhau */
+.admin-table th:last-child,
+.admin-table td:last-child {
+    width: 120px; /* Tăng độ rộng lên một chút */
+    min-width: 110px;
+    white-space: nowrap; /* Ngăn chặn tuyệt đối việc rớt dòng */
 }
 
 /* ================= ACTION ================= */
@@ -187,16 +206,19 @@
 }
 
 .action-btns {
-    display: flex;
+    display: flex !important;
+    flex-direction: row !important; /* Ép buộc nằm theo hàng ngang */
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 10px; /* Khoảng cách giữa nút Sửa và Xóa */
+    width: 100%;
 }
 
 /* ICON BUTTON */
 .btn-icon {
-    width: 36px;
-    height: 36px;
+    width: 32px;  /* Giảm nhẹ kích thước để vừa vặn hơn */
+    height: 32px;
+    flex-shrink: 0; /* Không cho phép nút bị co lại */
     border: none;
     border-radius: 8px;
     display: flex;
